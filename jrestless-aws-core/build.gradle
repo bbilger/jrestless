@@ -1,0 +1,33 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+apply plugin: 'checkstyle'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+group = 'com.jrestless.aws'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile (
+		'com.amazonaws:aws-lambda-java-core:1.1.0'
+	)
+}
+
+checkstyle {
+	configFile = '../alien/checkstyle/checkstyle.xml' as File
+	toolVersion = '6.19'
+	ignoreFailures = false
+	sourceSets = [project.sourceSets.main]
+}
+
+build.dependsOn checkstyleMain
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.14'
+}
