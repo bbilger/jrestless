@@ -1,0 +1,8 @@
+group = 'com.jrestless.aws'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+	compile(
+		'com.amazonaws:aws-lambda-java-core:1.1.0'
+	)
+}

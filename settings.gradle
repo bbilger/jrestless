@@ -1,0 +1,2 @@
+include "test:jrestless-test", 'aws:jrestless-aws-core'
+rootProject.name = 'jrestless'

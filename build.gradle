@@ -1,0 +1,60 @@
+def checkstyleCfg = "${projectDir}/alien/checkstyle/checkstyle.xml" as File
+
+allprojects {
+
+	apply plugin: 'java'
+
+	sourceCompatibility = 1.8
+	targetCompatibility = 1.8
+}
+
+subprojects {
+
+	apply plugin: 'java'
+	apply plugin: 'eclipse'
+	apply plugin: 'maven'
+	apply plugin: 'checkstyle'
+	apply plugin: 'findbugs'
+	apply plugin: 'pmd'
+	apply plugin: 'jacoco'
+
+	repositories {
+		mavenCentral()
+	}
+
+	checkstyle {
+		configFile = checkstyleCfg
+		toolVersion = '6.19'
+		ignoreFailures = false
+		sourceSets = [project.sourceSets.main]
+	}
+	build.dependsOn checkstyleMain
+
+	findbugs {
+		toolVersion = '3.0.1'
+		sourceSets = [project.sourceSets.main]
+		effort = 'max'
+	}
+	tasks.withType(FindBugs) {
+		reports {
+			xml.enabled = false
+			html.enabled = true
+		}
+	}
+
+	pmd {
+		toolVersion = '5.4.2'
+		sourceSets = [project.sourceSets.main]
+	}
+
+	test { finalizedBy jacocoTestReport }
+}
+
+dependencies {
+	compile project(":aws:jrestless-aws-core")
+	compile project(":test:jrestless-test")
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.14'
+}
