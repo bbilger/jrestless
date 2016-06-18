@@ -1,5 +1,7 @@
 # JRestless
 [![Build Status](https://travis-ci.org/bbilger/jrestless.svg?branch=master)](https://travis-ci.org/bbilger/jrestless)
+[![codecov](https://codecov.io/gh/bbilger/jrestless/branch/master/graph/badge.svg)](https://codecov.io/gh/bbilger/jrestless)
+[![License](http://img.shields.io/badge/license-APACHE2-blue.svg)]($3)
 
 JRestless allows you to create serverless applications using JAX-RS.
 
