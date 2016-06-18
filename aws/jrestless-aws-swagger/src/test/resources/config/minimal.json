@@ -1,0 +1,5 @@
+{
+	// min config
+	"lambdaUri": "arn:aws:apigateway:YOURREGION:lambda:path/2015-03-31/functions/arn:aws:lambda:YOURREGION:YOURID:function:YOURFUNCTION/invocations",
+	"lambdaCredential": "arn:aws:iam::YOURID:role/YOURINVOCATIONROLE"
+}

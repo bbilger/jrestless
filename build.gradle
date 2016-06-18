@@ -57,6 +57,7 @@ subprojects {
 }
 
 dependencies {
+	compile project(":aws:jrestless-aws-swagger")
 	compile project(":aws:jrestless-aws-core")
 	compile project(":test:jrestless-test")
 }
