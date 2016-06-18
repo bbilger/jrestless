@@ -1,12 +1,16 @@
 # JRestless
 [![Build Status](https://travis-ci.org/bbilger/jrestless.svg?branch=master)](https://travis-ci.org/bbilger/jrestless)
 [![codecov](https://codecov.io/gh/bbilger/jrestless/branch/master/graph/badge.svg)](https://codecov.io/gh/bbilger/jrestless)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/bbilger/jrestless/blob/master/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/bbilger/jrestless.svg)](https://github.com/bbilger/jrestless/issues)
+[![License](https://img.shields.io/github/license/bbilger/jrestless.svg)](https://github.com/bbilger/jrestless/blob/master/LICENSE)
+[![Twitter](https://img.shields.io/twitter/url/https/github.com/bbilger/jrestless.svg?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=%5Bobject%20Object%5D)
 
 JRestless allows you to create serverless applications using JAX-RS.
 
-It provides a generic jersey container that handles requests.
+It provides a generic Jersey container that handles requests.
 
 On top of it there's an integration layer for each serverless service. At the moment only AWS Lambda is supported since neither Azure functions nor Google Cloud functions support Java.
 
 In addition the whole API Gateway configuration gets generated at compile time from your JAX-RS resources.
+
+The framework decouples your code from any serverless service and API Gateway specifics.
