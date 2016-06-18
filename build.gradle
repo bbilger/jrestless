@@ -47,7 +47,13 @@ subprojects {
 		sourceSets = [project.sourceSets.main]
 	}
 
-	test { finalizedBy jacocoTestReport }
+	jacocoTestReport {
+		reports {
+			xml.enabled = true
+			html.enabled = true
+		}
+	}
+	check.dependsOn jacocoTestReport
 }
 
 dependencies {
