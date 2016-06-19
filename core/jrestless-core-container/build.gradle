@@ -1,0 +1,19 @@
+group = 'com.jrestless.core'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+	compile(
+		'org.glassfish.jersey.containers:project:2.23',
+		'org.slf4j:slf4j-api:1.7.21',
+		'com.google.code.findbugs:jsr305:3.0.1'
+	)
+	
+	testCompile project(":test:jrestless-test")
+	testCompile (
+		'junit:junit:4.12',
+		'org.mockito:mockito-core:1.10.19',
+		'org.powermock:powermock-module-junit4:1.6.5',
+		'org.powermock:powermock-api-mockito:1.6.5',
+		'org.slf4j:slf4j-simple:1.7.21'
+	)
+}

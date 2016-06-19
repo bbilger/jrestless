@@ -1,0 +1,120 @@
+package com.jrestless.core.container;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
+
+import org.glassfish.jersey.server.ContainerResponse;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.jrestless.core.container.JRestlessHandlerContainer.JRestlessContainerResponse;
+import com.jrestless.core.container.JRestlessHandlerContainer.JRestlessContainerResponseWriter;
+import com.jrestless.core.container.io.JRestlessResponseWriter;
+
+public class JRestlessContainerResponseWriterTest {
+
+	private JRestlessContainerResponseWriter containerResponseWriter;
+	private JRestlessContainerResponse response;
+
+	@Before
+	public void setup() {
+		JRestlessResponseWriter responseWriter = mock(JRestlessResponseWriter.class);
+		when(responseWriter.getEntityOutputStream()).thenReturn(new ByteArrayOutputStream());
+		response = spy(new JRestlessContainerResponse(responseWriter));
+		containerResponseWriter = new JRestlessContainerResponseWriter(response);
+	}
+
+	@Test
+	public void commit_ResponseNotYetClosed_ShouldCloseResponse() {
+		containerResponseWriter.commit();
+		verify(response, times(1)).close();
+	}
+
+	@Test
+	public void writeResponseStatusAndHeaders_ContextHeaderAndStatusGiven_ShouldUpdateResponseStatusAndHeaders() {
+		MultivaluedMap<String, String> actualHeaders = new MultivaluedHashMap<>();
+		actualHeaders.add("header0", "value0_0");
+		actualHeaders.add("header0", "value0_1");
+		actualHeaders.add("header1", "value1_0");
+		MultivaluedMap<String, String> expectedHeaders = new MultivaluedHashMap<>();
+		expectedHeaders.add("header0", "value0_0");
+		expectedHeaders.add("header0", "value0_1");
+		expectedHeaders.add("header1", "value1_0");
+
+		ContainerResponse context = mock(ContainerResponse.class);
+		when(context.getStatusInfo()).thenReturn(Status.CONFLICT);
+		when(context.getStringHeaders()).thenReturn(actualHeaders);
+
+		containerResponseWriter.writeResponseStatusAndHeaders(-1, context);
+
+		assertEquals(Status.CONFLICT, response.getStatusType());
+		assertEquals(expectedHeaders, response.getHeaders());
+	}
+
+	@Test
+	public void writeResponseStatusAndHeaders_ShouldReturnEntityOutputStreamOfResponse() {
+		ContainerResponse context = mock(ContainerResponse.class);
+		when(context.getStringHeaders()).thenReturn(new MultivaluedHashMap<>());
+		when(context.getStatusInfo()).thenReturn(Status.OK);
+		OutputStream entityOutputStream = containerResponseWriter.writeResponseStatusAndHeaders(-1, context);
+		assertSame(response.getEntityOutputStream(), entityOutputStream);
+	}
+
+	@Test
+	public void failure_ResponseNotYetCommitted_ShouldSetInternalServerErrorStatusOnFail() {
+		ContainerResponse context = mock(ContainerResponse.class);
+		when(context.getStatusInfo()).thenReturn(Status.OK);
+		when(context.getStringHeaders()).thenReturn(new MultivaluedHashMap<>());
+		containerResponseWriter.writeResponseStatusAndHeaders(-1, context);
+		containerResponseWriter.failure(new RuntimeException());
+		assertEquals(Status.INTERNAL_SERVER_ERROR, response.getStatusType());
+	}
+
+	@Test
+	public void failure_ResponseNotYetCommitted_ShouldCommitOnFailure() {
+		containerResponseWriter = spy(containerResponseWriter);
+		containerResponseWriter.failure(new RuntimeException());
+		verify(containerResponseWriter, times(1)).commit();
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void failure_ResponseNotYetCommitted_ShouldRethrowOnCommitFailure() {
+		containerResponseWriter = spy(containerResponseWriter);
+		containerResponseWriter.failure(new RuntimeException());
+		doThrow(CommitException.class).when(containerResponseWriter).commit();
+		containerResponseWriter.failure(new RuntimeException());
+	}
+
+	@Test
+	public void enableResponseBuffering_Always_ShouldBeDisabled() {
+		assertFalse(containerResponseWriter.enableResponseBuffering());
+	}
+
+	@Test(expected = UnsupportedOperationException.class)
+	public void setSuspendTimeout_Always_ShouldBeUnsupported() {
+		containerResponseWriter.setSuspendTimeout(1, null);
+	}
+
+	@Test(expected = UnsupportedOperationException.class)
+	public void suspend_Always_ShouldBeUnsupported() {
+		containerResponseWriter.suspend(1, null, null);
+	}
+
+	@SuppressWarnings("serial")
+	private static class CommitException extends RuntimeException {
+	}
+}
