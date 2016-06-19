@@ -34,7 +34,7 @@ public class ContainerRequestContextPropertyFactoryTest {
 		ContainerRequestContext requestContext = mock(ContainerRequestContext.class);
 		SomeObject property = mock(SomeObject.class);
 		when(requestContext.getProperty("propertyName")).thenReturn(property);
-		assertSame(property, new ContainerRequestContextPropertyFactoryImpl(requestContext).provide());
+		assertSame(property, new ContainerRequestContextPropertyFactoryImpl(requestContext, "propertyName").provide());
 		verify(requestContext, times(1)).getProperty("propertyName");
 		verifyNoMoreInteractions(requestContext);
 		verifyZeroInteractions(property);
@@ -44,20 +44,15 @@ public class ContainerRequestContextPropertyFactoryTest {
 	public void dispose_ShouldDoNothing() {
 		ContainerRequestContext requestContext = mock(ContainerRequestContext.class);
 		SomeObject property = mock(SomeObject.class);
-		new ContainerRequestContextPropertyFactoryImpl(requestContext).dispose(property);
+		new ContainerRequestContextPropertyFactoryImpl(requestContext, "propertyName").dispose(property);
 		verifyZeroInteractions(property);
 		verifyZeroInteractions(requestContext);
 	}
 
 	private static class ContainerRequestContextPropertyFactoryImpl extends ContainerRequestContextPropertyFactory<SomeObject> {
 
-		public ContainerRequestContextPropertyFactoryImpl(ContainerRequestContext context) {
-			super(context);
-		}
-
-		@Override
-		protected String getPropertyName() {
-			return "propertyName";
+		public ContainerRequestContextPropertyFactoryImpl(ContainerRequestContext context, String propertyName) {
+			super(context, propertyName);
 		}
 	}
 

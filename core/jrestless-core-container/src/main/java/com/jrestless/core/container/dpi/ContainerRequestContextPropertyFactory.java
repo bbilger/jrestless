@@ -31,17 +31,17 @@ import org.glassfish.hk2.api.Factory;
 public abstract class ContainerRequestContextPropertyFactory<T> implements Factory<T> {
 
 	private final ContainerRequestContext requestContext;
+	private final String propertyName;
 
-	public ContainerRequestContextPropertyFactory(ContainerRequestContext context) {
+	public ContainerRequestContextPropertyFactory(ContainerRequestContext context, String propertyName) {
 		this.requestContext = context;
+		this.propertyName = propertyName;
 	}
-	// FIXME no need to be abstract
-	protected abstract String getPropertyName();
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public T provide() {
-		return (T) requestContext.getProperty(getPropertyName());
+		return (T) requestContext.getProperty(propertyName);
 	}
 
 	@Override
