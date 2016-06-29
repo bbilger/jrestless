@@ -1,2 +1,2 @@
-include "test:jrestless-test", 'aws:jrestless-aws-core', 'aws:jrestless-aws-swagger', 'core:jrestless-core-container'
+include "test:jrestless-test", 'aws:jrestless-aws-core', 'aws:jrestless-aws-swagger', 'core:jrestless-core-container', 'aws:jrestless-aws-handler'
 rootProject.name = 'jrestless'

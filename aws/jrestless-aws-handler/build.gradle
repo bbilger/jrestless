@@ -1,0 +1,21 @@
+group = 'com.jrestless.aws'
+version = '0.0.1'
+
+dependencies {
+	compile project(':aws:jrestless-aws-core')
+	compile project(':core:jrestless-core-container')
+	compile (
+		'org.apache.commons:commons-lang3:3.4'
+	)
+	testCompile project(':test:jrestless-test')
+	testCompile (
+		'junit:junit:4.12',
+		'org.mockito:mockito-core:1.10.19',
+		'org.slf4j:slf4j-simple:1.7.21',
+		'org.glassfish.jersey.media:jersey-media-json-jackson:2.23.1'
+	)
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.14'
+}
