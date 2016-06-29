@@ -60,21 +60,21 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.jrestless.core.container.dpi.InstanceBinder;
-import com.jrestless.core.container.io.JRestlessRequestContext;
+import com.jrestless.core.container.io.JRestlessContainerRequest;
 import com.jrestless.core.container.io.JRestlessResponseWriter;
 import com.jrestless.test.AbstractTestRequest;
 
 public class JRestlessHandlerContainerInt {
 
 	private ArticleService testService;
-	private JRestlessHandlerContainer<JRestlessRequestContext> container;
+	private JRestlessHandlerContainer<JRestlessContainerRequest> container;
 
 	@Before
 	public void setup() {
 		testService = mock(ArticleService.class);
 		Binder binder = new InstanceBinder.Builder().addInstance(testService, ArticleService.class).build();
 
-		container = new JRestlessHandlerContainer<JRestlessRequestContext>(
+		container = new JRestlessHandlerContainer<JRestlessContainerRequest>(
 				new ResourceConfig().register(TestResource.class).register(binder).register(RolesAllowedDynamicFeature.class));
 		container.onStartup();
 	}

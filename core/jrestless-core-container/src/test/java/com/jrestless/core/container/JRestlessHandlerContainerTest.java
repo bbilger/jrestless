@@ -46,19 +46,19 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import com.jrestless.core.container.io.JRestlessRequestContext;
+import com.jrestless.core.container.io.JRestlessContainerRequest;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ApplicationHandler.class)
 public class JRestlessHandlerContainerTest {
 
 	private ApplicationHandler appHandler;
-	private JRestlessHandlerContainer<JRestlessRequestContext> container;
+	private JRestlessHandlerContainer<JRestlessContainerRequest> container;
 
 	@Before
 	public void setup() {
 		appHandler = PowerMockito.mock(ApplicationHandler.class);
-		container = spy(new JRestlessHandlerContainer<JRestlessRequestContext>(appHandler));
+		container = spy(new JRestlessHandlerContainer<JRestlessContainerRequest>(appHandler));
 	}
 
 	@Test
@@ -138,7 +138,7 @@ public class JRestlessHandlerContainerTest {
 
 	@Test(expected = NullPointerException.class)
 	public void constructor_NoAppHandlerGiven_ShouldThrowNpe() {
-		new JRestlessHandlerContainer<JRestlessRequestContext>((ApplicationHandler) null);
+		new JRestlessHandlerContainer<JRestlessContainerRequest>((ApplicationHandler) null);
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -163,35 +163,35 @@ public class JRestlessHandlerContainerTest {
 
 	@Test(expected = NullPointerException.class)
 	public void createContainerRequest_NoRequestBaseUriGiven_ShouldThrowNpe() {
-		JRestlessRequestContext request = createAnyRequest();
+		JRestlessContainerRequest request = createAnyRequest();
 		when(request.getBaseUri()).thenReturn(null);
 		container.createContainerRequest(request, mock(ContainerResponseWriter.class), mock(SecurityContext.class));
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void createContainerRequest_NoRequestRequestUriGiven_ShouldThrowNpe() {
-		JRestlessRequestContext request = createAnyRequest();
+		JRestlessContainerRequest request = createAnyRequest();
 		when(request.getRequestUri()).thenReturn(null);
 		container.createContainerRequest(request, mock(ContainerResponseWriter.class), mock(SecurityContext.class));
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void createContainerRequest_NoRequestHttpMethodGiven_ShouldThrowNpe() {
-		JRestlessRequestContext request = createAnyRequest();
+		JRestlessContainerRequest request = createAnyRequest();
 		when(request.getHttpMethod()).thenReturn(null);
 		container.createContainerRequest(request, mock(ContainerResponseWriter.class), mock(SecurityContext.class));
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void createContainerRequest_NoRequestEntityStreamGiven_ShouldThrowNpe() {
-		JRestlessRequestContext request = createAnyRequest();
+		JRestlessContainerRequest request = createAnyRequest();
 		when(request.getEntityStream()).thenReturn(null);
 		container.createContainerRequest(request, mock(ContainerResponseWriter.class), mock(SecurityContext.class));
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void createContainerRequest_NoRequestHeadersGiven_ShouldThrowNpe() {
-		JRestlessRequestContext request = createAnyRequest();
+		JRestlessContainerRequest request = createAnyRequest();
 		when(request.getHeaders()).thenReturn(null);
 		container.createContainerRequest(request, mock(ContainerResponseWriter.class), mock(SecurityContext.class));
 	}
@@ -206,7 +206,7 @@ public class JRestlessHandlerContainerTest {
 		headers.add("hk0", "hv0_0");
 		headers.add("hk0", "hv0_1");
 		headers.add("hk1", "hv1_0");
-		JRestlessRequestContext request = createRequest(baseUri, requestUri, httpMethod, entityStream, headers);
+		JRestlessContainerRequest request = createRequest(baseUri, requestUri, httpMethod, entityStream, headers);
 
 		ContainerResponseWriter containerResponseWriter = mock(ContainerResponseWriter.class);
 		SecurityContext securityContext = mock(SecurityContext.class);
@@ -222,16 +222,16 @@ public class JRestlessHandlerContainerTest {
 		assertSame(securityContext, containerRequest.getSecurityContext());
 	}
 
-	private JRestlessRequestContext createAnyRequest() {
+	private JRestlessContainerRequest createAnyRequest() {
 		return createRequest("/", "/entity", "GET", new ByteArrayInputStream(new byte[0]), new MultivaluedHashMap<>());
 	}
 
-	private JRestlessRequestContext createRequest(String baseUri, String requestUri, String httpMethod, InputStream entityStream, MultivaluedMap<String, String> headers) {
+	private JRestlessContainerRequest createRequest(String baseUri, String requestUri, String httpMethod, InputStream entityStream, MultivaluedMap<String, String> headers) {
 		return createRequest(URI.create(baseUri), URI.create(requestUri), httpMethod, entityStream, headers);
 	}
 
-	private JRestlessRequestContext createRequest(URI baseUri, URI requestUri, String httpMethod, InputStream entityStream, MultivaluedMap<String, String> headers) {
-		JRestlessRequestContext request = mock(JRestlessRequestContext.class);
+	private JRestlessContainerRequest createRequest(URI baseUri, URI requestUri, String httpMethod, InputStream entityStream, MultivaluedMap<String, String> headers) {
+		JRestlessContainerRequest request = mock(JRestlessContainerRequest.class);
 		when(request.getBaseUri()).thenReturn(baseUri);
 		when(request.getRequestUri()).thenReturn(requestUri);
 		when(request.getHttpMethod()).thenReturn(httpMethod);

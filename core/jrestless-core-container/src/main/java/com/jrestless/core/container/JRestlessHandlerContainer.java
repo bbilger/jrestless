@@ -47,7 +47,7 @@ import org.glassfish.jersey.server.spi.ContainerResponseWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jrestless.core.container.io.JRestlessRequestContext;
+import com.jrestless.core.container.io.JRestlessContainerRequest;
 import com.jrestless.core.container.io.JRestlessResponseWriter;
 
 
@@ -55,12 +55,12 @@ import com.jrestless.core.container.io.JRestlessResponseWriter;
  * Jersey container for any kind of serverless requests.
  * <p>
  * An implementation of {@link Container} that allows handling
- * serverless requests ({@link #handleRequest(JRestlessRequestContext, JRestlessResponseWriter, SecurityContext)}).
+ * serverless requests ({@link #handleRequest(JRestlessContainerRequest, JRestlessResponseWriter, SecurityContext)}).
  *
  * @author Bjoern Bilger
  *
  */
-public class JRestlessHandlerContainer<RequestT extends JRestlessRequestContext> implements Container {
+public class JRestlessHandlerContainer<RequestT extends JRestlessContainerRequest> implements Container {
 
 	private static final Logger LOG = LoggerFactory.getLogger(JRestlessHandlerContainer.class);
 
@@ -100,7 +100,7 @@ public class JRestlessHandlerContainer<RequestT extends JRestlessRequestContext>
 
 	/**
 	 * Shortcut for
-	 * {@link #handleRequest(JRestlessRequestContext, JRestlessResponseWriter, SecurityContext, Consumer)}
+	 * {@link #handleRequest(JRestlessContainerRequest, JRestlessResponseWriter, SecurityContext, Consumer)}
 	 * with noop containerRequestEnhancer.
 	 *
 	 * @param request

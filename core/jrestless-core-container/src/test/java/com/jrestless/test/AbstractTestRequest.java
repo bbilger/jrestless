@@ -21,9 +21,9 @@ import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
-import com.jrestless.core.container.io.JRestlessRequestContext;
+import com.jrestless.core.container.io.JRestlessContainerRequest;
 
-public abstract class AbstractTestRequest implements JRestlessRequestContext {
+public abstract class AbstractTestRequest implements JRestlessContainerRequest {
 
 	private final URI baseUri;
 	private final URI requestUri;

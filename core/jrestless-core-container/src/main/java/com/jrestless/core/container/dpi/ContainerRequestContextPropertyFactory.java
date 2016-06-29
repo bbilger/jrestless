@@ -15,6 +15,8 @@
  */
 package com.jrestless.core.container.dpi;
 
+import java.util.Objects;
+
 import javax.ws.rs.container.ContainerRequestContext;
 
 import org.glassfish.hk2.api.Factory;
@@ -34,6 +36,8 @@ public abstract class ContainerRequestContextPropertyFactory<T> implements Facto
 	private final String propertyName;
 
 	public ContainerRequestContextPropertyFactory(ContainerRequestContext context, String propertyName) {
+		Objects.requireNonNull(context);
+		Objects.requireNonNull(propertyName);
 		this.requestContext = context;
 		this.propertyName = propertyName;
 	}

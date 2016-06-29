@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
  * @author Bjoern Bilger
  *
  */
-public interface JRestlessRequestContext {
+public interface JRestlessContainerRequest {
 
 	/**
 	 *
