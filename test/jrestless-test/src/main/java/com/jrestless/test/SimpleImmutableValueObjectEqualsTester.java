@@ -60,23 +60,12 @@ public class SimpleImmutableValueObjectEqualsTester {
 
 		AccessibleRunner.run(constructor, () -> {
 			EqualsTester tester = new EqualsTester();
-			boolean first = true;
 			for (List<Argument> args : arguments.getCartesianProduct()) {
 				try {
 					Object[] invokeArgs = args.stream().map(a -> a.getValue()).toArray();
 					Object o1 = constructor.newInstance(invokeArgs);
-					if (first) {
-						/*
-						 * Make sure we don't check for object identity, only.
-						 * We, however, do this in the first case, only, to
-						 * avoid too many computations.
-						 */
-						Object o2 = constructor.newInstance(invokeArgs);
-						tester.addEqualityGroup(o1, o2);
-					} else {
-						tester.addEqualityGroup(o1);
-					}
-					first = false;
+					Object o2 = constructor.newInstance(invokeArgs);
+					tester.addEqualityGroup(o1, o2);
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException e) {
 					throw new RuntimeException(e);
