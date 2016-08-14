@@ -61,6 +61,7 @@ dependencies {
 	compile project(":aws:jrestless-aws-core")
 	compile project(":aws:jrestless-aws-handler")
 	compile project(":test:jrestless-test")
+	compile project(":aws:example:jrestless-aws-example-simple")
 }
 
 task wrapper(type: Wrapper) {
