@@ -51,12 +51,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.jrestless.aws.annotation.Cors;
-import com.jrestless.aws.annotation.StatusCodes;
 import com.jrestless.aws.swagger.models.ApiGatewayAuth;
 import com.jrestless.aws.swagger.models.ApiGatewayIntegrationExtension;
 import com.jrestless.aws.swagger.models.AwsSwaggerConfiguration;
 import com.jrestless.aws.swagger.models.AwsSwaggerConfiguration.AuthType;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import io.swagger.models.Operation;
 import io.swagger.models.Path;
 import io.swagger.models.Response;
@@ -140,51 +142,87 @@ public class AwsSwaggerEnhancerTest {
 	}
 
 	@Test
-	public void addAdditionalResponses_ResponsesMissingAndClassResponsesGiven_ShouldAddThem() throws NoSuchMethodException, SecurityException {
+	public void addAdditionalResponses_NoResponsesAndNoDefaultConfiguredGiven_ShouldAddDefault() throws NoSuchMethodException, SecurityException {
 		Operation op = new Operation();
 		op.setResponses(new HashMap<>());
-		Method meth = ResponseCodesOnClass.class.getMethod("method");
+		Method meth = SampleResource.class.getMethod("method");
 		OperationContext oc = new OperationContext(op, meth, new Swagger());
 		enhancer.addAdditionalResponses(oc);
-		assertEquals(ImmutableSet.of("0", "1", "2"), op.getResponses().keySet());
+		assertEquals(ImmutableSet.of("400", "401", "500", "403", "404", "415", "405", "406"), op.getResponses().keySet());
 	}
 
 	@Test
-	public void addAdditionalResponses_ResponsesMissingAndMethodResponsesGiven_ShouldAddThem() throws NoSuchMethodException, SecurityException {
+	public void addAdditionalResponses_NoAdditionalResponsesAndNoDefaultConfiguredGiven_ShouldAddDefault() throws NoSuchMethodException, SecurityException {
+		addAdditionalResponses_NoResponsesAndNoDefaultConfiguredGiven_ShouldAddDefault();
+	}
+
+	@Test
+	public void addAdditionalResponses_AdditionalResponsesAndNoDefaultConfiguredGiven_ShouldNotAddDefault() throws NoSuchMethodException, SecurityException {
 		Operation op = new Operation();
 		op.setResponses(new HashMap<>());
-		Method meth = ResponseCodesOnClass.class.getMethod("method1");
+		Method meth = SampleResource.class.getMethod("method1");
 		OperationContext oc = new OperationContext(op, meth, new Swagger());
 		enhancer.addAdditionalResponses(oc);
-		assertEquals(ImmutableSet.of("3", "4", "5"), op.getResponses().keySet());
+		assertEquals(ImmutableSet.of(), op.getResponses().keySet());
 	}
 
 	@Test
-	public void addAdditionalResponses_ResponsesPrtiallyMissingAndClassResponsesGiven_ShouldAddThem() throws NoSuchMethodException, SecurityException {
+	public void addAdditionalResponses_DefaultResponseAndNoAdditionalResponsesAndNoDefaultConfiguredGiven_ShouldNotOverwriteDefaultResponse() throws NoSuchMethodException, SecurityException {
 		Operation op = new Operation();
-		Response resp = new Response();
-		Map<String, Response> resps = new HashMap<>();
-		resps.put("1", resp);
-		op.setResponses(resps);
-		Method meth = ResponseCodesOnClass.class.getMethod("method");
+		Map<String, Response> responses = new HashMap<>();
+		Response defaultResponse = new Response();
+		responses.put("400", defaultResponse);
+		op.setResponses(responses);
+		Method meth = SampleResource.class.getMethod("method");
 		OperationContext oc = new OperationContext(op, meth, new Swagger());
 		enhancer.addAdditionalResponses(oc);
-		assertEquals(ImmutableSet.of("0", "1", "2"), op.getResponses().keySet());
-		assertSame(resp, op.getResponses().get("1"));
+		assertEquals(ImmutableSet.of("400", "401", "500", "403", "404", "415", "405", "406"), op.getResponses().keySet());
+		assertSame(defaultResponse, responses.get("400"));
 	}
 
 	@Test
-	public void addAdditionalResponses_ResponsesPrtiallyMissingAndMethResponsesGiven_ShouldAddThem() throws NoSuchMethodException, SecurityException {
+	public void addAdditionalResponses_NoResponsesAndDefaultConfiguredGiven_ShouldAddConfigured() throws NoSuchMethodException, SecurityException {
 		Operation op = new Operation();
-		Response resp = new Response();
-		Map<String, Response> resps = new HashMap<>();
-		resps.put("3", resp);
-		op.setResponses(resps);
-		Method meth = ResponseCodesOnClass.class.getMethod("method1");
+		op.setResponses(new HashMap<>());
+		when(configuration.isSetAdditionalResponseCodes()).thenReturn(true);
+		when(configuration.getAdditionalResponseCodes()).thenReturn(new int[] { 123 });
+		Method meth = SampleResource.class.getMethod("method");
 		OperationContext oc = new OperationContext(op, meth, new Swagger());
 		enhancer.addAdditionalResponses(oc);
-		assertEquals(ImmutableSet.of("3", "4", "5"), op.getResponses().keySet());
-		assertSame(resp, op.getResponses().get("3"));
+		assertEquals(ImmutableSet.of("123"), op.getResponses().keySet());
+	}
+
+	@Test
+	public void addAdditionalResponses_NoAdditionalResponsesAndDefaultConfiguredGiven_ShouldAddConfigured() throws NoSuchMethodException, SecurityException {
+		addAdditionalResponses_NoResponsesAndDefaultConfiguredGiven_ShouldAddConfigured();
+	}
+
+	@Test
+	public void addAdditionalResponses_AdditionalResponsesAndDefaultConfiguredGiven_ShouldAddConfigured() throws NoSuchMethodException, SecurityException {
+		Operation op = new Operation();
+		op.setResponses(new HashMap<>());
+		when(configuration.isSetAdditionalResponseCodes()).thenReturn(true);
+		when(configuration.getAdditionalResponseCodes()).thenReturn(new int[] { 123 });
+		Method meth = SampleResource.class.getMethod("method1");
+		OperationContext oc = new OperationContext(op, meth, new Swagger());
+		enhancer.addAdditionalResponses(oc);
+		assertEquals(ImmutableSet.of(), op.getResponses().keySet());
+	}
+
+	@Test
+	public void addAdditionalResponses_DefaultResponseAndNoAdditionalResponsesAndDefaultConfiguredGiven_ShouldNotOverwriteDefaultResponse() throws NoSuchMethodException, SecurityException {
+		Operation op = new Operation();
+		Map<String, Response> responses = new HashMap<>();
+		Response defaultResponse = new Response();
+		responses.put("123", defaultResponse);
+		op.setResponses(responses);
+		when(configuration.isSetAdditionalResponseCodes()).thenReturn(true);
+		when(configuration.getAdditionalResponseCodes()).thenReturn(new int[] { 123 });
+		Method meth = SampleResource.class.getMethod("method");
+		OperationContext oc = new OperationContext(op, meth, new Swagger());
+		enhancer.addAdditionalResponses(oc);
+		assertEquals(ImmutableSet.of("123"), op.getResponses().keySet());
+		assertSame(defaultResponse, responses.get("123"));
 	}
 
 	@Test
@@ -257,9 +295,9 @@ public class AwsSwaggerEnhancerTest {
 	public void getMethodsAllowingCors_OneMethodAllowsCors_ShouldReturnEnabledMethod() throws NoSuchMethodException, SecurityException {
 		Path path = new Path();
 		Operation getOperation = new Operation();
-		Method getMethod = ResponseCodesOnClass.class.getMethod("method");
+		Method getMethod = SampleResource.class.getMethod("method");
 		Operation postOperation = new Operation();
-		Method postMethod = ResponseCodesOnClass.class.getMethod("method1");
+		Method postMethod = SampleResource.class.getMethod("method1");
 		Function<Operation, Method> operationMethodMapper = (o) -> {
 			// identity check
 			if (o == getOperation) {
@@ -279,9 +317,9 @@ public class AwsSwaggerEnhancerTest {
 	public void getMethodsAllowingCors_AllMethodsAllowCors_ShouldReturnAllMethods() throws NoSuchMethodException, SecurityException {
 		Path path = new Path();
 		Operation getOperation = new Operation();
-		Method getMethod = ResponseCodesOnClass.class.getMethod("method");
+		Method getMethod = SampleResource.class.getMethod("method");
 		Operation postOperation = new Operation();
-		Method postMethod = ResponseCodesOnClass.class.getMethod("method1");
+		Method postMethod = SampleResource.class.getMethod("method1");
 		Function<Operation, Method> operationMethodMapper = (o) -> {
 			// identity check
 			if (o == getOperation) {
@@ -390,7 +428,7 @@ public class AwsSwaggerEnhancerTest {
 	@Test
 	public void addCorsAllowOriginHeader_CorsDisabledAndSetManuallyViaHeader_ShouldKeepCorsHeader() throws NoSuchMethodException, SecurityException {
 		OperationContext context = mock(OperationContext.class);
-		Method endpoint = ResponseCodesOnClass.class.getMethod("method");
+		Method endpoint = SampleResource.class.getMethod("method");
 		when(context.getEndpointMethod()).thenReturn(endpoint);
 		Response resp = new Response();
 		StringProperty headerProp = mock(StringProperty.class);
@@ -405,7 +443,7 @@ public class AwsSwaggerEnhancerTest {
 	@Test
 	public void addCorsAllowOriginHeader_CorsEnabledAndSetManuallyViaHeader_ShouldKeepCorsHeader() throws NoSuchMethodException, SecurityException {
 		OperationContext context = mock(OperationContext.class);
-		Method endpoint = ResponseCodesOnClass.class.getMethod("method");
+		Method endpoint = SampleResource.class.getMethod("method");
 		when(context.getEndpointMethod()).thenReturn(endpoint);
 		Response resp = new Response();
 		StringProperty headerProp = mock(StringProperty.class);
@@ -420,7 +458,7 @@ public class AwsSwaggerEnhancerTest {
 	@Test
 	public void addCorsAllowOriginHeader_CorsEnabledAndNoHeaderSet_ShouldAddCorsHeader() throws NoSuchMethodException, SecurityException {
 		OperationContext context = mock(OperationContext.class);
-		Method endpoint = ResponseCodesOnClass.class.getMethod("method");
+		Method endpoint = SampleResource.class.getMethod("method");
 		when(context.getEndpointMethod()).thenReturn(endpoint);
 		Response resp = new Response();
 		resp.setHeaders(new HashMap<>());
@@ -434,7 +472,7 @@ public class AwsSwaggerEnhancerTest {
 	@Test
 	public void addCorsAllowOriginHeader_CorsEnabledAndNullHeader_ShouldAddCorsHeader() throws NoSuchMethodException, SecurityException {
 		OperationContext context = mock(OperationContext.class);
-		Method endpoint = ResponseCodesOnClass.class.getMethod("method");
+		Method endpoint = SampleResource.class.getMethod("method");
 		when(context.getEndpointMethod()).thenReturn(endpoint);
 		Response resp = new Response();
 		resp.setHeaders(null);
@@ -723,13 +761,20 @@ public class AwsSwaggerEnhancerTest {
 	}
 
 
-	@StatusCodes(defaultCode = 0, additionalCodes = { 1, 2 })
-	static class ResponseCodesOnClass {
+	static class SampleResource {
 		public void method() {
 		}
 
-		@StatusCodes(defaultCode = 3, additionalCodes = { 4, 5 })
+		@ApiOperation(value = "", code = 3)
+		@ApiResponses({
+			@ApiResponse(message = "", code = 4),
+			@ApiResponse(message = "", code = 5)
+		})
 		public void method1() {
+		}
+
+		@ApiOperation(value = "", code = 3)
+		public void method2() {
 		}
 	}
 

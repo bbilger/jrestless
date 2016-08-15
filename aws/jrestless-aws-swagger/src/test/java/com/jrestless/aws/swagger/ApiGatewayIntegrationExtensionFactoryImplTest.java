@@ -45,13 +45,13 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.github.kongchen.swagger.docgen.LogAdapter;
 import com.google.common.collect.ImmutableMap;
-import com.jrestless.aws.annotation.StatusCodes;
 import com.jrestless.aws.swagger.ApiGatewayIntegrationExtensionFactoryImpl.AwsOperationContext;
 import com.jrestless.aws.swagger.ApiGatewayIntegrationExtensionFactoryImpl.ResponseContext;
 import com.jrestless.aws.swagger.models.ApiGatewayIntegrationExtension;
 import com.jrestless.aws.swagger.models.ApiGatewayIntegrationResponse;
 import com.jrestless.aws.swagger.models.AwsSwaggerConfiguration;
 
+import io.swagger.annotations.ApiOperation;
 import io.swagger.models.Operation;
 import io.swagger.models.Response;
 import io.swagger.models.Swagger;
@@ -99,22 +99,6 @@ public class ApiGatewayIntegrationExtensionFactoryImplTest {
 		Method method = StatusCodeTestResource1.class.getMethod("getSomeResource2");
 		when(context.getEndpointMethod()).thenReturn(method);
 		assertEquals(400, factory.getDefaultStatusCode(context));
-	}
-
-	@Test
-	public void getDefaultStatusCode_ResourceCodeGiven_ShouldReturnResourceCode() throws NoSuchMethodException, SecurityException {
-		AwsOperationContext context = mock(AwsOperationContext.class);
-		Method method = StatusCodeTestResource2.class.getMethod("getSomeResource1");
-		when(context.getEndpointMethod()).thenReturn(method);
-		assertEquals(302, factory.getDefaultStatusCode(context));
-	}
-
-	@Test
-	public void getDefaultStatusCode_ResourceCodeAndEndpointCodeGiven_ShouldReturnEndpointCode() throws NoSuchMethodException, SecurityException {
-		AwsOperationContext context = mock(AwsOperationContext.class);
-		Method method = StatusCodeTestResource2.class.getMethod("getSomeResource2");
-		when(context.getEndpointMethod()).thenReturn(method);
-		assertEquals(404, factory.getDefaultStatusCode(context));
 	}
 
 	@Test
@@ -198,6 +182,21 @@ public class ApiGatewayIntegrationExtensionFactoryImplTest {
 	}
 
 	@Test
+	public void isDefaultResponse_StatusCodeDefaultGiven_ShouldReturnTrue() throws NoSuchMethodException, SecurityException {
+		AwsOperationContext aContext = mock(AwsOperationContext.class);
+		ResponseContext rContext = new ResponseContext(aContext, mock(io.swagger.models.Response.class), "default");
+		assertTrue(factory.isDefaultResponse(rContext));
+	}
+
+	@Test
+	public void isDefaultResponse_StatusCodeNotDefaultGiven_ShouldReturnTrue() throws NoSuchMethodException, SecurityException {
+		AwsOperationContext aContext = mock(AwsOperationContext.class);
+		ResponseContext rContext = new ResponseContext(aContext, mock(io.swagger.models.Response.class), "123");
+		when(aContext.getEndpointMethod()).thenReturn(StatusCodeTestResource1.class.getMethod("getSomeResource2"));
+		assertFalse(factory.isDefaultResponse(rContext));
+	}
+
+	@Test
 	public void createIntegrationResponseParameters_NullHeadersGiven_ShouldReturnEmptyParametersMap() {
 		ResponseContext rc = mock(ResponseContext.class);
 		Response r = new Response();
@@ -257,7 +256,7 @@ public class ApiGatewayIntegrationExtensionFactoryImplTest {
 	public void createIntegrationResponseParameters_HeaderWithDynValueOnDefaultResponse_ShouldAddHeaderMapping() {
 		ResponseContext rc = mock(ResponseContext.class);
 		when(rc.getAwsOperationContext()).thenReturn(createMockAwsOperationContextContext());
-		when(rc.getStatusCode()).thenReturn("200");
+		when(rc.getStatusCode()).thenReturn("default");
 		Response r = new Response();
 		Map<String, Property> headers = new HashMap<>();
 		StringProperty headerProp = new StringProperty();
@@ -308,7 +307,7 @@ public class ApiGatewayIntegrationExtensionFactoryImplTest {
 	public void createIntegrationResponseParameters_HeaderWithoutValueOnDefaultResponse_ShouldAddHeaderNameMapping() {
 		ResponseContext rc = mock(ResponseContext.class);
 		when(rc.getAwsOperationContext()).thenReturn(createMockAwsOperationContextContext());
-		when(rc.getStatusCode()).thenReturn("200");
+		when(rc.getStatusCode()).thenReturn("default");
 		Response r = new Response();
 		Map<String, Property> headers = new HashMap<>();
 		StringProperty headerProp = new StringProperty();
@@ -371,6 +370,7 @@ public class ApiGatewayIntegrationExtensionFactoryImplTest {
 		doReturn(integrationResponseParameters).when(factory).createIntegrationResponseParameters(rc);
 		doReturn("integrationStatusCodePattern").when(factory).getIntegrationStatusCodePattern(rc);
 		doReturn("responseTemplate").when(factory).getResponseTemplate(rc);
+		doReturn(123).when(factory).getDefaultStatusCode(any());
 
 		Entry<String, ApiGatewayIntegrationResponse> intRespEntry = factory.createIntegrationResponse(rc);
 		assertEquals("integrationStatusCodePattern", intRespEntry.getKey());
@@ -428,19 +428,7 @@ public class ApiGatewayIntegrationExtensionFactoryImplTest {
 		public Response getSomeResource1() {
 			return null;
 		}
-		@StatusCodes(defaultCode = 400)
-		public Response getSomeResource2() {
-			return null;
-		}
-	}
-
-	@StatusCodes(defaultCode = 302)
-	private static class StatusCodeTestResource2 {
-		@SuppressWarnings("unused")
-		public Response getSomeResource1() {
-			return null;
-		}
-		@StatusCodes(defaultCode = 404)
+		@ApiOperation(value = "", code = 400)
 		public Response getSomeResource2() {
 			return null;
 		}

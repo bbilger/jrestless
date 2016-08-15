@@ -21,11 +21,6 @@ import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -50,12 +45,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.jrestless.aws.GatewayRequestContext;
 import com.jrestless.aws.GatewayResourceConfig;
-import com.jrestless.aws.annotation.StatusCodes;
 import com.jrestless.aws.io.GatewayAdditionalResponseException;
 import com.jrestless.aws.io.GatewayDefaultResponse;
 import com.jrestless.aws.io.GatewayRequest;
 import com.jrestless.aws.io.GatewayRequestContextImpl;
 import com.jrestless.core.container.dpi.InstanceBinder;
+
+import io.swagger.annotations.ApiOperation;
 
 public class GatewayRequestObjectHandlerInt {
 
@@ -131,21 +127,6 @@ public class GatewayRequestObjectHandlerInt {
 	}
 
 	@Test
-	public void testCustomDefaultResponse() {
-		Context context = mock(Context.class);
-		GatewayRequest request = new GatewayRequest();
-		GatewayRequestContextImpl requestContext = new GatewayRequestContextImpl();
-		request.setContext(requestContext);
-		requestContext.setHttpMethod("GET");
-		requestContext.setResourcePath("/customdefault");
-		request.setHeaderParams(ImmutableMap.of("Accept", "application/json"));
-		GatewayDefaultResponse response = handler.handleRequest(request, context);
-		assertEquals(new GatewayDefaultResponse("{\"value\":\"customDefault\"}", ImmutableMap.of("X-Is-Default-Response",
-				ImmutableList.of("1"), "Content-Type", ImmutableList.of("application/json")), Status.MOVED_PERMANENTLY),
-				response);
-	}
-
-	@Test
 	public void testCustomNonDefaultResponse() {
 		Context context = mock(Context.class);
 		GatewayRequest request = new GatewayRequest();
@@ -210,16 +191,9 @@ public class GatewayRequestObjectHandlerInt {
 			return Response.status(301).entity(new Entity("nonDefault")).build();
 		}
 
-		@Path("/customdefault")
-		@GET
-		@MyMovedStatusCodes
-		public Response customDefaultResponse() {
-			return Response.status(301).entity(new Entity("customDefault")).build();
-		}
-
 		@Path("/customnondefault")
 		@GET
-		@StatusCodes(defaultCode = 301)
+		@ApiOperation(value = "", code = 301)
 		public Response customNonDefaultResponse() {
 			return Response.ok(new Entity("nonCustomDefault")).build();
 		}
@@ -227,7 +201,7 @@ public class GatewayRequestObjectHandlerInt {
 		@Path("/requestbody")
 		@POST
 		@Consumes("application/json")
-		@StatusCodes(defaultCode = 204)
+		@ApiOperation(value = "", code = 204)
 		public void requestBody(Entity entity) {
 			service.requestBody(entity);
 		}
@@ -279,13 +253,6 @@ public class GatewayRequestObjectHandlerInt {
 			}
 			return true;
 		}
-	}
-
-	@StatusCodes(defaultCode = 301)
-	@Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD })
-	@Retention(RetentionPolicy.RUNTIME)
-	public static @interface MyMovedStatusCodes {
-
 	}
 
 	public static class GatewayRequestObjectHandlerImpl extends GatewayRequestObjectHandler {

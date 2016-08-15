@@ -15,6 +15,7 @@
  */
 package com.jrestless.aws.swagger.models;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,6 +42,7 @@ public class AwsSwaggerConfiguration {
 	private String defaultAccessControlAllowHeaders;
 	private AuthType defaultAuthType;
 	private List<Map<String, List<String>>> defaultSecurity;
+	private int[] additionalResponseCodes;
 
 	// CHECKSTYLE:OFF
 	@JsonCreator
@@ -49,7 +51,8 @@ public class AwsSwaggerConfiguration {
 			@JsonProperty("defaultAccessControlAllowOrigin") String defaultAccessControlAllowOrigin,
 			@JsonProperty("defaultAccessControlAllowHeaders") String defaultAccessControlAllowHeaders,
 			@JsonProperty("defaultAuthType") AuthType defaultAuthType,
-			@JsonProperty("defaultSecurity") List<Map<String, List<String>>> defaultSecurity) {
+			@JsonProperty("defaultSecurity") List<Map<String, List<String>>> defaultSecurity,
+			@JsonProperty("additionalResponseCodes") int[] additionalResponseCodes) {
 		super();
 		this.lambdaCredential = lambdaCredential;
 		this.lambdaUri = lambdaUri;
@@ -58,6 +61,7 @@ public class AwsSwaggerConfiguration {
 		this.defaultAccessControlAllowHeaders = defaultAccessControlAllowHeaders;
 		this.defaultAuthType = defaultAuthType;
 		this.defaultSecurity = defaultSecurity;
+		this.additionalResponseCodes = additionalResponseCodes;
 	}
 	// CHECKSTYLE:ON
 
@@ -160,6 +164,23 @@ public class AwsSwaggerConfiguration {
 		return defaultSecurity;
 	}
 
+	/**
+	 * A copy of the additional response code (or null if none).
+	 *
+	 * @return
+	 */
+	public int[] getAdditionalResponseCodes() {
+		if (additionalResponseCodes == null) {
+			return null;
+		} else {
+			return Arrays.copyOf(additionalResponseCodes, additionalResponseCodes.length);
+		}
+	}
+
+	public boolean isSetAdditionalResponseCodes() {
+		return additionalResponseCodes != null;
+	}
+
 	public enum AuthType {
 		@JsonProperty("none")
 		NONE,
@@ -179,6 +200,7 @@ public class AwsSwaggerConfiguration {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + Arrays.hashCode(additionalResponseCodes);
 		result = prime * result
 				+ ((defaultAccessControlAllowHeaders == null) ? 0 : defaultAccessControlAllowHeaders.hashCode());
 		result = prime * result
@@ -203,6 +225,9 @@ public class AwsSwaggerConfiguration {
 			return false;
 		}
 		AwsSwaggerConfiguration other = (AwsSwaggerConfiguration) obj;
+		if (!Arrays.equals(additionalResponseCodes, other.additionalResponseCodes)) {
+			return false;
+		}
 		if (defaultAccessControlAllowHeaders == null) {
 			if (other.defaultAccessControlAllowHeaders != null) {
 				return false;
@@ -257,8 +282,6 @@ public class AwsSwaggerConfiguration {
 				+ ", defaultCorsEnabled=" + defaultCorsEnabled + ", defaultAccessControlAllowOrigin="
 				+ defaultAccessControlAllowOrigin + ", defaultAccessControlAllowHeaders="
 				+ defaultAccessControlAllowHeaders + ", defaultAuthType=" + defaultAuthType + ", defaultSecurity="
-				+ defaultSecurity + "]";
+				+ defaultSecurity + ", additionalResponseCodes=" + Arrays.toString(additionalResponseCodes) + "]";
 	}
-
-
 }

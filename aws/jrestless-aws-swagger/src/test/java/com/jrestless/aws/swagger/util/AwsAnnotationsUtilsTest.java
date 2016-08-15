@@ -15,17 +15,16 @@
  */
 package com.jrestless.aws.swagger.util;
 
-import static com.jrestless.aws.swagger.util.AwsAnnotationsUtils.getAdditionalStatusCodesOrDefault;
-import static com.jrestless.aws.swagger.util.AwsAnnotationsUtils.getAllStatusCodesOrDefault;
+import static com.jrestless.aws.swagger.util.AwsAnnotationsUtils.getAdditionalStatusCodes;
 import static com.jrestless.aws.swagger.util.AwsAnnotationsUtils.getDefaultStatusCodeOrDefault;
 import static com.jrestless.aws.swagger.util.AwsAnnotationsUtils.isCorsEnabledOrDefault;
 import static com.jrestless.aws.swagger.util.AwsAnnotationsUtils.isSecured;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
@@ -33,8 +32,12 @@ import javax.annotation.security.RolesAllowed;
 
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableSet;
 import com.jrestless.aws.annotation.Cors;
-import com.jrestless.aws.annotation.StatusCodes;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 public class AwsAnnotationsUtilsTest {
 
@@ -84,32 +87,9 @@ public class AwsAnnotationsUtilsTest {
 	}
 
 	@Test
-	public void getAdditionalStatusCodesOrDefault_NoStatusCodeGiven_ShouldReturnAnnotationsDefaultValue() {
-		assertArrayEquals(new int[] { 400, 401, 403, 404, 405, 406, 415, 500 },
-				getAdditionalStatusCodesOrDefault(getMethod(NoStatusCodes.class)));
-	}
-
-	@Test
-	public void getAllStatusCodesOrDefault_StatusCodesOnClassGiven_ShouldReturnAnnotationValue() {
-		assertArrayEquals(new int[] { 200, 400, 401, 403, 404, 405, 406, 415, 500 },
-				getAllStatusCodesOrDefault(getMethod(NoStatusCodes.class)));
-	}
-
-	@Test
-	public void getDefaultStatusCodeOrDefault_StatusCodesOnClassGiven_ShouldReturnAnnotationValue() {
-		assertEquals(0, getDefaultStatusCodeOrDefault(getMethod(StatusCodesOnClass.class)));
-	}
-
-	@Test
-	public void getAdditionalStatusCodesOrDefault_StatusCodesOnClassGiven_ShouldReturnAnnotationValue() {
-		assertArrayEquals(new int[] { 1, 2 },
-				getAdditionalStatusCodesOrDefault(getMethod(StatusCodesOnClass.class)));
-	}
-
-	@Test
-	public void getAllStatusCodesOrDefault_StatusCodesOnClassGiven_ShouldReturnAnnotationsDefaultValue() {
-		assertArrayEquals(new int[] { 0, 1, 2 },
-				getAllStatusCodesOrDefault(getMethod(StatusCodesOnClass.class)));
+	public void getAdditionalStatusCodes_NoStatusCodeGiven_ShouldReturnAnnotationsDefaultValue() {
+		assertEquals(Collections.emptySet(),
+				getAdditionalStatusCodes(getMethod(NoStatusCodes.class)));
 	}
 
 	@Test
@@ -118,32 +98,9 @@ public class AwsAnnotationsUtilsTest {
 	}
 
 	@Test
-	public void getAdditionalStatusCodesOrDefault_StatusCodesOnMethodGiven_ShouldReturnAnnotationValue() {
-		assertArrayEquals(new int[] { 4, 5 },
-				getAdditionalStatusCodesOrDefault(getMethod(StatusCodesOnMethod.class)));
-	}
-
-	@Test
-	public void getAllStatusCodesOrDefault_StatusCodesOnMethodGiven_ShouldReturnAnnotationsDefaultValue() {
-		assertArrayEquals(new int[] { 3, 4, 5 },
-				getAllStatusCodesOrDefault(getMethod(StatusCodesOnMethod.class)));
-	}
-
-	@Test
-	public void getDefaultStatusCodeOrDefault_StatusCodesOnClassAndMethodGiven_ShouldReturnAnnotationValue() {
-		assertEquals(3, getDefaultStatusCodeOrDefault(getMethod(StatusCodesOnClassAndMethod.class)));
-	}
-
-	@Test
-	public void getAdditionalStatusCodesOrDefault_StatusCodesOnClassAndMethodGiven_ShouldReturnAnnotationValue() {
-		assertArrayEquals(new int[] { 4, 5 },
-				getAdditionalStatusCodesOrDefault(getMethod(StatusCodesOnClassAndMethod.class)));
-	}
-
-	@Test
-	public void getAllStatusCodesOrDefault_StatusCodesOnClassAndMethodGiven_ShouldReturnAnnotationsDefaultValue() {
-		assertArrayEquals(new int[] { 3, 4, 5 },
-				getAllStatusCodesOrDefault(getMethod(StatusCodesOnClassAndMethod.class)));
+	public void getAdditionalStatusCodes_StatusCodesOnMethodGiven_ShouldReturnAnnotationValue() {
+		assertEquals(ImmutableSet.of(4, 5),
+				getAdditionalStatusCodes(getMethod(StatusCodesOnMethod.class)));
 	}
 
 	@Test
@@ -237,23 +194,12 @@ public class AwsAnnotationsUtilsTest {
 		}
 	}
 
-	@StatusCodes(defaultCode = 0, additionalCodes = { 1, 2 })
-	static class StatusCodesOnClass {
-		public void method() {
-			;
-		}
-	}
-
 	static class StatusCodesOnMethod {
-		@StatusCodes(defaultCode = 3, additionalCodes = { 4, 5 })
-		public void method() {
-			;
-		}
-	}
-
-	@StatusCodes(defaultCode = 0, additionalCodes = { 1, 2 })
-	static class StatusCodesOnClassAndMethod {
-		@StatusCodes(defaultCode = 3, additionalCodes = { 4, 5 })
+		@ApiOperation(value = "", code = 3)
+		@ApiResponses({
+			@ApiResponse(message = "", code = 4),
+			@ApiResponse(message = "", code = 5)
+		})
 		public void method() {
 			;
 		}

@@ -3,20 +3,11 @@
     "paths": {
         "/204": {
             "get": {
-                "summary": "default status code 302",
+                "summary": "default status code 204",
                 "description": "",
                 "operationId": "default204",
                 "parameters": [],
                 "responses": {
-                    "default": {
-                        "description": "successful operation",
-                        "headers": {
-                            "Content-Type": {
-                                "type": "string",
-                                "description": "'application/json'"
-                            }
-                        }
-                    },
                     "400": {
                         "headers": {
                             "Content-Type": {
@@ -42,6 +33,10 @@
                         }
                     },
                     "204": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "string"
+                        },
                         "headers": {
                             "Content-Type": {
                                 "type": "string",
@@ -192,15 +187,6 @@
                 "operationId": "default302",
                 "parameters": [],
                 "responses": {
-                    "default": {
-                        "description": "successful operation",
-                        "headers": {
-                            "Content-Type": {
-                                "type": "string",
-                                "description": "'application/json'"
-                            }
-                        }
-                    },
                     "400": {
                         "headers": {
                             "Content-Type": {
@@ -210,6 +196,10 @@
                         }
                     },
                     "302": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "string"
+                        },
                         "headers": {
                             "Content-Type": {
                                 "type": "string",

@@ -674,20 +674,11 @@
                 "operationId": "deleteEntity",
                 "parameters": [],
                 "responses": {
-                    "default": {
-                        "description": "successful operation",
-                        "headers": {
-                            "Content-Type": {
-                                "type": "string",
-                                "description": "'application/json'"
-                            },
-                            "Access-Control-Allow-Origin": {
-                                "type": "string",
-                                "description": "'*'"
-                            }
-                        }
-                    },
                     "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Response"
+                        },
                         "headers": {
                             "Content-Type": {
                                 "type": "string",
@@ -953,10 +944,92 @@
         }
     },
     "definitions": {
+        "Response": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "schema": {
+                    "$ref": "#/definitions/Property"
+                },
+                "examples": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object"
+                    }
+                },
+                "headers": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/Property"
+                    }
+                }
+            }
+        },
+        "Xml": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "prefix": {
+                    "type": "string"
+                },
+                "attribute": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "wrapped": {
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        },
         "Entity0": {
             "type": "object",
             "properties": {
                 "prop": {
+                    "type": "string"
+                }
+            }
+        },
+        "Property": {
+            "type": "object",
+            "properties": {
+                "example": {
+                    "type": "string"
+                },
+                "readOnly": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "position": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "vendorExtensions": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object"
+                    }
+                },
+                "xml": {
+                    "$ref": "#/definitions/Xml"
+                },
+                "format": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }

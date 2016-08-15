@@ -8,20 +8,11 @@
                 "operationId": "corsoff",
                 "parameters": [],
                 "responses": {
-                    "default": {
+                    "301": {
                         "description": "successful operation",
-                        "headers": {
-                            "Content-Type": {
-                                "type": "string",
-                                "description": "'application/json'"
-                            },
-                            "Access-Control-Allow-Origin": {
-                                "type": "string",
-                                "description": "'MyCustomOrigin'"
-                            }
-                        }
-                    },
-                    "200": {
+                        "schema": {
+                            "type": "string"
+                        },
                         "headers": {
                             "Content-Type": {
                                 "type": "string",
@@ -139,7 +130,7 @@
                     "requestParameters": {},
                     "responses": {
                         "default": {
-                            "statusCode": "200",
+                            "statusCode": "301",
                             "responseParameters": {
                                 "method.response.header.Content-Type": "'application/json'",
                                 "method.response.header.Access-Control-Allow-Origin": "'MyCustomOrigin'"

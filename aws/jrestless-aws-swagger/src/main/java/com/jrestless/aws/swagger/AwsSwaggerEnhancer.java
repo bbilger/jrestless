@@ -35,12 +35,14 @@ import java.util.function.Function;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.kongchen.swagger.docgen.LogAdapter;
+import com.google.common.collect.ImmutableSet;
 import com.jrestless.aws.swagger.models.ApiGatewayAuth;
 import com.jrestless.aws.swagger.models.ApiGatewayIntegrationExtension;
 import com.jrestless.aws.swagger.models.AwsSwaggerConfiguration;
@@ -73,6 +75,20 @@ public class AwsSwaggerEnhancer implements SwaggerEnhancer {
 	static {
 		CONFIGURATION_OBJECT_MAPPER = new ObjectMapper();
 		CONFIGURATION_OBJECT_MAPPER.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+	}
+	private static final int STATUS_METHOD_NOT_ALLOWED = 405;
+	private static final Set<Integer> DEFAULT_ADDITIONAL_STATUS_CODES;
+	static {
+		DEFAULT_ADDITIONAL_STATUS_CODES = ImmutableSet.of(
+			Status.BAD_REQUEST.getStatusCode(),
+			Status.UNAUTHORIZED.getStatusCode(),
+			Status.FORBIDDEN.getStatusCode(),
+			Status.NOT_FOUND.getStatusCode(),
+			STATUS_METHOD_NOT_ALLOWED,
+			Status.NOT_ACCEPTABLE.getStatusCode(),
+			Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode(),
+			Status.INTERNAL_SERVER_ERROR.getStatusCode()
+		);
 	}
 
 	private final ApiGatewayIntegrationExtensionFactory apiGatewayExtensionFactory;
@@ -140,8 +156,20 @@ public class AwsSwaggerEnhancer implements SwaggerEnhancer {
 	}
 
 	protected void addAdditionalResponses(OperationContext operationContext) {
-		for (int statusCode : AwsAnnotationsUtils.getAllStatusCodesOrDefault(operationContext.getEndpointMethod())) {
-			addResponse(operationContext.getOperation(), statusCode);
+		/*
+		 * if no additional response codes are given explicitly, then add
+		 * the default ones.
+		 */
+		if (AwsAnnotationsUtils.getAdditionalStatusCodes(operationContext.getEndpointMethod()).isEmpty()) {
+			if (configuration.isSetAdditionalResponseCodes()) {
+				for (int statusCode : configuration.getAdditionalResponseCodes()) {
+					addResponse(operationContext.getOperation(), statusCode);
+				}
+			} else {
+				for (int statusCode : DEFAULT_ADDITIONAL_STATUS_CODES) {
+					addResponse(operationContext.getOperation(), statusCode);
+				}
+			}
 		}
 	}
 

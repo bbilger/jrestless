@@ -1,5 +1,15 @@
 def checkstyleCfg = "${projectDir}/alien/checkstyle/checkstyle.xml" as File
 
+
+buildscript {
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
+	}
+}
+
 allprojects {
 
 	apply plugin: 'java'
@@ -16,6 +26,8 @@ subprojects {
 	apply plugin: 'findbugs'
 	apply plugin: 'pmd'
 	apply plugin: 'jacoco'
+	apply plugin: 'com.jfrog.bintray'
+	apply plugin: 'maven-publish'
 
 	repositories {
 		mavenCentral()
@@ -53,6 +65,29 @@ subprojects {
 		}
 	}
 	check.dependsOn jacocoTestReport
+	
+	bintray {
+		user = hasProperty('bintray_user') ? property('bintray_user') : 'unset'
+		key = hasProperty('bintray_user') ? property('bintray_key') : 'unset'
+		pkg {
+			repo = 'maven'
+			name = 'jrestless'
+			licenses = ['Apache-2.0']
+			vcsUrl = 'https://github.com/bbilger/jrestless.git'
+		}
+		publications = ['BintrayPublication']
+	}
+	
+	publishing {
+		publications {
+			BintrayPublication(MavenPublication) {
+				from components.java
+				groupId "$group"
+				artifactId "$project.name"
+				version "$version"
+			}
+		}
+	}
 }
 
 dependencies {

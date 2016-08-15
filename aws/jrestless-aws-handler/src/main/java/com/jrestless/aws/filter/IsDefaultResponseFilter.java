@@ -16,7 +16,6 @@
 package com.jrestless.aws.filter;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
@@ -29,8 +28,7 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 
-import com.jrestless.aws.annotation.StatusCodes;
-
+import io.swagger.annotations.ApiOperation;
 import jersey.repackaged.com.google.common.cache.Cache;
 import jersey.repackaged.com.google.common.cache.CacheBuilder;
 
@@ -82,11 +80,8 @@ public class IsDefaultResponseFilter implements ContainerResponseFilter {
 		}
 	}
 
-	private Integer getDefaultResponseCode(Method endpoint) {
+	private int getDefaultResponseCode(Method endpoint) {
 		Integer defaultResponseCode = getDefaultResponseCodeFromAnnotatedElement(endpoint);
-		if (defaultResponseCode == null) {
-			defaultResponseCode = getDefaultResponseCodeFromAnnotatedElement(endpoint.getDeclaringClass());
-		}
 		if (defaultResponseCode == null) {
 			defaultResponseCode = Status.OK.getStatusCode();
 		}
@@ -94,15 +89,9 @@ public class IsDefaultResponseFilter implements ContainerResponseFilter {
 	}
 
 	private Integer getDefaultResponseCodeFromAnnotatedElement(AnnotatedElement annotatedElement) {
-		StatusCodes codes = annotatedElement.getAnnotation(StatusCodes.class);
-		if (codes != null) {
-			return codes.defaultCode();
-		}
-		for (Annotation annotation : annotatedElement.getAnnotations()) {
-			codes = annotation.annotationType().getAnnotation(StatusCodes.class);
-			if (codes != null) {
-				return codes.defaultCode();
-			}
+		ApiOperation apiOperation = annotatedElement.getAnnotation(ApiOperation.class);
+		if (apiOperation != null) {
+			return apiOperation.code();
 		}
 		return null;
 	}

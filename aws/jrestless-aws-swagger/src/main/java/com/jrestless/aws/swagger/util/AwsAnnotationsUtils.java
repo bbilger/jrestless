@@ -17,7 +17,10 @@ package com.jrestless.aws.swagger.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
@@ -26,7 +29,11 @@ import javax.annotation.security.RolesAllowed;
 import org.springframework.core.annotation.AnnotationUtils;
 
 import com.jrestless.aws.annotation.Cors;
-import com.jrestless.aws.annotation.StatusCodes;
+import com.sun.jersey.api.client.ClientResponse.Status;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 /**
  * Utility class handling with AWS specific annotation from 'jrestless-aws-core'
@@ -127,8 +134,12 @@ public final class AwsAnnotationsUtils {
 	 * @return
 	 */
 	public static int getDefaultStatusCodeOrDefault(Method endpointMethod) {
-		return findAnnotationOnMethodOrClass(endpointMethod, StatusCodes.class)
-				.orElse(DefaultStatusCodes.class.getAnnotation(StatusCodes.class)).defaultCode();
+		Optional<ApiOperation> apiOperation = findAnnotationOnMethod(endpointMethod, ApiOperation.class);
+		if (apiOperation.isPresent()) {
+			return apiOperation.get().code();
+		} else {
+			return Status.OK.getStatusCode();
+		}
 	}
 
 	/**
@@ -142,27 +153,14 @@ public final class AwsAnnotationsUtils {
 	 * @param defaultValue
 	 * @return
 	 */
-	public static int[] getAdditionalStatusCodesOrDefault(Method endpointMethod) {
-		return findAnnotationOnMethodOrClass(endpointMethod, StatusCodes.class)
-				.orElse(DefaultStatusCodes.class.getAnnotation(StatusCodes.class)).additionalCodes();
-	}
-
-	/**
-	 * Returns the endpoint's default status code and additional status codes.
-	 * <p>
-	 * Returns the value of {@link StatusCodes#additionalCodes()} - either from the
-	 * endpoint method, the resource class or the annotation's default value.
-	 *
-	 * @param endpointMethod
-	 * @param defaultValue
-	 * @return
-	 */
-	public static int[] getAllStatusCodesOrDefault(Method endpointMethod) {
-		int[] defaultStatusCodes = getAdditionalStatusCodesOrDefault(endpointMethod);
-		int[] statusCodes = new int[defaultStatusCodes.length + 1];
-		System.arraycopy(defaultStatusCodes, 0, statusCodes, 1, defaultStatusCodes.length);
-		statusCodes[0] = getDefaultStatusCodeOrDefault(endpointMethod);
-		return statusCodes;
+	public static Set<Integer> getAdditionalStatusCodes(Method endpointMethod) {
+		Set<ApiResponse> apiResponses = AnnotationUtils.getRepeatableAnnotation(endpointMethod, ApiResponses.class,
+				ApiResponse.class);
+		if (apiResponses.size() > 0) {
+			return apiResponses.stream().map(r -> r.code()).collect(Collectors.toSet());
+		} else {
+			return Collections.emptySet();
+		}
 	}
 
 	private static <T extends Annotation> Optional<T> findAnnotationOnMethodOrClass(Method endpointMethod,
@@ -182,11 +180,6 @@ public final class AwsAnnotationsUtils {
 	private static <T extends Annotation> Optional<T> findAnnotationOnClass(Class<?> resourceClass,
 			Class<T> annotationType) {
 		return Optional.ofNullable(AnnotationUtils.findAnnotation(resourceClass, annotationType));
-	}
-
-	@StatusCodes
-	private static class DefaultStatusCodes {
-
 	}
 
 	@Cors

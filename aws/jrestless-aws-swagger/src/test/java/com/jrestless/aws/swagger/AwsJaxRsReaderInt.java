@@ -17,6 +17,7 @@ package com.jrestless.aws.swagger;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -39,10 +40,11 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import com.github.kongchen.swagger.docgen.LogAdapter;
 import com.google.common.io.Files;
 import com.jrestless.aws.annotation.Cors;
-import com.jrestless.aws.annotation.StatusCodes;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import io.swagger.models.Response;
 import io.swagger.models.Swagger;
@@ -170,6 +172,9 @@ public class AwsJaxRsReaderInt {
 	private void assertSwagger(String expectedSwaggerPath, Swagger actual) {
 		try {
 			String actualJson = Json.mapper().writeValueAsString(actual);
+			try(  PrintWriter out = new PrintWriter( "/home/REMOVED/tmp/swagger.json" )  ){
+			    out.println( actualJson );
+			}
 			String expectedJson = Files.toString(getResourceFile(expectedSwaggerPath), StandardCharsets.UTF_8);
 			JSONAssert.assertEquals(expectedJson, actualJson, true);
 		} catch (IOException | JSONException e) {
@@ -195,8 +200,9 @@ public class AwsJaxRsReaderInt {
 	public static class MinimalResource {
 		@GET
 		@Path("/blub")
-		@ApiOperation(value = "blub")
-		public void corsoff() {
+		@ApiOperation(value = "blub", code = 301, response = String.class)
+		public Response corsoff() {
+			return null;
 		}
 	}
 
@@ -206,71 +212,83 @@ public class AwsJaxRsReaderInt {
 	public static class CustomCorsResource {
 		@GET
 		@Path("/corsoff")
-		@ApiOperation(value = "corsoff")
-		public void corsoff() {
+		@ApiOperation(value = "corsoff", response = String.class)
+		public Response corsoff() {
+			return null;
 		}
 		@GET
 		@Path("/corson")
 		@Cors(enabled = true)
-		@ApiOperation(value = "corson")
-		public void corson() {
+		@ApiOperation(value = "corson", response = String.class)
+		public Response corson() {
+			return null;
 		}
 	}
 
 	@Api
 	@Path("/")
-	@StatusCodes(defaultCode = 302)
 	@Cors(enabled = false)
 	public static class CustomDefaultStatusCodeResource {
 		@GET
 		@Path("/302")
-		@ApiOperation(value = "default status code 302")
-		public void default302() {
+		@ApiOperation(value = "default status code 302", code = 302, response = String.class)
+		public Response default302() {
+			return null;
 		}
 
 		@GET
 		@Path("/204")
-		@StatusCodes(defaultCode = 204)
-		@ApiOperation(value = "default status code 302")
-		public void default204() {
+		@ApiOperation(value = "default status code 204", code = 204, response = String.class)
+		public Response default204() {
+			return null;
 		}
 	}
 
 	@Api
 	@Path("/")
 	@Cors(enabled = false)
-	@StatusCodes(additionalCodes = 500)
 	public static class CustomAdditionalStatusCodesResource {
 		@GET
 		@Path("/500")
-		@ApiOperation(value = "additional status code 500 (default 200)")
-		public void additional302() {
+		@ApiOperation(value = "additional status code 500 (default 200)", response = String.class)
+		@ApiResponses(@ApiResponse(message = "", code = 500))
+		public Response additional500() {
+			return null;
 		}
 
 		@GET
 		@Path("/204")
-		@StatusCodes(additionalCodes = { 400, 404 })
-		@ApiOperation(value = "additional status code 400, 404 (default 200)")
-		public void additional400404() {
+		@ApiOperation(value = "additional status code 400, 404 (default 200)", response = String.class)
+		@ApiResponses({
+			@ApiResponse(message = "", code = 400),
+			@ApiResponse(message = "", code = 404)
+		})
+		public Response additional400404() {
+			return null;
 		}
 	}
 
 	@Api
 	@Path("/")
 	@Cors(enabled = false)
-	@StatusCodes(defaultCode = 204, additionalCodes = 500)
 	public static class CustomStatusCodesResource {
 		@GET
 		@Path("/204-500")
-		@ApiOperation(value = "default 204, additional = {500})")
-		public void default204additional500() {
+		@ApiOperation(value = "default 204, additional = {500})", code = 204, response = String.class)
+		@ApiResponses(@ApiResponse(message = "", code = 500))
+		public Response default204additional500() {
+			return null;
 		}
 
 		@GET
 		@Path("/200-400-404")
-		@StatusCodes(defaultCode = 200, additionalCodes = { 400, 404 })
-		@ApiOperation(value = "default 200, additional = {400, 404})")
-		public void default200additional400404() {
+		@ApiOperation(value = "default 200, additional = {400, 404})", response = String.class)
+		@ApiResponses({
+			@ApiResponse(message = "", code = 400),
+			@ApiResponse(message = "", code = 404)
+		})
+		public Response default200additional400404() {
+			return null;
 		}
 	}
 
@@ -278,28 +296,34 @@ public class AwsJaxRsReaderInt {
 	@Path("/")
 	@DenyAll
 	@Cors(enabled = false)
-	@StatusCodes(defaultCode = 200, additionalCodes = { 500 })
 	public static class SecuredResource {
 		@GET
 		@Path("/permitAll")
 		@PermitAll
-		@ApiOperation(value = "permit all")
-		public void permitAll() {
+		@ApiOperation(value = "permit all", code = 200, response = String.class)
+		@ApiResponses({ @ApiResponse(message = "123", code = 500) })
+		public Response permitAll() {
+			return null;
 		}
 
 		@GET
 		@Path("/rolesAllowed")
 		@RolesAllowed({ "user, admin" })
-		@ApiOperation(value = "roles allowed")
-		public void rolesAllowed() {
+		@ApiOperation(value = "roles allowed", code = 200, response = String.class)
+		@ApiResponses(@ApiResponse(message = "", code = 500))
+		public Response rolesAllowed() {
+			return null;
 		}
 
 		@GET
 		@Path("/swaggerRolesAllowed")
 		@RolesAllowed({ "user, admin" })
-		@ApiOperation(value = "swagger roles allowed", authorizations = {
-				@Authorization(value = "swagger-authorizer") })
-		public void swaggerRolesAllowed() {
+		@ApiOperation(value = "swagger roles allowed", code = 200, response = String.class, authorizations = {
+			@Authorization(value = "swagger-authorizer")
+		})
+		@ApiResponses(@ApiResponse(message = "", code = 500))
+		public Response swaggerRolesAllowed() {
+			return null;
 		}
 	}
 
@@ -315,7 +339,8 @@ public class AwsJaxRsReaderInt {
 		@DELETE
 		@Path("/entity0")
 		@ApiOperation(value = "delete entity")
-		public void deleteEntity() {
+		public Response deleteEntity() {
+			return null;
 		}
 		@POST
 		@Path("/entity0")

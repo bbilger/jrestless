@@ -8,16 +8,11 @@
                 "operationId": "permitAll",
                 "parameters": [],
                 "responses": {
-                    "default": {
-                        "description": "successful operation",
-                        "headers": {
-                            "Content-Type": {
-                                "type": "string",
-                                "description": "'application/json'"
-                            }
-                        }
-                    },
                     "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "string"
+                        },
                         "headers": {
                             "Content-Type": {
                                 "type": "string",
@@ -26,6 +21,7 @@
                         }
                     },
                     "500": {
+                        "description": "123",
                         "headers": {
                             "Content-Type": {
                                 "type": "string",
@@ -73,16 +69,11 @@
                 "operationId": "rolesAllowed",
                 "parameters": [],
                 "responses": {
-                    "default": {
-                        "description": "successful operation",
-                        "headers": {
-                            "Content-Type": {
-                                "type": "string",
-                                "description": "'application/json'"
-                            }
-                        }
-                    },
                     "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "string"
+                        },
                         "headers": {
                             "Content-Type": {
                                 "type": "string",
@@ -91,6 +82,7 @@
                         }
                     },
                     "500": {
+                        "description": "",
                         "headers": {
                             "Content-Type": {
                                 "type": "string",
@@ -138,16 +130,11 @@
                 "operationId": "swaggerRolesAllowed",
                 "parameters": [],
                 "responses": {
-                    "default": {
-                        "description": "successful operation",
-                        "headers": {
-                            "Content-Type": {
-                                "type": "string",
-                                "description": "'application/json'"
-                            }
-                        }
-                    },
                     "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "string"
+                        },
                         "headers": {
                             "Content-Type": {
                                 "type": "string",
@@ -156,6 +143,7 @@
                         }
                     },
                     "500": {
+                        "description": "",
                         "headers": {
                             "Content-Type": {
                                 "type": "string",

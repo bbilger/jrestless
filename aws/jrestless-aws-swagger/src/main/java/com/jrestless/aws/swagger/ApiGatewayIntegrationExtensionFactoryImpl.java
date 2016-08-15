@@ -92,8 +92,13 @@ public class ApiGatewayIntegrationExtensionFactoryImpl implements ApiGatewayInte
 	}
 
 	protected boolean isDefaultResponse(ResponseContext responseContext) {
-		String defaultStatusCode = getDefaultStatusCode(responseContext.getAwsOperationContext()) + "";
-		return defaultStatusCode.equals(responseContext.getStatusCode());
+		String statusCode = responseContext.getStatusCode();
+		if ("default".equals(statusCode)) {
+			return true;
+		} else {
+			String defaultStatusCode = getDefaultStatusCode(responseContext.getAwsOperationContext()) + "";
+			return defaultStatusCode.equals(statusCode);
+		}
 	}
 
 	protected boolean isDynamicHeaderValue(String headerValue) {
@@ -118,12 +123,10 @@ public class ApiGatewayIntegrationExtensionFactoryImpl implements ApiGatewayInte
 		Map<String, ApiGatewayIntegrationResponse> integrationResponses = new HashMap<>();
 		for (Map.Entry<String, Response> responseEntry : responses.entrySet()) {
 			String statusCode = responseEntry.getKey();
-			if (!"default".equals(statusCode)) {
-				Response response = responseEntry.getValue();
-				Map.Entry<String, ApiGatewayIntegrationResponse> intResponse = createIntegrationResponse(
-						new ResponseContext(context, response, statusCode));
-				integrationResponses.put(intResponse.getKey(), intResponse.getValue());
-			}
+			Response response = responseEntry.getValue();
+			Map.Entry<String, ApiGatewayIntegrationResponse> intResponse = createIntegrationResponse(
+					new ResponseContext(context, response, statusCode));
+			integrationResponses.put(intResponse.getKey(), intResponse.getValue());
 		}
 		return integrationResponses;
 	}
@@ -135,7 +138,7 @@ public class ApiGatewayIntegrationExtensionFactoryImpl implements ApiGatewayInte
 		Map<String, String> responseTemplate = ImmutableMap.of(MediaType.APPLICATION_JSON,
 				getResponseTemplate(responseContext));
 		return new SimpleEntry<>(integrationStatusCodePattern, new ApiGatewayIntegrationResponse(
-				responseContext.getStatusCode(), integrationResponseParameters, responseTemplate));
+				getStatusCode(responseContext), integrationResponseParameters, responseTemplate));
 	}
 
 	protected Map<String, String> createIntegrationResponseParameters(ResponseContext responseContext) {
@@ -198,6 +201,14 @@ public class ApiGatewayIntegrationExtensionFactoryImpl implements ApiGatewayInte
 			return DEFAULT_RESPONSE_CODE_PATTERN;
 		} else {
 			return String.format(RESPONSE_STATUS_CODE_PATTERN_FMT, responseContext.getStatusCode());
+		}
+	}
+
+	protected String getStatusCode(ResponseContext responseContext) {
+		if (isDefaultResponse(responseContext)) {
+			return getDefaultStatusCode(responseContext.getAwsOperationContext()) + "";
+		} else {
+			return responseContext.getStatusCode();
 		}
 	}
 
