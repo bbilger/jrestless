@@ -1,2 +1,3 @@
 include "test:jrestless-test", 'aws:jrestless-aws-core', 'aws:jrestless-aws-swagger', 'core:jrestless-core-container', 'aws:jrestless-aws-handler', 'aws:example:jrestless-aws-example-simple'
 rootProject.name = 'jrestless'
+gradle.ext.globaleModuleVersion = '0.0.1-SNAPSHOT'
