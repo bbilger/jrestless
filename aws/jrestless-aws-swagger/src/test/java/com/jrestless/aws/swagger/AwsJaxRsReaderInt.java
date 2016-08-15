@@ -17,7 +17,6 @@ package com.jrestless.aws.swagger;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -172,9 +171,6 @@ public class AwsJaxRsReaderInt {
 	private void assertSwagger(String expectedSwaggerPath, Swagger actual) {
 		try {
 			String actualJson = Json.mapper().writeValueAsString(actual);
-			try(  PrintWriter out = new PrintWriter( "/home/REMOVED/tmp/swagger.json" )  ){
-			    out.println( actualJson );
-			}
 			String expectedJson = Files.toString(getResourceFile(expectedSwaggerPath), StandardCharsets.UTF_8);
 			JSONAssert.assertEquals(expectedJson, actualJson, true);
 		} catch (IOException | JSONException e) {
