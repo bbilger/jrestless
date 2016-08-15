@@ -28,6 +28,8 @@ import io.swagger.annotations.ResponseHeader;
 @Produces({ MediaType.APPLICATION_JSON })
 public class SampleResource {
 
+	private static final int MOVED_STATUS_CODE = 301;
+
 	@GET
 	@Path("/info_json")
 	@ApiOperation(value = "get application info as JSON", response = VO.class)
@@ -74,15 +76,14 @@ public class SampleResource {
 		return Response.ok(wrapValue("something")).cookie(new NewCookie("foo", "bar")).build();
 	}
 
-//	@GET
-//	@Path("/moved")
-//	@ApiOperation(value = "moved response", responseHeaders = {
-//		@ResponseHeader(name = "Location", response = String.class)
-//	})
-//	@StatusCodes(defaultCode = MOVED_STATUS_CODE)
-//	public Response getNonDefaultHeader() {
-//		return Response.status(Status.MOVED_PERMANENTLY).header("Location", "/newlocation").build();
-//	}
+	@GET
+	@Path("/moved")
+	@ApiOperation(code = MOVED_STATUS_CODE, value = "moved response", response = VO.class, responseHeaders = {
+		@ResponseHeader(name = "Location", response = String.class)
+	})
+	public Response getNonDefaultHeader() {
+		return Response.status(Status.MOVED_PERMANENTLY).header("Location", "/newlocation").build();
+	}
 
 	@GET
 	@Path("/pathparam")
