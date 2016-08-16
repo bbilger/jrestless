@@ -83,7 +83,3 @@ build.dependsOn buildZip
 		swaggerApiReader = 'com.jrestless.aws.swagger.AwsJaxRsReader'
 	}
 } */
-
-task wrapper(type: Wrapper) {
-	gradleVersion = '2.14'
-}

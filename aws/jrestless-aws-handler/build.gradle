@@ -16,7 +16,3 @@ dependencies {
 		'org.glassfish.jersey.media:jersey-media-json-jackson:2.23.1'
 	)
 }
-
-task wrapper(type: Wrapper) {
-	gradleVersion = '2.14'
-}
