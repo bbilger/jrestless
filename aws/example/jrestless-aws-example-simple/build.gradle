@@ -18,7 +18,7 @@ apply plugin: 'eclipse'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-version = "${gradle.globaleModuleVersion}"
+version = "${globaleModuleVersion}"
 
 repositories {
 	mavenCentral()

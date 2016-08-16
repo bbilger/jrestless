@@ -1,5 +1,5 @@
 group = 'com.jrestless.test'
-version = "${gradle.globaleModuleVersion}"
+version = "${globaleModuleVersion}"
 
 dependencies {
 	compile(
