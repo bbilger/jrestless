@@ -38,7 +38,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 
 import com.github.kongchen.swagger.docgen.LogAdapter;
 import com.google.common.io.Files;
-import com.jrestless.aws.annotation.Cors;
+import com.jrestless.annotation.Cors;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

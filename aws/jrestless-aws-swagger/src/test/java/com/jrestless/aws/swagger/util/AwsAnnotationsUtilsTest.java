@@ -33,7 +33,7 @@ import javax.annotation.security.RolesAllowed;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableSet;
-import com.jrestless.aws.annotation.Cors;
+import com.jrestless.annotation.Cors;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;

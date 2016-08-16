@@ -50,7 +50,7 @@ import com.github.kongchen.swagger.docgen.LogAdapter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.jrestless.aws.annotation.Cors;
+import com.jrestless.annotation.Cors;
 import com.jrestless.aws.swagger.models.ApiGatewayAuth;
 import com.jrestless.aws.swagger.models.ApiGatewayIntegrationExtension;
 import com.jrestless.aws.swagger.models.AwsSwaggerConfiguration;

@@ -28,7 +28,7 @@ import javax.annotation.security.RolesAllowed;
 
 import org.springframework.core.annotation.AnnotationUtils;
 
-import com.jrestless.aws.annotation.Cors;
+import com.jrestless.annotation.Cors;
 import com.sun.jersey.api.client.ClientResponse.Status;
 
 import io.swagger.annotations.ApiOperation;
