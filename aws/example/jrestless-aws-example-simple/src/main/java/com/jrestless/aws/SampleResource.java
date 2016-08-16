@@ -144,7 +144,7 @@ public class SampleResource {
 		OK(200),
 		EMPTY(204),
 		BAD(400);
-		int code;
+		private int code;
 		ResponseStatus(int code) {
 			this.code = code;
 		}
