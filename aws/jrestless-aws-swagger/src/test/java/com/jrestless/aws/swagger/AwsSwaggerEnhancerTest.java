@@ -148,22 +148,12 @@ public class AwsSwaggerEnhancerTest {
 		Method meth = SampleResource.class.getMethod("method");
 		OperationContext oc = new OperationContext(op, meth, new Swagger());
 		enhancer.addAdditionalResponses(oc);
-		assertEquals(ImmutableSet.of("400", "401", "500", "403", "404", "415", "405", "406"), op.getResponses().keySet());
+		assertEquals(ImmutableSet.of("200", "204", "400", "401", "500", "403", "404", "415", "405", "406"), op.getResponses().keySet());
 	}
 
 	@Test
 	public void addAdditionalResponses_NoAdditionalResponsesAndNoDefaultConfiguredGiven_ShouldAddDefault() throws NoSuchMethodException, SecurityException {
 		addAdditionalResponses_NoResponsesAndNoDefaultConfiguredGiven_ShouldAddDefault();
-	}
-
-	@Test
-	public void addAdditionalResponses_AdditionalResponsesAndNoDefaultConfiguredGiven_ShouldNotAddDefault() throws NoSuchMethodException, SecurityException {
-		Operation op = new Operation();
-		op.setResponses(new HashMap<>());
-		Method meth = SampleResource.class.getMethod("method1");
-		OperationContext oc = new OperationContext(op, meth, new Swagger());
-		enhancer.addAdditionalResponses(oc);
-		assertEquals(ImmutableSet.of(), op.getResponses().keySet());
 	}
 
 	@Test
@@ -176,7 +166,7 @@ public class AwsSwaggerEnhancerTest {
 		Method meth = SampleResource.class.getMethod("method");
 		OperationContext oc = new OperationContext(op, meth, new Swagger());
 		enhancer.addAdditionalResponses(oc);
-		assertEquals(ImmutableSet.of("400", "401", "500", "403", "404", "415", "405", "406"), op.getResponses().keySet());
+		assertEquals(ImmutableSet.of("200", "204", "400", "401", "500", "403", "404", "415", "405", "406"), op.getResponses().keySet());
 		assertSame(defaultResponse, responses.get("400"));
 	}
 
@@ -206,7 +196,7 @@ public class AwsSwaggerEnhancerTest {
 		Method meth = SampleResource.class.getMethod("method1");
 		OperationContext oc = new OperationContext(op, meth, new Swagger());
 		enhancer.addAdditionalResponses(oc);
-		assertEquals(ImmutableSet.of(), op.getResponses().keySet());
+		assertEquals(ImmutableSet.of("123"), op.getResponses().keySet());
 	}
 
 	@Test

@@ -87,7 +87,9 @@ public class AwsSwaggerEnhancer implements SwaggerEnhancer {
 			STATUS_METHOD_NOT_ALLOWED,
 			Status.NOT_ACCEPTABLE.getStatusCode(),
 			Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode(),
-			Status.INTERNAL_SERVER_ERROR.getStatusCode()
+			Status.INTERNAL_SERVER_ERROR.getStatusCode(),
+			Status.OK.getStatusCode(),
+			Status.NO_CONTENT.getStatusCode()
 		);
 	}
 
@@ -156,19 +158,13 @@ public class AwsSwaggerEnhancer implements SwaggerEnhancer {
 	}
 
 	protected void addAdditionalResponses(OperationContext operationContext) {
-		/*
-		 * if no additional response codes are given explicitly, then add
-		 * the default ones.
-		 */
-		if (AwsAnnotationsUtils.getAdditionalStatusCodes(operationContext.getEndpointMethod()).isEmpty()) {
-			if (configuration.isSetAdditionalResponseCodes()) {
-				for (int statusCode : configuration.getAdditionalResponseCodes()) {
-					addResponse(operationContext.getOperation(), statusCode);
-				}
-			} else {
-				for (int statusCode : DEFAULT_ADDITIONAL_STATUS_CODES) {
-					addResponse(operationContext.getOperation(), statusCode);
-				}
+		if (configuration.isSetAdditionalResponseCodes()) {
+			for (int statusCode : configuration.getAdditionalResponseCodes()) {
+				addResponse(operationContext.getOperation(), statusCode);
+			}
+		} else {
+			for (int statusCode : DEFAULT_ADDITIONAL_STATUS_CODES) {
+				addResponse(operationContext.getOperation(), statusCode);
 			}
 		}
 	}

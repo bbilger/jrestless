@@ -1,145 +1,400 @@
 {
-    "swagger": "2.0",
-    "paths": {
-        "/204": {
-            "get": {
-                "summary": "additional status code 400, 404 (default 200)",
-                "description": "",
-                "operationId": "additional400404",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "headers": {
-                            "Content-Type": {
-                                "type": "string",
-                                "description": "'application/json'"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "",
-                        "headers": {
-                            "Content-Type": {
-                                "type": "string",
-                                "description": "'application/json'"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "",
-                        "headers": {
-                            "Content-Type": {
-                                "type": "string",
-                                "description": "'application/json'"
-                            }
-                        }
-                    }
-                },
-                "x-amazon-apigateway-integration": {
-                    "credentials": "arn:aws:iam::YOURID:role/YOURINVOCATIONROLE",
-                    "uri": "arn:aws:apigateway:YOURREGION:lambda:path/2015-03-31/functions/arn:aws:lambda:YOURREGION:YOURID:function:YOURFUNCTION/invocations",
-                    "requestTemplates": {
-                        "application/json": "{\n\"body\": \"$util.escapeJavaScript($input.json('$'))\",\n\"headers\": {\n#foreach($param in $input.params().header.keySet())\n\"$param\": \"$util.escapeJavaScript($input.params().header.get($param))\" #if($foreach.hasNext),#end\n#end\n},\n\"queryParams\": {\n#foreach($param in $input.params().querystring.keySet())\n\"$param\": \"$util.escapeJavaScript($input.params().querystring.get($param))\" #if($foreach.hasNext),#end\n#end\n},\n\"pathParams\": {\n#foreach($param in $input.params().path.keySet())\n\"$param\": \"$util.escapeJavaScript($input.params().path.get($param))\" #if($foreach.hasNext),#end\n#end\n},\n\"context\": {\n\"apiId\":\"$context.apiId\",\n\"principalId\":\"$util.escapeJavaScript($context.authorizer.principalId)\",\n\"httpMethod\":\"$context.httpMethod\",\n\"accountId\":\"$context.identity.accountId\",\n\"apiKey\":\"$context.identity.apiKey\",\n\"caller\":\"$context.identity.caller\",\n\"cognitoAuthenticationProvider\":\"$context.identity.cognitoAuthenticationProvider\",\n\"cognitoAuthenticationType\":\"$context.identity.cognitoAuthenticationType\",\n\"cognitoIdentityId\":\"$context.identity.cognitoIdentityId\",\n\"cognitoIdentityPoolId\":\"$context.identity.cognitoIdentityPoolId\",\n\"sourceIp\":\"$context.identity.sourceIp\",\n\"user\":\"$context.identity.user\",\n\"userAgent\":\"$context.identity.userAgent\",\n\"userArn\":\"$context.identity.userArn\",\n\"requestId\":\"$context.requestId\",\n\"resourceId\":\"$context.resourceId\",\n\"resourcePath\":\"$context.resourcePath\",\n\"stage\":\"$context.stage\",\n\"stageVariables\": {\n#foreach($stageKey in $stageVariables.keySet())\n\"$stageKey\": \"$util.escapeJavaScript($stageVariables.get($stageKey))\" #if($foreach.hasNext),#end\n#end\n}\n}\n}\n"
-                    },
-                    "requestParameters": {},
-                    "responses": {
-                        "default": {
-                            "statusCode": "200",
-                            "responseParameters": {
-                                "method.response.header.Content-Type": "'application/json'"
-                            },
-                            "responseTemplates": {
-                                "application/json": "$input.path('$.body')"
-                            }
-                        },
-                        "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"400\\\"(.|\\n)*": {
-                            "statusCode": "400",
-                            "responseParameters": {
-                                "method.response.header.Content-Type": "'application/json'"
-                            },
-                            "responseTemplates": {
-                                "application/json": "$util.parseJson($input.path('$.errorMessage')).body"
-                            }
-                        },
-                        "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"404\\\"(.|\\n)*": {
-                            "statusCode": "404",
-                            "responseParameters": {
-                                "method.response.header.Content-Type": "'application/json'"
-                            },
-                            "responseTemplates": {
-                                "application/json": "$util.parseJson($input.path('$.errorMessage')).body"
-                            }
-                        }
-                    },
-                    "httpMethod": "POST",
-                    "type": "aws"
-                }
+  "swagger" : "2.0",
+  "paths" : {
+    "/204" : {
+      "get" : {
+        "summary" : "additional status code 400, 404 (default 200)",
+        "description" : "",
+        "operationId" : "additional400404",
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "string"
+            },
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
             }
+          },
+          "400" : {
+            "description" : "",
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          },
+          "401" : {
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          },
+          "500" : {
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          },
+          "204" : {
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          },
+          "403" : {
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          },
+          "404" : {
+            "description" : "",
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          },
+          "415" : {
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          },
+          "405" : {
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          },
+          "406" : {
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          }
         },
-        "/500": {
-            "get": {
-                "summary": "additional status code 500 (default 200)",
-                "description": "",
-                "operationId": "additional500",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "headers": {
-                            "Content-Type": {
-                                "type": "string",
-                                "description": "'application/json'"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "",
-                        "headers": {
-                            "Content-Type": {
-                                "type": "string",
-                                "description": "'application/json'"
-                            }
-                        }
-                    }
-                },
-                "x-amazon-apigateway-integration": {
-                    "credentials": "arn:aws:iam::YOURID:role/YOURINVOCATIONROLE",
-                    "uri": "arn:aws:apigateway:YOURREGION:lambda:path/2015-03-31/functions/arn:aws:lambda:YOURREGION:YOURID:function:YOURFUNCTION/invocations",
-                    "requestTemplates": {
-                        "application/json": "{\n\"body\": \"$util.escapeJavaScript($input.json('$'))\",\n\"headers\": {\n#foreach($param in $input.params().header.keySet())\n\"$param\": \"$util.escapeJavaScript($input.params().header.get($param))\" #if($foreach.hasNext),#end\n#end\n},\n\"queryParams\": {\n#foreach($param in $input.params().querystring.keySet())\n\"$param\": \"$util.escapeJavaScript($input.params().querystring.get($param))\" #if($foreach.hasNext),#end\n#end\n},\n\"pathParams\": {\n#foreach($param in $input.params().path.keySet())\n\"$param\": \"$util.escapeJavaScript($input.params().path.get($param))\" #if($foreach.hasNext),#end\n#end\n},\n\"context\": {\n\"apiId\":\"$context.apiId\",\n\"principalId\":\"$util.escapeJavaScript($context.authorizer.principalId)\",\n\"httpMethod\":\"$context.httpMethod\",\n\"accountId\":\"$context.identity.accountId\",\n\"apiKey\":\"$context.identity.apiKey\",\n\"caller\":\"$context.identity.caller\",\n\"cognitoAuthenticationProvider\":\"$context.identity.cognitoAuthenticationProvider\",\n\"cognitoAuthenticationType\":\"$context.identity.cognitoAuthenticationType\",\n\"cognitoIdentityId\":\"$context.identity.cognitoIdentityId\",\n\"cognitoIdentityPoolId\":\"$context.identity.cognitoIdentityPoolId\",\n\"sourceIp\":\"$context.identity.sourceIp\",\n\"user\":\"$context.identity.user\",\n\"userAgent\":\"$context.identity.userAgent\",\n\"userArn\":\"$context.identity.userArn\",\n\"requestId\":\"$context.requestId\",\n\"resourceId\":\"$context.resourceId\",\n\"resourcePath\":\"$context.resourcePath\",\n\"stage\":\"$context.stage\",\n\"stageVariables\": {\n#foreach($stageKey in $stageVariables.keySet())\n\"$stageKey\": \"$util.escapeJavaScript($stageVariables.get($stageKey))\" #if($foreach.hasNext),#end\n#end\n}\n}\n}\n"
-                    },
-                    "requestParameters": {},
-                    "responses": {
-                        "default": {
-                            "statusCode": "200",
-                            "responseParameters": {
-                                "method.response.header.Content-Type": "'application/json'"
-                            },
-                            "responseTemplates": {
-                                "application/json": "$input.path('$.body')"
-                            }
-                        },
-                        "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"500\\\"(.|\\n)*": {
-                            "statusCode": "500",
-                            "responseParameters": {
-                                "method.response.header.Content-Type": "'application/json'"
-                            },
-                            "responseTemplates": {
-                                "application/json": "$util.parseJson($input.path('$.errorMessage')).body"
-                            }
-                        }
-                    },
-                    "httpMethod": "POST",
-                    "type": "aws"
-                }
+        "x-amazon-apigateway-integration" : {
+          "credentials" : "arn:aws:iam::YOURID:role/YOURINVOCATIONROLE",
+          "uri" : "arn:aws:apigateway:YOURREGION:lambda:path/2015-03-31/functions/arn:aws:lambda:YOURREGION:YOURID:function:YOURFUNCTION/invocations",
+          "requestTemplates" : {
+            "application/json" : "{\n\"body\": \"$util.escapeJavaScript($input.json('$'))\",\n\"headers\": {\n#foreach($param in $input.params().header.keySet())\n\"$param\": \"$util.escapeJavaScript($input.params().header.get($param))\" #if($foreach.hasNext),#end\n#end\n},\n\"queryParams\": {\n#foreach($param in $input.params().querystring.keySet())\n\"$param\": \"$util.escapeJavaScript($input.params().querystring.get($param))\" #if($foreach.hasNext),#end\n#end\n},\n\"pathParams\": {\n#foreach($param in $input.params().path.keySet())\n\"$param\": \"$util.escapeJavaScript($input.params().path.get($param))\" #if($foreach.hasNext),#end\n#end\n},\n\"context\": {\n\"apiId\":\"$context.apiId\",\n\"principalId\":\"$util.escapeJavaScript($context.authorizer.principalId)\",\n\"httpMethod\":\"$context.httpMethod\",\n\"accountId\":\"$context.identity.accountId\",\n\"apiKey\":\"$context.identity.apiKey\",\n\"caller\":\"$context.identity.caller\",\n\"cognitoAuthenticationProvider\":\"$context.identity.cognitoAuthenticationProvider\",\n\"cognitoAuthenticationType\":\"$context.identity.cognitoAuthenticationType\",\n\"cognitoIdentityId\":\"$context.identity.cognitoIdentityId\",\n\"cognitoIdentityPoolId\":\"$context.identity.cognitoIdentityPoolId\",\n\"sourceIp\":\"$context.identity.sourceIp\",\n\"user\":\"$context.identity.user\",\n\"userAgent\":\"$context.identity.userAgent\",\n\"userArn\":\"$context.identity.userArn\",\n\"requestId\":\"$context.requestId\",\n\"resourceId\":\"$context.resourceId\",\n\"resourcePath\":\"$context.resourcePath\",\n\"stage\":\"$context.stage\",\n\"stageVariables\": {\n#foreach($stageKey in $stageVariables.keySet())\n\"$stageKey\": \"$util.escapeJavaScript($stageVariables.get($stageKey))\" #if($foreach.hasNext),#end\n#end\n}\n}\n}\n"
+          },
+          "requestParameters" : { },
+          "responses" : {
+            "default" : {
+              "statusCode" : "200",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$input.path('$.body')"
+              }
+            },
+            "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"400\\\"(.|\\n)*" : {
+              "statusCode" : "400",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$util.parseJson($input.path('$.errorMessage')).body"
+              }
+            },
+            "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"415\\\"(.|\\n)*" : {
+              "statusCode" : "415",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$util.parseJson($input.path('$.errorMessage')).body"
+              }
+            },
+            "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"500\\\"(.|\\n)*" : {
+              "statusCode" : "500",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$util.parseJson($input.path('$.errorMessage')).body"
+              }
+            },
+            "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"404\\\"(.|\\n)*" : {
+              "statusCode" : "404",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$util.parseJson($input.path('$.errorMessage')).body"
+              }
+            },
+            "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"406\\\"(.|\\n)*" : {
+              "statusCode" : "406",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$util.parseJson($input.path('$.errorMessage')).body"
+              }
+            },
+            "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"204\\\"(.|\\n)*" : {
+              "statusCode" : "204",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$util.parseJson($input.path('$.errorMessage')).body"
+              }
+            },
+            "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"405\\\"(.|\\n)*" : {
+              "statusCode" : "405",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$util.parseJson($input.path('$.errorMessage')).body"
+              }
+            },
+            "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"401\\\"(.|\\n)*" : {
+              "statusCode" : "401",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$util.parseJson($input.path('$.errorMessage')).body"
+              }
+            },
+            "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"403\\\"(.|\\n)*" : {
+              "statusCode" : "403",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$util.parseJson($input.path('$.errorMessage')).body"
+              }
             }
+          },
+          "httpMethod" : "POST",
+          "type" : "aws"
         }
+      }
+    },
+    "/500" : {
+      "get" : {
+        "summary" : "additional status code 500 (default 200)",
+        "description" : "",
+        "operationId" : "additional500",
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "string"
+            },
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          },
+          "400" : {
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          },
+          "500" : {
+            "description" : "",
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          },
+          "401" : {
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          },
+          "204" : {
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          },
+          "403" : {
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          },
+          "404" : {
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          },
+          "415" : {
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          },
+          "405" : {
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          },
+          "406" : {
+            "headers" : {
+              "Content-Type" : {
+                "type" : "string",
+                "description" : "'application/json'"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "credentials" : "arn:aws:iam::YOURID:role/YOURINVOCATIONROLE",
+          "uri" : "arn:aws:apigateway:YOURREGION:lambda:path/2015-03-31/functions/arn:aws:lambda:YOURREGION:YOURID:function:YOURFUNCTION/invocations",
+          "requestTemplates" : {
+            "application/json" : "{\n\"body\": \"$util.escapeJavaScript($input.json('$'))\",\n\"headers\": {\n#foreach($param in $input.params().header.keySet())\n\"$param\": \"$util.escapeJavaScript($input.params().header.get($param))\" #if($foreach.hasNext),#end\n#end\n},\n\"queryParams\": {\n#foreach($param in $input.params().querystring.keySet())\n\"$param\": \"$util.escapeJavaScript($input.params().querystring.get($param))\" #if($foreach.hasNext),#end\n#end\n},\n\"pathParams\": {\n#foreach($param in $input.params().path.keySet())\n\"$param\": \"$util.escapeJavaScript($input.params().path.get($param))\" #if($foreach.hasNext),#end\n#end\n},\n\"context\": {\n\"apiId\":\"$context.apiId\",\n\"principalId\":\"$util.escapeJavaScript($context.authorizer.principalId)\",\n\"httpMethod\":\"$context.httpMethod\",\n\"accountId\":\"$context.identity.accountId\",\n\"apiKey\":\"$context.identity.apiKey\",\n\"caller\":\"$context.identity.caller\",\n\"cognitoAuthenticationProvider\":\"$context.identity.cognitoAuthenticationProvider\",\n\"cognitoAuthenticationType\":\"$context.identity.cognitoAuthenticationType\",\n\"cognitoIdentityId\":\"$context.identity.cognitoIdentityId\",\n\"cognitoIdentityPoolId\":\"$context.identity.cognitoIdentityPoolId\",\n\"sourceIp\":\"$context.identity.sourceIp\",\n\"user\":\"$context.identity.user\",\n\"userAgent\":\"$context.identity.userAgent\",\n\"userArn\":\"$context.identity.userArn\",\n\"requestId\":\"$context.requestId\",\n\"resourceId\":\"$context.resourceId\",\n\"resourcePath\":\"$context.resourcePath\",\n\"stage\":\"$context.stage\",\n\"stageVariables\": {\n#foreach($stageKey in $stageVariables.keySet())\n\"$stageKey\": \"$util.escapeJavaScript($stageVariables.get($stageKey))\" #if($foreach.hasNext),#end\n#end\n}\n}\n}\n"
+          },
+          "requestParameters" : { },
+          "responses" : {
+            "default" : {
+              "statusCode" : "200",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$input.path('$.body')"
+              }
+            },
+            "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"400\\\"(.|\\n)*" : {
+              "statusCode" : "400",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$util.parseJson($input.path('$.errorMessage')).body"
+              }
+            },
+            "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"415\\\"(.|\\n)*" : {
+              "statusCode" : "415",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$util.parseJson($input.path('$.errorMessage')).body"
+              }
+            },
+            "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"500\\\"(.|\\n)*" : {
+              "statusCode" : "500",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$util.parseJson($input.path('$.errorMessage')).body"
+              }
+            },
+            "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"404\\\"(.|\\n)*" : {
+              "statusCode" : "404",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$util.parseJson($input.path('$.errorMessage')).body"
+              }
+            },
+            "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"406\\\"(.|\\n)*" : {
+              "statusCode" : "406",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$util.parseJson($input.path('$.errorMessage')).body"
+              }
+            },
+            "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"204\\\"(.|\\n)*" : {
+              "statusCode" : "204",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$util.parseJson($input.path('$.errorMessage')).body"
+              }
+            },
+            "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"405\\\"(.|\\n)*" : {
+              "statusCode" : "405",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$util.parseJson($input.path('$.errorMessage')).body"
+              }
+            },
+            "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"401\\\"(.|\\n)*" : {
+              "statusCode" : "401",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$util.parseJson($input.path('$.errorMessage')).body"
+              }
+            },
+            "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"403\\\"(.|\\n)*" : {
+              "statusCode" : "403",
+              "responseParameters" : {
+                "method.response.header.Content-Type" : "'application/json'"
+              },
+              "responseTemplates" : {
+                "application/json" : "$util.parseJson($input.path('$.errorMessage')).body"
+              }
+            }
+          },
+          "httpMethod" : "POST",
+          "type" : "aws"
+        }
+      }
     }
+  }
 }
