@@ -1,4 +1,4 @@
-group = 'com.jrestless.aws'
+group = 'com.jrestless'
 version = "${globaleModuleVersion}"
 
 dependencies {
