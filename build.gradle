@@ -80,9 +80,9 @@ subprojects {
 			websiteUrl = 'https://github.com/bbilger/jrestless'
 			githubRepo = 'bbilger/jrestless'
 			version {
-				name = "$version"
-				released = new Date()
-				vcsTag = 'v' + "$version"
+				name = "$globaleModuleVersion"
+				vcsTag = 'v' + "$globaleModuleVersion"
+				desc = "$globaleModuleVersion"
 			}
 		}
 		publications = ['BintrayPublication']
