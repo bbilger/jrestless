@@ -1,9 +1,0 @@
-{
-	"lambdaUri": "arn:aws:apigateway:REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:REGION:ACCOUNT_ID:function:FUNCTION_NAME/invocations",
-	"lambdaCredential": "arn:aws:iam::ACCOUNT_ID:role/LAMBDA_INVOKATION_RULE",
-	// uncomment in order to enable an authorizer
-	// "defaultAuthType": "authorizer",
-	// "defaultSecurity" : [ {
-	//   "your-authorizer" : [ ]
-    // } ]
-}
