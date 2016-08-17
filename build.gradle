@@ -1,5 +1,7 @@
 def checkstyleCfg = "${projectDir}/alien/checkstyle/checkstyle.xml" as File
-
+	
+def bintrayUser = hasProperty('bintray_user') ? property('bintray_user') : 'unset'
+def bintrayKey = hasProperty('bintray_key') ? property('bintray_key') : 'unset'
 
 buildscript {
 	repositories {
@@ -67,13 +69,21 @@ subprojects {
 	check.dependsOn jacocoTestReport
 	
 	bintray {
-		user = hasProperty('bintray_user') ? property('bintray_user') : 'unset'
-		key = hasProperty('bintray_user') ? property('bintray_key') : 'unset'
+		user = bintrayUser
+		key = bintrayKey
 		pkg {
 			repo = 'maven'
 			name = 'jrestless'
 			licenses = ['Apache-2.0']
 			vcsUrl = 'https://github.com/bbilger/jrestless.git'
+			issueTrackerUrl = 'https://github.com/bbilger/jrestless/issues'
+			websiteUrl = 'https://github.com/bbilger/jrestless'
+			githubRepo = 'bbilger/jrestless'
+			version {
+				name = "$version"
+				released = new Date()
+				vcsTag = 'v' + "$version"
+			}
 		}
 		publications = ['BintrayPublication']
 	}
@@ -85,6 +95,16 @@ subprojects {
 				groupId "$group"
 				artifactId "$project.name"
 				version "$version"
+			}
+			// change from runtime to compile time
+			all {
+				pom.withXml {
+    				asNode().dependencies.'*'.findAll() {
+      					it.scope.text() == 'runtime' && project.configurations.compile.allDependencies.find { dep ->
+        					dep.name == it.artifactId.text()
+      					}
+    				}.each { it.scope*.value = 'compile'}
+  				}
 			}
 		}
 	}
