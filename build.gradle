@@ -73,7 +73,7 @@ subprojects {
 		key = bintrayKey
 		pkg {
 			repo = 'maven'
-			name = 'jrestless'
+			name = "$project.name"
 			licenses = ['Apache-2.0']
 			vcsUrl = 'https://github.com/bbilger/jrestless.git'
 			issueTrackerUrl = 'https://github.com/bbilger/jrestless/issues'
