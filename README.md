@@ -3,7 +3,6 @@
 [![codecov](https://codecov.io/gh/bbilger/jrestless/branch/master/graph/badge.svg)](https://codecov.io/gh/bbilger/jrestless)
 [![GitHub issues](https://img.shields.io/github/issues/bbilger/jrestless.svg)](https://github.com/bbilger/jrestless/issues)
 [![License](https://img.shields.io/github/license/bbilger/jrestless.svg)](https://github.com/bbilger/jrestless/blob/master/LICENSE)
-[![Twitter](https://img.shields.io/twitter/url/https/github.com/bbilger/jrestless.svg?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=%5Bobject%20Object%5D)
 
 JRestless allows you to create serverless applications using JAX-RS.
 
