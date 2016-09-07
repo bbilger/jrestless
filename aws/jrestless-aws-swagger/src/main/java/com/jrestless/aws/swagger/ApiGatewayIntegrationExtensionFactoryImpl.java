@@ -17,6 +17,7 @@ package com.jrestless.aws.swagger;
 
 
 import static com.jrestless.aws.swagger.util.LogUtils.createLogIdentifier;
+import static com.jrestless.aws.swagger.util.LogUtils.logAndReturn;
 import static com.jrestless.aws.swagger.util.LogUtils.logOnSupply;
 import static java.util.Objects.requireNonNull;
 
@@ -25,8 +26,10 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +41,7 @@ import com.jrestless.aws.swagger.models.ApiGatewayIntegrationResponse;
 import com.jrestless.aws.swagger.models.AwsSwaggerConfiguration;
 import com.jrestless.aws.swagger.util.AwsAnnotationsUtils;
 import com.jrestless.aws.swagger.util.HeaderUtils;
+import com.jrestless.aws.swagger.util.HeaderUtils.DynamicNonDefaultHeaderNotSupportedException;
 
 import io.swagger.models.Operation;
 import io.swagger.models.Response;
@@ -52,8 +56,10 @@ import io.swagger.models.properties.Property;
  */
 public class ApiGatewayIntegrationExtensionFactoryImpl implements ApiGatewayIntegrationExtensionFactory {
 
-	private final LogAdapter log;
+	private static final String[] DEFAULT_SUPPORTED_NONDEFAULT_HEADERS_IN_ORDER = new String[] {
+			HttpHeaders.CONTENT_TYPE, HttpHeaders.LOCATION };
 
+	private final LogAdapter log;
 	private final String awsCredentials;
 	private final String awsLambdaUri;
 
@@ -99,10 +105,6 @@ public class ApiGatewayIntegrationExtensionFactoryImpl implements ApiGatewayInte
 			String defaultStatusCode = getDefaultStatusCode(responseContext.getAwsOperationContext()) + "";
 			return defaultStatusCode.equals(statusCode);
 		}
-	}
-
-	protected boolean isDynamicHeaderValue(String headerValue) {
-		return headerValue.startsWith(RESPONSE_PARAM_VALUE_INTEGRATION_RESPONSE_BODY_PREFIX);
 	}
 
 	/**
@@ -156,26 +158,36 @@ public class ApiGatewayIntegrationExtensionFactoryImpl implements ApiGatewayInte
 							createLogIdentifier(context));
 					continue;
 				}
+				boolean defaultResponse = isDefaultResponse(responseContext);
 				if (StringUtils.isBlank(swaggerHeaderValue)) {
-					swaggerHeaderValue = RESPONSE_PARAM_VALUE_INTEGRATION_RESPONSE_BODY_HEADERS_PREFIX
-							+ swaggerHeaderName;
+					try {
+						AwsSwaggerConfiguration configuration = responseContext.getAwsOperationContext()
+								.getConfiguration();
+						String[] supportedNonDefaultHeadersInOrder;
+						if (configuration.isSetSupportedNonDefaultHeadersInOrder()) {
+							supportedNonDefaultHeadersInOrder = configuration.getSupportedNonDefaultHeadersInOrder();
+						} else {
+							supportedNonDefaultHeadersInOrder = DEFAULT_SUPPORTED_NONDEFAULT_HEADERS_IN_ORDER;
+						}
+						swaggerHeaderValue = HeaderUtils.getDynamicHeaderIntegrationExpression(swaggerHeaderName,
+								defaultResponse, supportedNonDefaultHeadersInOrder);
+					} catch (DynamicNonDefaultHeaderNotSupportedException e) {
+						String msg = "header '" + e.getHeaderName()
+								+ "' is not whitelisted via configuration parameter "
+								+ "'supportedNonDefaultHeadersInOrder'. "
+								+ createLogIdentifier(context, "headerName=" + swaggerHeaderName);
+						throw new RuntimeException(logAndReturn(msg, log));
+					}
 				}
 
 				boolean staticHeaderValue = HeaderUtils.isStaticValue(swaggerHeaderValue);
-				boolean dynamicHeaderValue = isDynamicHeaderValue(swaggerHeaderValue);
-				boolean defaultResponse = isDefaultResponse(responseContext);
+				boolean dynamicHeaderValue = HeaderUtils.isDynamicValue(swaggerHeaderValue);
 				if (!staticHeaderValue && !dynamicHeaderValue) {
 					warnSkipHeader(
 							"Invalid header value. Headers must either be static ('yourStaticValueInSingleQuotes'),"
 									+ " or must start with '"
-									+ RESPONSE_PARAM_VALUE_INTEGRATION_RESPONSE_BODY_PREFIX
+									+ HeaderUtils.INTEGRATION_RESPONSE_PREFIX
 									+ "'. They must be passed via @ResponseHeader#description.",
-									createLogIdentifier(context, "headerName=" + swaggerHeaderName,
-											"headerValue=" + swaggerHeaderValue));
-				} else if (!defaultResponse && dynamicHeaderValue) {
-					warnSkipHeader(
-							"Non-default responses support static header values ('yourStaticValueInSingleQuotes'),"
-									+ " only. They must be passed via @ResponseHeader#description.",
 									createLogIdentifier(context, "headerName=" + swaggerHeaderName,
 											"headerValue=" + swaggerHeaderValue));
 				} else {
@@ -242,33 +254,23 @@ public class ApiGatewayIntegrationExtensionFactoryImpl implements ApiGatewayInte
 		}
 
 		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = super.hashCode();
-			result = prime * result + ((configuration == null) ? 0 : configuration.hashCode());
-			return result;
+		public boolean equals(final Object other) {
+			if (this == other) {
+				return true;
+			}
+			if (!super.equals(other)) {
+				return false;
+			}
+			if (!getClass().equals(other.getClass())) {
+				return false;
+			}
+			AwsOperationContext castOther = (AwsOperationContext) other;
+			return Objects.equals(configuration, castOther.configuration);
 		}
 
 		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) {
-				return true;
-			}
-			if (!super.equals(obj)) {
-				return false;
-			}
-			if (getClass() != obj.getClass()) {
-				return false;
-			}
-			AwsOperationContext other = (AwsOperationContext) obj;
-			if (configuration == null) {
-				if (other.configuration != null) {
-					return false;
-				}
-			} else if (!configuration.equals(other.configuration)) {
-				return false;
-			}
-			return true;
+		public int hashCode() {
+			return Objects.hash(configuration);
 		}
 	}
 	/**
@@ -308,8 +310,6 @@ public class ApiGatewayIntegrationExtensionFactoryImpl implements ApiGatewayInte
 	// CHECKSTYLE:OFF
 	protected static final String DEFAULT_RESPONSE_CODE_PATTERN = "default";
 	protected static final String RESPONSE_PARAM_KEY_METHOD_RESPONSE_HEADER_PREFIX = "method.response.header.";
-	protected static final String RESPONSE_PARAM_VALUE_INTEGRATION_RESPONSE_BODY_PREFIX = "integration.response.body.";
-	protected static final String RESPONSE_PARAM_VALUE_INTEGRATION_RESPONSE_BODY_HEADERS_PREFIX = "integration.response.body.headers.";
 	protected static final String RESPONSE_STATUS_CODE_PATTERN_FMT = "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"%s\\\"(.|\\n)*";
 
 	protected static final String INTEGRATION_ERROR_RESPONSE_TEMPLATE = "$util.parseJson($input.path('$.errorMessage')).body";
@@ -319,7 +319,7 @@ public class ApiGatewayIntegrationExtensionFactoryImpl implements ApiGatewayInte
 	protected static final String JSON_REQUEST_TEMPLATE = ""
 			+ "{\n"
 			+ "  \"body\": \"$util.escapeJavaScript($input.json('$'))\",\n"
-			+ "  \"headers\": {\n"
+			+ "  \"headerParams\": {\n"
 			+ "    #foreach($param in $input.params().header.keySet())\n"
 			+ "      \"$param\": \"$util.escapeJavaScript($input.params().header.get($param))\" #if($foreach.hasNext),#end\n"
 			+ "    #end\n"

@@ -86,7 +86,7 @@ public class GatewayRequestHandlerTest {
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void sinit2_MultiInit_ShouldThrowIse() {
+	public void init2_MultiInit_ShouldThrowIse() {
 		gatewayHandler.init(container);
 	}
 
@@ -156,7 +156,7 @@ public class GatewayRequestHandlerTest {
 		when(responseWriter.getResponse()).thenReturn(containerResponse);
 		doReturn(responseWriter).when(gatewayHandler).createResponseWriter();
 		GatewayDefaultResponse response = gatewayHandler.delegateRequest(request, context);
-		assertEquals(new GatewayDefaultResponse("testBody", headers, Status.OK), response);
+		assertEquals(new GatewayDefaultResponse("testBody", ImmutableMap.of("k", "k,v"), Status.OK), response);
 	}
 
 	@Test
@@ -245,6 +245,5 @@ public class GatewayRequestHandlerTest {
 	}
 
 	private static class GatewayRequestHandlerImpl extends GatewayRequestHandler {
-
 	}
 }

@@ -16,9 +16,7 @@
 package com.jrestless.aws.io;
 
 import java.lang.reflect.Constructor;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
@@ -27,24 +25,11 @@ import javax.ws.rs.core.Response.StatusType;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.jrestless.test.ConstructorPreconditionsTester;
 import com.jrestless.test.SimpleImmutableValueObjectEqualsTester;
 
 public class GatewayDefaultResponseTest {
-
-	@Test
-	public void getBody_NullBodyGiven_ShouldBeReturnedAsIs() {
-		GatewayDefaultResponse resp = new GatewayDefaultResponse(null, ImmutableMap.of(), Status.OK);
-		Assert.assertEquals(null, resp.getBody());
-	}
-
-	@Test
-	public void getBody_BodyGiven_ShouldBeReturnedAsIs() {
-		GatewayDefaultResponse resp = new GatewayDefaultResponse("body", ImmutableMap.of(), Status.OK);
-		Assert.assertEquals("body", resp.getBody());
-	}
 
 	@Test
 	public void getStatusCode_StatusTypeGiven_ShouldReturnStatusCodeFromType() {
@@ -53,41 +38,14 @@ public class GatewayDefaultResponseTest {
 	}
 
 	@Test
-	public void getHeaders_SingleValueForHeaderGiven_ShouldBeReturnedAsIs() {
-		Map<String, List<String>> multiHeaders = ImmutableMap.of("Header", ImmutableList.of("val1"));
-		GatewayDefaultResponse resp = new GatewayDefaultResponse("", multiHeaders, Status.OK);
-		Map<String, String> headers = resp.getHeaders();
-		Assert.assertEquals(1, headers.size());
-		Assert.assertEquals("val1", headers.get("Header"));
-	}
-
-	@Test
-	public void getHeaders_MultipleValuesForHeaderGiven_ShouldBeMergedCommaSeparated() {
-		Map<String, List<String>> multiHeaders = ImmutableMap.of("Header", ImmutableList.of("val1", "val2"));
-		GatewayDefaultResponse resp = new GatewayDefaultResponse("", multiHeaders, Status.OK);
-		Map<String, String> headers = resp.getHeaders();
-		Assert.assertEquals(1, headers.size());
-		Assert.assertEquals("val1,val2", headers.get("Header"));
-	}
-
-	@Test
-	public void getHeaders_NullValueForHeaderGiven_ShouldBeFilteredOut() {
-		Map<String, List<String>> multiHeaders = new HashMap<>();
-		multiHeaders.put("Header", null);
-		GatewayDefaultResponse resp = new GatewayDefaultResponse("", multiHeaders, Status.OK);
-		Map<String, String> headers = resp.getHeaders();
-		Assert.assertEquals(0, headers.size());
-	}
-
-	@Test
 	public void testEquals() {
+		Map<String, String> nullHeader = new HashMap<>();
+		nullHeader.put("headerName", null);
 		new SimpleImmutableValueObjectEqualsTester(getConstructor())
 			// body
 			.addArguments(0, null, "body", "")
 			// headers
-			.addArguments(1, ImmutableMap.of(), ImmutableMap.of("Header", ImmutableList.of()))
-			.addArguments(1, ImmutableMap.of("Header", Collections.singletonList(null)))
-			.addArguments(1, ImmutableMap.of("Header", ImmutableList.of("Val")))
+			.addArguments(1, ImmutableMap.of(), ImmutableMap.of("headerName", "headerValue"), nullHeader)
 			// statusType
 			.addArguments(2, Status.OK, Status.BAD_GATEWAY)
 			.testEquals();
@@ -95,13 +53,13 @@ public class GatewayDefaultResponseTest {
 
 	@Test
 	public void testConstructorPreconditions() {
+		Map<String, String> nullHeader = new HashMap<>();
+		nullHeader.put("headerName", null);
 		new ConstructorPreconditionsTester(getConstructor())
 			// body
 			.addValidArgs(0, null, "body")
 			// headers
-			.addValidArgs(1, ImmutableMap.of(), ImmutableMap.of("Header", ImmutableList.of()))
-			.addValidArgs(1, ImmutableMap.of("Header", Collections.singletonList(null)))
-			.addValidArgs(1, ImmutableMap.of("Header", ImmutableList.of("Val")))
+			.addValidArgs(1, ImmutableMap.of(), ImmutableMap.of("headerName", "headerValue"), nullHeader)
 			.addInvalidNpeArg(1)
 			// statusType
 			.addValidArgs(2, Status.OK)

@@ -19,6 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -107,33 +108,24 @@ class InvokableArguments<T extends Argument> {
 			return value;
 		}
 		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((value == null) ? 0 : value.hashCode());
-			return result;
-		}
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) {
+		public boolean equals(final Object other) {
+			if (this == other) {
 				return true;
 			}
-			if (obj == null) {
+			if (other == null) {
 				return false;
 			}
-			if (getClass() != obj.getClass()) {
+			if (!getClass().equals(other.getClass())) {
 				return false;
 			}
-			Argument other = (Argument) obj;
-			if (value == null) {
-				if (other.value != null) {
-					return false;
-				}
-			} else if (!value.equals(other.value)) {
-				return false;
-			}
-			return true;
+			Argument castOther = (Argument) other;
+			return Objects.equals(value, castOther.value);
 		}
+		@Override
+		public int hashCode() {
+			return Objects.hash(value);
+		}
+
 	}
 
 	protected interface Invokable {

@@ -18,6 +18,7 @@ package com.jrestless.aws.swagger;
 import static java.util.Objects.requireNonNull;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 import io.swagger.models.Operation;
 import io.swagger.models.Swagger;
@@ -57,48 +58,24 @@ public class OperationContext {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((endpointMethod == null) ? 0 : endpointMethod.hashCode());
-		result = prime * result + ((operation == null) ? 0 : operation.hashCode());
-		result = prime * result + ((swagger == null) ? 0 : swagger.hashCode());
-		return result;
+	public boolean equals(final Object other) {
+		if (this == other) {
+			return true;
+		}
+		if (other == null) {
+			return false;
+		}
+		if (!getClass().equals(other.getClass())) {
+			return false;
+		}
+		OperationContext castOther = (OperationContext) other;
+		return Objects.equals(operation, castOther.operation)
+				&& Objects.equals(endpointMethod, castOther.endpointMethod)
+				&& Objects.equals(swagger, castOther.swagger);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		OperationContext other = (OperationContext) obj;
-		if (endpointMethod == null) {
-			if (other.endpointMethod != null) {
-				return false;
-			}
-		} else if (!endpointMethod.equals(other.endpointMethod)) {
-			return false;
-		}
-		if (operation == null) {
-			if (other.operation != null) {
-				return false;
-			}
-		} else if (!operation.equals(other.operation)) {
-			return false;
-		}
-		if (swagger == null) {
-			if (other.swagger != null) {
-				return false;
-			}
-		} else if (!swagger.equals(other.swagger)) {
-			return false;
-		}
-		return true;
+	public int hashCode() {
+		return Objects.hash(operation, endpointMethod, swagger);
 	}
 }

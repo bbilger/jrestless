@@ -43,6 +43,7 @@ public class AwsSwaggerConfiguration {
 	private AuthType defaultAuthType;
 	private List<Map<String, List<String>>> defaultSecurity;
 	private int[] additionalResponseCodes;
+	private String[] supportedNonDefaultHeadersInOrder;
 
 	// CHECKSTYLE:OFF
 	@JsonCreator
@@ -52,7 +53,8 @@ public class AwsSwaggerConfiguration {
 			@JsonProperty("defaultAccessControlAllowHeaders") String defaultAccessControlAllowHeaders,
 			@JsonProperty("defaultAuthType") AuthType defaultAuthType,
 			@JsonProperty("defaultSecurity") List<Map<String, List<String>>> defaultSecurity,
-			@JsonProperty("additionalResponseCodes") int[] additionalResponseCodes) {
+			@JsonProperty("additionalResponseCodes") int[] additionalResponseCodes,
+			@JsonProperty("supportedNonDefaultHeadersInOrder") String[] supportedNonDefaultHeadersInOrder) {
 		super();
 		this.lambdaCredential = lambdaCredential;
 		this.lambdaUri = lambdaUri;
@@ -62,6 +64,7 @@ public class AwsSwaggerConfiguration {
 		this.defaultAuthType = defaultAuthType;
 		this.defaultSecurity = defaultSecurity;
 		this.additionalResponseCodes = additionalResponseCodes;
+		this.supportedNonDefaultHeadersInOrder = supportedNonDefaultHeadersInOrder;
 	}
 	// CHECKSTYLE:ON
 
@@ -181,6 +184,28 @@ public class AwsSwaggerConfiguration {
 		return additionalResponseCodes != null;
 	}
 
+	/**
+	 * A copy of the supported non-default headers in order.
+	 * <p>
+	 * Non-default means we throw an exception from lambda in
+	 * order to pass 400s, for example. The outermost exception will contain
+	 * nested exceptions, the so called header exceptions, that contain the
+	 * actual header values in the errorMessage field.
+	 *
+	 * @return
+	 */
+	public String[] getSupportedNonDefaultHeadersInOrder() {
+		if (supportedNonDefaultHeadersInOrder == null) {
+			return null;
+		} else {
+			return Arrays.copyOf(supportedNonDefaultHeadersInOrder, supportedNonDefaultHeadersInOrder.length);
+		}
+	}
+
+	public boolean isSetSupportedNonDefaultHeadersInOrder() {
+		return supportedNonDefaultHeadersInOrder != null;
+	}
+
 	public enum AuthType {
 		@JsonProperty("none")
 		NONE,
@@ -197,83 +222,33 @@ public class AwsSwaggerConfiguration {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + Arrays.hashCode(additionalResponseCodes);
-		result = prime * result
-				+ ((defaultAccessControlAllowHeaders == null) ? 0 : defaultAccessControlAllowHeaders.hashCode());
-		result = prime * result
-				+ ((defaultAccessControlAllowOrigin == null) ? 0 : defaultAccessControlAllowOrigin.hashCode());
-		result = prime * result + ((defaultAuthType == null) ? 0 : defaultAuthType.hashCode());
-		result = prime * result + ((defaultCorsEnabled == null) ? 0 : defaultCorsEnabled.hashCode());
-		result = prime * result + ((defaultSecurity == null) ? 0 : defaultSecurity.hashCode());
-		result = prime * result + ((lambdaCredential == null) ? 0 : lambdaCredential.hashCode());
-		result = prime * result + ((lambdaUri == null) ? 0 : lambdaUri.hashCode());
-		return result;
+	public boolean equals(final Object other) {
+		if (this == other) {
+			return true;
+		}
+		if (other == null) {
+			return false;
+		}
+		if (!getClass().equals(other.getClass())) {
+			return false;
+		}
+		AwsSwaggerConfiguration castOther = AwsSwaggerConfiguration.class.cast(other);
+		return Objects.equals(lambdaCredential, castOther.lambdaCredential)
+				&& Objects.equals(lambdaUri, castOther.lambdaUri)
+				&& Objects.equals(defaultCorsEnabled, castOther.defaultCorsEnabled)
+				&& Objects.equals(defaultAccessControlAllowOrigin, castOther.defaultAccessControlAllowOrigin)
+				&& Objects.equals(defaultAccessControlAllowHeaders, castOther.defaultAccessControlAllowHeaders)
+				&& Objects.equals(defaultAuthType, castOther.defaultAuthType)
+				&& Objects.equals(defaultSecurity, castOther.defaultSecurity)
+				&& Arrays.equals(additionalResponseCodes, castOther.additionalResponseCodes)
+				&& Arrays.equals(supportedNonDefaultHeadersInOrder, castOther.supportedNonDefaultHeadersInOrder);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		AwsSwaggerConfiguration other = (AwsSwaggerConfiguration) obj;
-		if (!Arrays.equals(additionalResponseCodes, other.additionalResponseCodes)) {
-			return false;
-		}
-		if (defaultAccessControlAllowHeaders == null) {
-			if (other.defaultAccessControlAllowHeaders != null) {
-				return false;
-			}
-		} else if (!defaultAccessControlAllowHeaders.equals(other.defaultAccessControlAllowHeaders)) {
-			return false;
-		}
-		if (defaultAccessControlAllowOrigin == null) {
-			if (other.defaultAccessControlAllowOrigin != null) {
-				return false;
-			}
-		} else if (!defaultAccessControlAllowOrigin.equals(other.defaultAccessControlAllowOrigin)) {
-			return false;
-		}
-		if (defaultAuthType != other.defaultAuthType) {
-			return false;
-		}
-		if (defaultCorsEnabled == null) {
-			if (other.defaultCorsEnabled != null) {
-				return false;
-			}
-		} else if (!defaultCorsEnabled.equals(other.defaultCorsEnabled)) {
-			return false;
-		}
-		if (defaultSecurity == null) {
-			if (other.defaultSecurity != null) {
-				return false;
-			}
-		} else if (!defaultSecurity.equals(other.defaultSecurity)) {
-			return false;
-		}
-		if (lambdaCredential == null) {
-			if (other.lambdaCredential != null) {
-				return false;
-			}
-		} else if (!lambdaCredential.equals(other.lambdaCredential)) {
-			return false;
-		}
-		if (lambdaUri == null) {
-			if (other.lambdaUri != null) {
-				return false;
-			}
-		} else if (!lambdaUri.equals(other.lambdaUri)) {
-			return false;
-		}
-		return true;
+	public int hashCode() {
+		return Objects.hash(lambdaCredential, lambdaUri, defaultCorsEnabled, defaultAccessControlAllowOrigin,
+				defaultAccessControlAllowHeaders, defaultAuthType, defaultSecurity, additionalResponseCodes,
+				supportedNonDefaultHeadersInOrder);
 	}
 
 	@Override
@@ -282,6 +257,9 @@ public class AwsSwaggerConfiguration {
 				+ ", defaultCorsEnabled=" + defaultCorsEnabled + ", defaultAccessControlAllowOrigin="
 				+ defaultAccessControlAllowOrigin + ", defaultAccessControlAllowHeaders="
 				+ defaultAccessControlAllowHeaders + ", defaultAuthType=" + defaultAuthType + ", defaultSecurity="
-				+ defaultSecurity + ", additionalResponseCodes=" + Arrays.toString(additionalResponseCodes) + "]";
+				+ defaultSecurity + ", additionalResponseCodes=" + Arrays.toString(additionalResponseCodes)
+				+ ", supportedNonDefaultHeadersInOrder=" + Arrays.toString(supportedNonDefaultHeadersInOrder) + "]";
 	}
+
+
 }

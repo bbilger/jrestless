@@ -21,6 +21,8 @@ import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -41,7 +43,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.jrestless.aws.GatewayRequestContext;
 import com.jrestless.aws.GatewayResourceConfig;
@@ -104,9 +105,8 @@ public class GatewayRequestObjectHandlerInt {
 		requestContext.setResourcePath("/default");
 		request.setHeaderParams(ImmutableMap.of("Accept", "application/json"));
 		GatewayDefaultResponse response = handler.handleRequest(request, context);
-		assertEquals(new GatewayDefaultResponse("{\"value\":\"default\"}", ImmutableMap.of("X-Is-Default-Response",
-				ImmutableList.of("1"), "Content-Type", ImmutableList.of("application/json")), Status.OK),
-				response);
+		Map<String, String> headers = ImmutableMap.of("X-Is-Default-Response", "1", "Content-Type", "application/json");
+		assertEquals(new GatewayDefaultResponse("{\"value\":\"default\"}", headers, Status.OK), response);
 	}
 
 	@Test

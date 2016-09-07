@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.core.HttpHeaders;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -81,64 +82,20 @@ public class AwsSwaggerEnhancerTest {
 		enhancer = spy(new AwsSwaggerEnhancer(xFactory, configuration, log));
 	}
 
-	@Test
-	public void getResponseContentType_NoContentTypeGiven_ShouldAssumeJson() {
-		OperationContext context = mock(OperationContext.class);
-		Operation operation = mock(Operation.class);
-		when(context.getOperation()).thenReturn(operation);
-		when(operation.getProduces()).thenReturn(null);
-		String contentType = enhancer.getContentType(context);
-		assertEquals("application/json", contentType);
-	}
-
-	@Test
-	public void getResponseContentType_OneContentTypeGiven_ShouldReturnTheContentType() {
-		OperationContext context = mock(OperationContext.class);
-		Operation operation = mock(Operation.class);
-		when(context.getOperation()).thenReturn(operation);
-		when(operation.getProduces()).thenReturn(Collections.singletonList("someContentType"));
-		String contentType = enhancer.getContentType(context);
-		assertEquals("someContentType", contentType);
-	}
-
 	@Test(expected = RuntimeException.class)
-	public void getResponseContentType_MultipleContentTypesGiven_ShouldThrowException() {
-		OperationContext context = mock(OperationContext.class);
-		Operation operation = mock(Operation.class);
-		when(context.getOperation()).thenReturn(operation);
-		when(operation.getProduces()).thenReturn(ImmutableList.of("someContentType1", "someContentType2"));
-		enhancer.getContentType(context);
+	public void init_NoContentTypeNonDefaultHeaderSet_ShouldFail() {
+		AwsSwaggerConfiguration customConfig = mock(AwsSwaggerConfiguration.class);
+		when(customConfig.isSetSupportedNonDefaultHeadersInOrder()).thenReturn(true);
+		when(customConfig.getSupportedNonDefaultHeadersInOrder()).thenReturn(new String[0]);
+		new AwsSwaggerEnhancer(xFactory, customConfig, log);
 	}
 
 	@Test
-	public void addContentTypeHeaders_ContentTypeHeaderGiven_ShouldNotOverwrite() {
-		Response response = new Response();
-		StringProperty headerProp = new StringProperty();
-		headerProp.setDescription("'some cc'");
-		response.addHeader("Content-Type", headerProp);
-		OperationContext context = mock(OperationContext.class);
-		doReturn("some other cc").when(enhancer).getContentType(context);
-		enhancer.addContentTypeHeader(response, context);
-		assertEquals("'some cc'", response.getHeaders().get("Content-Type").getDescription());
-	}
-
-	@Test
-	public void addContentTypeHeaders_NullHeadersGiven_ShouldSetContentTypeHeader() {
-		Response response = new Response();
-		OperationContext context = mock(OperationContext.class);
-		doReturn("some other cc").when(enhancer).getContentType(context);
-		enhancer.addContentTypeHeader(response, context);
-		assertEquals("'some other cc'", response.getHeaders().get("Content-Type").getDescription());
-	}
-
-	@Test
-	public void addContentTypeHeaders_NoContentTypeHeaderGiven_ShouldSetContentTypeHeader() {
-		Response response = new Response();
-		response.setHeaders(new HashMap<>());
-		OperationContext context = mock(OperationContext.class);
-		doReturn("some other cc").when(enhancer).getContentType(context);
-		enhancer.addContentTypeHeader(response, context);
-		assertEquals("'some other cc'", response.getHeaders().get("Content-Type").getDescription());
+	public void init_customDefaultHeaderWithContentTypeSet_ShouldCreate() {
+		AwsSwaggerConfiguration customConfig = mock(AwsSwaggerConfiguration.class);
+		when(customConfig.isSetSupportedNonDefaultHeadersInOrder()).thenReturn(true);
+		when(customConfig.getSupportedNonDefaultHeadersInOrder()).thenReturn(new String[] { HttpHeaders.CONTENT_TYPE });
+		new AwsSwaggerEnhancer(xFactory, customConfig, log);
 	}
 
 	@Test
@@ -377,42 +334,6 @@ public class AwsSwaggerEnhancerTest {
 
 		verifyZeroInteractions(p1);
 		verifyZeroInteractions(p2);
-	}
-
-	@Test
-	public void getContentType_NullProduces_ShouldReturnJson() {
-		OperationContext context = mock(OperationContext.class);
-		Operation operation = new Operation();
-		operation.setProduces(null);
-		when(context.getOperation()).thenReturn(operation);
-		assertEquals("application/json", enhancer.getContentType(context));
-	}
-
-	@Test
-	public void getContentType_NoContentTypeGiven_ShouldReturnJson() {
-		OperationContext context = mock(OperationContext.class);
-		Operation operation = new Operation();
-		operation.setProduces(ImmutableList.of());
-		when(context.getOperation()).thenReturn(operation);
-		assertEquals("application/json", enhancer.getContentType(context));
-	}
-
-	@Test
-	public void getContentType_ContentTypeGiven_ShouldReturnSetContentType() {
-		OperationContext context = mock(OperationContext.class);
-		Operation operation = new Operation();
-		operation.setProduces(ImmutableList.of("whatever"));
-		when(context.getOperation()).thenReturn(operation);
-		assertEquals("whatever", enhancer.getContentType(context));
-	}
-
-	@Test(expected = RuntimeException.class)
-	public void getContentType_MultipleContentTypesGiven_ShouldReturnSetContentType() {
-		OperationContext context = mock(OperationContext.class);
-		Operation operation = new Operation();
-		operation.setProduces(ImmutableList.of("a", "b"));
-		when(context.getOperation()).thenReturn(operation);
-		enhancer.getContentType(context);
 	}
 
 	@Test

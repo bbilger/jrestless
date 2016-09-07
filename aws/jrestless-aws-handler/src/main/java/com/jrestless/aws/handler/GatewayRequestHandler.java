@@ -42,9 +42,10 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.jrestless.aws.dpi.ApiGatewayContextFactory;
 import com.jrestless.aws.dpi.LambdaContextFactory;
 import com.jrestless.aws.filter.IsDefaultResponseFilter;
-import com.jrestless.aws.io.GatewayAdditionalResponseException;
 import com.jrestless.aws.io.GatewayDefaultResponse;
 import com.jrestless.aws.io.GatewayRequest;
+import com.jrestless.aws.io.GatewayResponseFactory;
+import com.jrestless.aws.io.GatewayResponseFactoryImpl;
 import com.jrestless.core.container.JRestlessHandlerContainer;
 import com.jrestless.core.container.io.JRestlessResponseWriter;
 import com.jrestless.core.security.AnonSecurityContext;
@@ -66,9 +67,19 @@ public abstract class GatewayRequestHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(GatewayRequestHandler.class);
 
 	private JRestlessHandlerContainer<GatewayRequest> container;
+	private final GatewayResponseFactory responseFactory;
 
 	private boolean initialized = false;
 	private boolean started = false;
+
+	public GatewayRequestHandler() {
+		this(new GatewayResponseFactoryImpl());
+	}
+
+	public GatewayRequestHandler(@Nonnull GatewayResponseFactory responseFactory) {
+		requireNonNull(responseFactory);
+		this.responseFactory = responseFactory;
+	}
 
 	/**
 	 * Initializes the container using the given application.
@@ -129,7 +140,7 @@ public abstract class GatewayRequestHandler {
 	 *
 	 * @param request
 	 * @param context
-	 * @throws GatewayAdditionalResponseException
+	 * @throws com.jrestless.aws.io.GatewayAdditionalResponseException
 	 *             Non-default responses are passed back to the API gateway as
 	 *             an exception.
 	 * @return
@@ -174,7 +185,7 @@ public abstract class GatewayRequestHandler {
 	 * response.
 	 *
 	 * @param containerResponse
-	 * @throws GatewayAdditionalResponseException
+	 * @throws com.jrestless.aws.io.GatewayAdditionalResponseException
 	 *             Non-default responses are passed back to the API gateway as
 	 *             exceptions.
 	 * @return
@@ -183,12 +194,9 @@ public abstract class GatewayRequestHandler {
 		String body = containerResponse.getBody();
 		Map<String, List<String>> headers = containerResponse.getHeaders();
 		StatusType statusType = containerResponse.getStatusType();
-		if (isDefaultResponse(containerResponse)) {
-			return new GatewayDefaultResponse(body, headers, statusType);
-		} else {
-			throw new GatewayAdditionalResponseException(body, statusType);
-		}
+		return responseFactory.createResponse(body, headers, statusType, isDefaultResponse(containerResponse));
 	}
+
 	/**
 	 * Checks if the container response is the default response or not.
 	 *
@@ -335,6 +343,12 @@ public abstract class GatewayRequestHandler {
 
 		protected Map<String, List<String>> getHeaders() {
 			return headers;
+		}
+
+		@Override
+		public String toString() {
+			return "GatewayContainerResponse [statusType=" + statusType + ", body=" + body + ", headers=" + headers
+					+ "]";
 		}
 	}
 }

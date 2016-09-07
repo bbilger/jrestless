@@ -15,16 +15,16 @@
  */
 package com.jrestless.aws.io;
 
-import java.util.List;
+import static java.util.Objects.requireNonNull;
+
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Response.StatusType;
-import javax.ws.rs.ext.RuntimeDelegate;
-
-import org.glassfish.jersey.message.internal.HeaderUtils;
 /**
  * The default response that will the passed back to the API Gateway.
  * <p>
@@ -44,24 +44,15 @@ public class GatewayDefaultResponse {
 	 *
 	 * @param body
 	 * @param headers
-	 * 		headers containing a null value will be filtered out
 	 * @param statusType
 	 */
-	public GatewayDefaultResponse(@Nullable String body, @Nonnull Map<String, List<String>> headers,
+	public GatewayDefaultResponse(@Nullable String body, @Nonnull Map<String, String> headers,
 			@Nonnull StatusType statusType) {
+		requireNonNull(headers);
+		requireNonNull(statusType);
 		this.statusCode = statusType.getStatusCode();
 		this.body = body;
-		this.headers = headers.entrySet().stream()
-				.filter(e -> e.getValue() != null)
-				.collect(Collectors.toMap(
-						e -> e.getKey(),
-						e -> asHeaderString(e.getValue())
-				));
-	}
-
-	private String asHeaderString(List<String> headerValues) {
-		return HeaderUtils.asHeaderString(headerValues.stream().collect(Collectors.toList()),
-				RuntimeDelegate.getInstance());
+		this.headers = Collections.unmodifiableMap(new HashMap<>(headers));
 	}
 
 	public String getBody() {
@@ -76,45 +67,31 @@ public class GatewayDefaultResponse {
 		return statusCode;
 	}
 
+
+
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((body == null) ? 0 : body.hashCode());
-		result = prime * result + ((headers == null) ? 0 : headers.hashCode());
-		result = prime * result + statusCode;
-		return result;
+	public String toString() {
+		return "GatewayDefaultResponse [body=" + body + ", headers=" + headers + ", statusCode=" + statusCode + "]";
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(final Object other) {
+		if (this == other) {
 			return true;
 		}
-		if (obj == null) {
+		if (other == null) {
 			return false;
 		}
-		if (getClass() != obj.getClass()) {
+		if (!getClass().equals(other.getClass())) {
 			return false;
 		}
-		GatewayDefaultResponse other = (GatewayDefaultResponse) obj;
-		if (body == null) {
-			if (other.body != null) {
-				return false;
-			}
-		} else if (!body.equals(other.body)) {
-			return false;
-		}
-		if (headers == null) {
-			if (other.headers != null) {
-				return false;
-			}
-		} else if (!headers.equals(other.headers)) {
-			return false;
-		}
-		if (statusCode != other.statusCode) {
-			return false;
-		}
-		return true;
+		GatewayDefaultResponse castOther = (GatewayDefaultResponse) other;
+		return Objects.equals(body, castOther.body) && Objects.equals(headers, castOther.headers)
+				&& Objects.equals(statusCode, castOther.statusCode);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(body, headers, statusCode);
 	}
 }

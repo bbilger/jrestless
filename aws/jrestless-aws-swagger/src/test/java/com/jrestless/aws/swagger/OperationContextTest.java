@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 
 import org.junit.Test;
 
+import com.jrestless.aws.swagger.OperationContext;
 import com.jrestless.test.ConstructorPreconditionsTester;
 import com.jrestless.test.SimpleImmutableValueObjectEqualsTester;
 

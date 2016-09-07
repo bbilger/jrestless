@@ -210,39 +210,25 @@ public class ConstructorPreconditionsTesterTest {
 			this.a = a;
 			this.b = b;
 		}
+
 		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((a == null) ? 0 : a.hashCode());
-			long temp;
-			temp = Double.doubleToLongBits(b);
-			result = prime * result + (int) (temp ^ (temp >>> 32));
-			return result;
-		}
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) {
+		public boolean equals(final Object other) {
+			if (this == other) {
 				return true;
 			}
-			if (obj == null) {
+			if (other == null) {
 				return false;
 			}
-			if (getClass() != obj.getClass()) {
+			if (!getClass().equals(other.getClass())) {
 				return false;
 			}
-			SomeClassCapture other = (SomeClassCapture) obj;
-			if (a == null) {
-				if (other.a != null) {
-					return false;
-				}
-			} else if (!a.equals(other.a)) {
-				return false;
-			}
-			if (Double.doubleToLongBits(b) != Double.doubleToLongBits(other.b)) {
-				return false;
-			}
-			return true;
+			SomeClassCapture castOther = (SomeClassCapture) other;
+			return Objects.equals(a, castOther.a) && Objects.equals(b, castOther.b);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(a, b);
 		}
 	}
 

@@ -26,6 +26,7 @@ import static java.util.Objects.requireNonNull;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +35,6 @@ import java.util.Set;
 import java.util.function.Function;
 
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.lang3.StringUtils;
@@ -48,7 +48,6 @@ import com.jrestless.aws.swagger.models.ApiGatewayIntegrationExtension;
 import com.jrestless.aws.swagger.models.AwsSwaggerConfiguration;
 import com.jrestless.aws.swagger.models.AwsSwaggerConfiguration.AuthType;
 import com.jrestless.aws.swagger.util.AwsAnnotationsUtils;
-import com.jrestless.aws.swagger.util.HeaderUtils;
 
 import io.swagger.models.HttpMethod;
 import io.swagger.models.Operation;
@@ -105,6 +104,11 @@ public class AwsSwaggerEnhancer implements SwaggerEnhancer {
 		this.apiGatewayExtensionFactory = requireNonNull(apiGatewayExtensionFactory,
 				logOnSupply("apiGatewayExtensionFactory may not be null", log));
 		this.configuration = requireNonNull(configuration, logOnSupply("configuration may not be null", log));
+		if (configuration.isSetSupportedNonDefaultHeadersInOrder()
+				&& !Arrays.stream(configuration.getSupportedNonDefaultHeadersInOrder())
+						.anyMatch(h -> HttpHeaders.CONTENT_TYPE.equals(h))) {
+			throw new RuntimeException("supportedNonDefaultHeadersInOrder must contain the Content-Type header");
+		}
 	}
 
 	protected AwsSwaggerEnhancer(AwsSwaggerConfiguration configuration, LogAdapter log) {
@@ -179,34 +183,8 @@ public class AwsSwaggerEnhancer implements SwaggerEnhancer {
 		Map<String, Property> headers = response.getHeaders();
 		if (headers == null || !headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
 			StringProperty property = new StringProperty();
-			property.setDescription(HeaderUtils.asStaticValue(getContentType(context)));
 			response.addHeader(HttpHeaders.CONTENT_TYPE, property);
 		}
-	}
-
-	/**
-	 * Returns endpoint's Content-Type. If none is given, "application/json" is
-	 * assumed. If multiple are given an exceptions gets thrown since we are not
-	 * able to support this at the moment.
-	 *
-	 *
-	 * @param context
-	 * @return
-	 */
-	protected String getContentType(OperationContext context) {
-		List<String> produces = context.getOperation().getProduces();
-		String contentType;
-		if (produces == null || produces.isEmpty()) {
-			log.info("the endpoint doesn't produce anything explicitly; assuming '" + MediaType.APPLICATION_JSON + "'"
-					+ createLogIdentifier(context));
-			contentType = MediaType.APPLICATION_JSON;
-		} else if (produces.size() == 1) {
-			contentType = produces.get(0);
-		} else {
-			throw new RuntimeException(logAndReturn(
-					"multiple produces is not supported at the moment " + createLogIdentifier(context), log));
-		}
-		return contentType;
 	}
 
 	protected void addCorsAllowOriginHeader(Response response, OperationContext operationContext) {

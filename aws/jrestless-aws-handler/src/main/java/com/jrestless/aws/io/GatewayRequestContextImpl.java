@@ -20,6 +20,7 @@ import static org.apache.commons.lang3.StringUtils.trimToNull;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import com.jrestless.aws.GatewayRequestContext;
 
@@ -261,178 +262,36 @@ public class GatewayRequestContextImpl implements GatewayRequestContext {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((accountId == null) ? 0 : accountId.hashCode());
-		result = prime * result + ((apiId == null) ? 0 : apiId.hashCode());
-		result = prime * result + ((apiKey == null) ? 0 : apiKey.hashCode());
-		result = prime * result + ((caller == null) ? 0 : caller.hashCode());
-		result = prime * result
-				+ ((cognitoAuthenticationProvider == null) ? 0 : cognitoAuthenticationProvider.hashCode());
-		result = prime * result + ((cognitoAuthenticationType == null) ? 0 : cognitoAuthenticationType.hashCode());
-		result = prime * result + ((cognitoIdentityId == null) ? 0 : cognitoIdentityId.hashCode());
-		result = prime * result + ((cognitoIdentityPoolId == null) ? 0 : cognitoIdentityPoolId.hashCode());
-		result = prime * result + ((httpMethod == null) ? 0 : httpMethod.hashCode());
-		result = prime * result + ((principalId == null) ? 0 : principalId.hashCode());
-		result = prime * result + ((requestId == null) ? 0 : requestId.hashCode());
-		result = prime * result + ((resourceId == null) ? 0 : resourceId.hashCode());
-		result = prime * result + ((resourcePath == null) ? 0 : resourcePath.hashCode());
-		result = prime * result + ((sourceIp == null) ? 0 : sourceIp.hashCode());
-		result = prime * result + ((stage == null) ? 0 : stage.hashCode());
-		result = prime * result + ((stageVariables == null) ? 0 : stageVariables.hashCode());
-		result = prime * result + ((user == null) ? 0 : user.hashCode());
-		result = prime * result + ((userAgent == null) ? 0 : userAgent.hashCode());
-		result = prime * result + ((userArn == null) ? 0 : userArn.hashCode());
-		return result;
+	public boolean equals(final Object other) {
+		if (this == other) {
+			return true;
+		}
+		if (other == null) {
+			return false;
+		}
+		if (!getClass().equals(other.getClass())) {
+			return false;
+		}
+		GatewayRequestContextImpl castOther = (GatewayRequestContextImpl) other;
+		return Objects.equals(apiId, castOther.apiId) && Objects.equals(principalId, castOther.principalId)
+				&& Objects.equals(httpMethod, castOther.httpMethod) && Objects.equals(accountId, castOther.accountId)
+				&& Objects.equals(apiKey, castOther.apiKey) && Objects.equals(caller, castOther.caller)
+				&& Objects.equals(cognitoAuthenticationProvider, castOther.cognitoAuthenticationProvider)
+				&& Objects.equals(cognitoAuthenticationType, castOther.cognitoAuthenticationType)
+				&& Objects.equals(cognitoIdentityId, castOther.cognitoIdentityId)
+				&& Objects.equals(cognitoIdentityPoolId, castOther.cognitoIdentityPoolId)
+				&& Objects.equals(sourceIp, castOther.sourceIp) && Objects.equals(user, castOther.user)
+				&& Objects.equals(userAgent, castOther.userAgent) && Objects.equals(userArn, castOther.userArn)
+				&& Objects.equals(requestId, castOther.requestId) && Objects.equals(resourceId, castOther.resourceId)
+				&& Objects.equals(resourcePath, castOther.resourcePath) && Objects.equals(stage, castOther.stage)
+				&& Objects.equals(stageVariables, castOther.stageVariables);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		GatewayRequestContextImpl other = (GatewayRequestContextImpl) obj;
-		if (accountId == null) {
-			if (other.accountId != null) {
-				return false;
-			}
-		} else if (!accountId.equals(other.accountId)) {
-			return false;
-		}
-		if (apiId == null) {
-			if (other.apiId != null) {
-				return false;
-			}
-		} else if (!apiId.equals(other.apiId)) {
-			return false;
-		}
-		if (apiKey == null) {
-			if (other.apiKey != null) {
-				return false;
-			}
-		} else if (!apiKey.equals(other.apiKey)) {
-			return false;
-		}
-		if (caller == null) {
-			if (other.caller != null) {
-				return false;
-			}
-		} else if (!caller.equals(other.caller)) {
-			return false;
-		}
-		if (cognitoAuthenticationProvider == null) {
-			if (other.cognitoAuthenticationProvider != null) {
-				return false;
-			}
-		} else if (!cognitoAuthenticationProvider.equals(other.cognitoAuthenticationProvider)) {
-			return false;
-		}
-		if (cognitoAuthenticationType == null) {
-			if (other.cognitoAuthenticationType != null) {
-				return false;
-			}
-		} else if (!cognitoAuthenticationType.equals(other.cognitoAuthenticationType)) {
-			return false;
-		}
-		if (cognitoIdentityId == null) {
-			if (other.cognitoIdentityId != null) {
-				return false;
-			}
-		} else if (!cognitoIdentityId.equals(other.cognitoIdentityId)) {
-			return false;
-		}
-		if (cognitoIdentityPoolId == null) {
-			if (other.cognitoIdentityPoolId != null) {
-				return false;
-			}
-		} else if (!cognitoIdentityPoolId.equals(other.cognitoIdentityPoolId)) {
-			return false;
-		}
-		if (httpMethod == null) {
-			if (other.httpMethod != null) {
-				return false;
-			}
-		} else if (!httpMethod.equals(other.httpMethod)) {
-			return false;
-		}
-		if (principalId == null) {
-			if (other.principalId != null) {
-				return false;
-			}
-		} else if (!principalId.equals(other.principalId)) {
-			return false;
-		}
-		if (requestId == null) {
-			if (other.requestId != null) {
-				return false;
-			}
-		} else if (!requestId.equals(other.requestId)) {
-			return false;
-		}
-		if (resourceId == null) {
-			if (other.resourceId != null) {
-				return false;
-			}
-		} else if (!resourceId.equals(other.resourceId)) {
-			return false;
-		}
-		if (resourcePath == null) {
-			if (other.resourcePath != null) {
-				return false;
-			}
-		} else if (!resourcePath.equals(other.resourcePath)) {
-			return false;
-		}
-		if (sourceIp == null) {
-			if (other.sourceIp != null) {
-				return false;
-			}
-		} else if (!sourceIp.equals(other.sourceIp)) {
-			return false;
-		}
-		if (stage == null) {
-			if (other.stage != null) {
-				return false;
-			}
-		} else if (!stage.equals(other.stage)) {
-			return false;
-		}
-		if (stageVariables == null) {
-			if (other.stageVariables != null) {
-				return false;
-			}
-		} else if (!stageVariables.equals(other.stageVariables)) {
-			return false;
-		}
-		if (user == null) {
-			if (other.user != null) {
-				return false;
-			}
-		} else if (!user.equals(other.user)) {
-			return false;
-		}
-		if (userAgent == null) {
-			if (other.userAgent != null) {
-				return false;
-			}
-		} else if (!userAgent.equals(other.userAgent)) {
-			return false;
-		}
-		if (userArn == null) {
-			if (other.userArn != null) {
-				return false;
-			}
-		} else if (!userArn.equals(other.userArn)) {
-			return false;
-		}
-		return true;
+	public int hashCode() {
+		return Objects.hash(apiId, principalId, httpMethod, accountId, apiKey, caller, cognitoAuthenticationProvider,
+				cognitoAuthenticationType, cognitoIdentityId, cognitoIdentityPoolId, sourceIp, user, userAgent, userArn,
+				requestId, resourceId, resourcePath, stage, stageVariables);
 	}
 
 	@Override

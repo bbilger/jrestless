@@ -19,6 +19,7 @@ import static com.jrestless.aws.swagger.util.Strings.requireNonBlank;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
@@ -60,49 +61,24 @@ public class ApiGatewayIntegrationResponse {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((responseParameters == null) ? 0 : responseParameters.hashCode());
-		result = prime * result + ((responseTemplates == null) ? 0 : responseTemplates.hashCode());
-		result = prime * result + ((statusCode == null) ? 0 : statusCode.hashCode());
-		return result;
+	public boolean equals(final Object other) {
+		if (this == other) {
+			return true;
+		}
+		if (other == null) {
+			return false;
+		}
+		if (!getClass().equals(other.getClass())) {
+			return false;
+		}
+		ApiGatewayIntegrationResponse castOther = ApiGatewayIntegrationResponse.class.cast(other);
+		return Objects.equals(statusCode, castOther.statusCode)
+				&& Objects.equals(responseParameters, castOther.responseParameters)
+				&& Objects.equals(responseTemplates, castOther.responseTemplates);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		ApiGatewayIntegrationResponse other = (ApiGatewayIntegrationResponse) obj;
-		if (responseParameters == null) {
-			if (other.responseParameters != null) {
-				return false;
-			}
-		} else if (!responseParameters.equals(other.responseParameters)) {
-			return false;
-		}
-		if (responseTemplates == null) {
-			if (other.responseTemplates != null) {
-				return false;
-			}
-		} else if (!responseTemplates.equals(other.responseTemplates)) {
-			return false;
-		}
-		if (statusCode == null) {
-			if (other.statusCode != null) {
-				return false;
-			}
-		} else if (!statusCode.equals(other.statusCode)) {
-			return false;
-		}
-		return true;
+	public int hashCode() {
+		return Objects.hash(statusCode, responseParameters, responseTemplates);
 	}
-
 }

@@ -118,21 +118,6 @@ public class ApiGatewayIntegrationExtensionFactoryImplTest {
 	}
 
 	@Test
-	public void isDynamicHeaderValue_StaticHeaderValueGiven_ShouldNotBeDynamic() {
-		assertFalse(factory.isDynamicHeaderValue("'test'"));
-	}
-
-	@Test
-	public void isDynamicHeaderValue_DynamicHeaderValueGiven_ShouldBeDynamic() {
-		assertTrue(factory.isDynamicHeaderValue("integration.response.body.test"));
-	}
-
-	@Test
-	public void isDynamicHeaderValue_NonStaticAndNonDynamicHeaderValueGiven_ShouldNotBeDynamic() {
-		assertFalse(factory.isDynamicHeaderValue("test"));
-	}
-
-	@Test
 	public void getIntegrationStatusCodePattern_DefaultResponseGiven_ShouldReturnDefault() {
 		ResponseContext context = mock(ResponseContext.class);
 		doReturn(true).when(factory).isDefaultResponse(context);
@@ -208,7 +193,7 @@ public class ApiGatewayIntegrationExtensionFactoryImplTest {
 	@Test
 	public void createIntegrationResponseParameters_HeaderWithMissingName_ShouldSkipAndReturnEmptyParametersMap() {
 		ResponseContext rc = mock(ResponseContext.class);
-		when(rc.getAwsOperationContext()).thenReturn(createMockAwsOperationContextContext());
+		when(rc.getAwsOperationContext()).thenReturn(createMockAwsOperationContext());
 		Response r = new Response();
 		Map<String, Property> headers = new HashMap<>();
 		headers.put("", new StringProperty());
@@ -222,7 +207,7 @@ public class ApiGatewayIntegrationExtensionFactoryImplTest {
 	@Test
 	public void createIntegrationResponseParameters_HeaderWithNonStaticAndNonDynValue_ShouldSkipAndReturnEmptyParametersMap() {
 		ResponseContext rc = mock(ResponseContext.class);
-		when(rc.getAwsOperationContext()).thenReturn(createMockAwsOperationContextContext());
+		when(rc.getAwsOperationContext()).thenReturn(createMockAwsOperationContext());
 		Response r = new Response();
 		Map<String, Property> headers = new HashMap<>();
 		StringProperty headerProp = new StringProperty();
@@ -236,9 +221,9 @@ public class ApiGatewayIntegrationExtensionFactoryImplTest {
 	}
 
 	@Test
-	public void createIntegrationResponseParameters_HeaderWithDynValueOnNonDefaultResponse_ShouldSkipAndReturnEmptyParametersMap() {
+	public void createIntegrationResponseParameters_HeaderWithDynValueOnNonDefaultResponse_ShouldAddHeaderMapping() {
 		ResponseContext rc = mock(ResponseContext.class);
-		when(rc.getAwsOperationContext()).thenReturn(createMockAwsOperationContextContext());
+		when(rc.getAwsOperationContext()).thenReturn(createMockAwsOperationContext());
 		when(rc.getStatusCode()).thenReturn("201");
 		Response r = new Response();
 		Map<String, Property> headers = new HashMap<>();
@@ -248,14 +233,14 @@ public class ApiGatewayIntegrationExtensionFactoryImplTest {
 		r.setHeaders(headers);
 		when(rc.getResponse()).thenReturn(r);
 		Map<String, String> rParams = factory.createIntegrationResponseParameters(rc);
-		assertEquals(0, rParams.size());
-		verify(factory).warnSkipHeader(any(), any());
+		assertEquals(1, rParams.size());
+		assertEquals("integration.response.body.test", rParams.get("method.response.header.Some-Header"));
 	}
 
 	@Test
 	public void createIntegrationResponseParameters_HeaderWithDynValueOnDefaultResponse_ShouldAddHeaderMapping() {
 		ResponseContext rc = mock(ResponseContext.class);
-		when(rc.getAwsOperationContext()).thenReturn(createMockAwsOperationContextContext());
+		when(rc.getAwsOperationContext()).thenReturn(createMockAwsOperationContext());
 		when(rc.getStatusCode()).thenReturn("default");
 		Response r = new Response();
 		Map<String, Property> headers = new HashMap<>();
@@ -272,7 +257,7 @@ public class ApiGatewayIntegrationExtensionFactoryImplTest {
 	@Test
 	public void createIntegrationResponseParameters_HeaderWithStaticValueOnDefaultResponse_ShouldAddHeaderMapping() {
 		ResponseContext rc = mock(ResponseContext.class);
-		when(rc.getAwsOperationContext()).thenReturn(createMockAwsOperationContextContext());
+		when(rc.getAwsOperationContext()).thenReturn(createMockAwsOperationContext());
 		when(rc.getStatusCode()).thenReturn("200");
 		Response r = new Response();
 		Map<String, Property> headers = new HashMap<>();
@@ -289,7 +274,7 @@ public class ApiGatewayIntegrationExtensionFactoryImplTest {
 	@Test
 	public void createIntegrationResponseParameters_HeaderWithStaticValueOnNonDefaultResponse_ShouldAddHeaderMapping() {
 		ResponseContext rc = mock(ResponseContext.class);
-		when(rc.getAwsOperationContext()).thenReturn(createMockAwsOperationContextContext());
+		when(rc.getAwsOperationContext()).thenReturn(createMockAwsOperationContext());
 		when(rc.getStatusCode()).thenReturn("201");
 		Response r = new Response();
 		Map<String, Property> headers = new HashMap<>();
@@ -306,7 +291,7 @@ public class ApiGatewayIntegrationExtensionFactoryImplTest {
 	@Test
 	public void createIntegrationResponseParameters_HeaderWithoutValueOnDefaultResponse_ShouldAddHeaderNameMapping() {
 		ResponseContext rc = mock(ResponseContext.class);
-		when(rc.getAwsOperationContext()).thenReturn(createMockAwsOperationContextContext());
+		when(rc.getAwsOperationContext()).thenReturn(createMockAwsOperationContext());
 		when(rc.getStatusCode()).thenReturn("default");
 		Response r = new Response();
 		Map<String, Property> headers = new HashMap<>();
@@ -319,10 +304,10 @@ public class ApiGatewayIntegrationExtensionFactoryImplTest {
 		assertEquals("integration.response.body.headers.Some-Header", rParams.get("method.response.header.Some-Header"));
 	}
 
-	@Test
-	public void createIntegrationResponseParameters_HeaderWithoutValueOnNonDefaultResponse_ShouldSkipAndReturnEmptyParametersMap() {
+	@Test(expected = RuntimeException.class)
+	public void createIntegrationResponseParameters_NonSupportedNonDefaultHeaderGiven_ShouldFail() {
 		ResponseContext rc = mock(ResponseContext.class);
-		when(rc.getAwsOperationContext()).thenReturn(createMockAwsOperationContextContext());
+		when(rc.getAwsOperationContext()).thenReturn(createMockAwsOperationContext());
 		when(rc.getStatusCode()).thenReturn("201");
 		Response r = new Response();
 		Map<String, Property> headers = new HashMap<>();
@@ -330,9 +315,47 @@ public class ApiGatewayIntegrationExtensionFactoryImplTest {
 		headers.put("Some-Header", headerProp);
 		r.setHeaders(headers);
 		when(rc.getResponse()).thenReturn(r);
+		factory.createIntegrationResponseParameters(rc);
+	}
+
+	@Test
+	public void createIntegrationResponseParameters_SupportedNonDefaultHeaderAtFirstPositionGiven_ShouldAddHeaderNameMapping() {
+		ResponseContext rc = mock(ResponseContext.class);
+		AwsOperationContext context = createMockAwsOperationContext();
+		when(context.getConfiguration().getSupportedNonDefaultHeadersInOrder()).thenReturn(new String[] { "Some-Header" });
+		when(context.getConfiguration().isSetSupportedNonDefaultHeadersInOrder()).thenReturn(true);
+		when(rc.getAwsOperationContext()).thenReturn(context);
+		when(rc.getStatusCode()).thenReturn("201");
+		Response r = new Response();
+		Map<String, Property> headers = new HashMap<>();
+		StringProperty headerProp = new StringProperty();
+		headers.put("Some-Header", headerProp);
+		r.setHeaders(headers);
+		when(rc.getResponse()).thenReturn(r);
+		factory.createIntegrationResponseParameters(rc);
 		Map<String, String> rParams = factory.createIntegrationResponseParameters(rc);
-		assertEquals(0, rParams.size());
-		verify(factory).warnSkipHeader(any(), any());
+		assertEquals(1, rParams.size());
+		assertEquals("integration.response.body.cause.errorMessage", rParams.get("method.response.header.Some-Header"));
+	}
+
+	@Test
+	public void createIntegrationResponseParameters_SupportedNonDefaultHeaderAtSecondPositionGiven_ShouldAddHeaderNameMapping() {
+		ResponseContext rc = mock(ResponseContext.class);
+		AwsOperationContext context = createMockAwsOperationContext();
+		when(context.getConfiguration().getSupportedNonDefaultHeadersInOrder()).thenReturn(new String[] { "Some-Other-Header", "Some-Header" });
+		when(context.getConfiguration().isSetSupportedNonDefaultHeadersInOrder()).thenReturn(true);
+		when(rc.getAwsOperationContext()).thenReturn(context);
+		when(rc.getStatusCode()).thenReturn("201");
+		Response r = new Response();
+		Map<String, Property> headers = new HashMap<>();
+		StringProperty headerProp = new StringProperty();
+		headers.put("Some-Header", headerProp);
+		r.setHeaders(headers);
+		when(rc.getResponse()).thenReturn(r);
+		factory.createIntegrationResponseParameters(rc);
+		Map<String, String> rParams = factory.createIntegrationResponseParameters(rc);
+		assertEquals(1, rParams.size());
+		assertEquals("integration.response.body.cause.cause.errorMessage", rParams.get("method.response.header.Some-Header"));
 	}
 
 	@Test
@@ -412,7 +435,7 @@ public class ApiGatewayIntegrationExtensionFactoryImplTest {
 		verifyZeroInteractions(iR2);
 	}
 
-	private static AwsOperationContext createMockAwsOperationContextContext() {
+	private static AwsOperationContext createMockAwsOperationContext() {
 		Method endpoint;
 		try {
 			endpoint = StatusCodeTestResource1.class.getMethod("getSomeResource1");

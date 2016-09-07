@@ -15,6 +15,8 @@
  */
 package com.jrestless.test;
 
+import java.util.Objects;
+
 import org.junit.Test;
 
 public class SimpleImmutableValueObjectEqualsTesterTest {
@@ -82,44 +84,30 @@ public class SimpleImmutableValueObjectEqualsTesterTest {
 			return b;
 		}
 
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((a == null) ? 0 : a.hashCode());
-			long temp;
-			temp = Double.doubleToLongBits(b);
-			result = prime * result + (int) (temp ^ (temp >>> 32));
-			return result;
-		}
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) {
-				return true;
-			}
-			if (obj == null) {
-				return false;
-			}
-			if (getClass() != obj.getClass()) {
-				return false;
-			}
-			CorrectValueObject other = (CorrectValueObject) obj;
-			if (a == null) {
-				if (other.a != null) {
-					return false;
-				}
-			} else if (!a.equals(other.a)) {
-				return false;
-			}
-			if (Double.doubleToLongBits(b) != Double.doubleToLongBits(other.b)) {
-				return false;
-			}
-			return true;
-		}
 
 		@Override
 		public String toString() {
 			return "SomeClass [a=" + a + ", b=" + b + "]";
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			if (this == other) {
+				return true;
+			}
+			if (other == null) {
+				return false;
+			}
+			if (!getClass().equals(other.getClass())) {
+				return false;
+			}
+			CorrectValueObject castOther = (CorrectValueObject) other;
+			return Objects.equals(a, castOther.a) && Objects.equals(b, castOther.b);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(a, b);
 		}
 
 	}

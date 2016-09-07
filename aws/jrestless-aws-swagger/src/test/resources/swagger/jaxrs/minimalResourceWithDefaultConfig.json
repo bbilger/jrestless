@@ -11,8 +11,7 @@
           "200" : {
             "headers" : {
               "Content-Type" : {
-                "type" : "string",
-                "description" : "'application/json'"
+                "type" : "string"
               },
               "Access-Control-Allow-Origin" : {
                 "type" : "string",
@@ -27,8 +26,7 @@
             },
             "headers" : {
               "Content-Type" : {
-                "type" : "string",
-                "description" : "'application/json'"
+                "type" : "string"
               },
               "Access-Control-Allow-Origin" : {
                 "type" : "string",
@@ -39,8 +37,7 @@
           "400" : {
             "headers" : {
               "Content-Type" : {
-                "type" : "string",
-                "description" : "'application/json'"
+                "type" : "string"
               },
               "Access-Control-Allow-Origin" : {
                 "type" : "string",
@@ -51,8 +48,7 @@
           "401" : {
             "headers" : {
               "Content-Type" : {
-                "type" : "string",
-                "description" : "'application/json'"
+                "type" : "string"
               },
               "Access-Control-Allow-Origin" : {
                 "type" : "string",
@@ -63,8 +59,7 @@
           "500" : {
             "headers" : {
               "Content-Type" : {
-                "type" : "string",
-                "description" : "'application/json'"
+                "type" : "string"
               },
               "Access-Control-Allow-Origin" : {
                 "type" : "string",
@@ -75,8 +70,7 @@
           "204" : {
             "headers" : {
               "Content-Type" : {
-                "type" : "string",
-                "description" : "'application/json'"
+                "type" : "string"
               },
               "Access-Control-Allow-Origin" : {
                 "type" : "string",
@@ -87,8 +81,7 @@
           "403" : {
             "headers" : {
               "Content-Type" : {
-                "type" : "string",
-                "description" : "'application/json'"
+                "type" : "string"
               },
               "Access-Control-Allow-Origin" : {
                 "type" : "string",
@@ -99,8 +92,7 @@
           "404" : {
             "headers" : {
               "Content-Type" : {
-                "type" : "string",
-                "description" : "'application/json'"
+                "type" : "string"
               },
               "Access-Control-Allow-Origin" : {
                 "type" : "string",
@@ -111,8 +103,7 @@
           "415" : {
             "headers" : {
               "Content-Type" : {
-                "type" : "string",
-                "description" : "'application/json'"
+                "type" : "string"
               },
               "Access-Control-Allow-Origin" : {
                 "type" : "string",
@@ -123,8 +114,7 @@
           "405" : {
             "headers" : {
               "Content-Type" : {
-                "type" : "string",
-                "description" : "'application/json'"
+                "type" : "string"
               },
               "Access-Control-Allow-Origin" : {
                 "type" : "string",
@@ -135,8 +125,7 @@
           "406" : {
             "headers" : {
               "Content-Type" : {
-                "type" : "string",
-                "description" : "'application/json'"
+                "type" : "string"
               },
               "Access-Control-Allow-Origin" : {
                 "type" : "string",
@@ -149,14 +138,14 @@
           "credentials" : "arn:aws:iam::YOURID:role/YOURINVOCATIONROLE",
           "uri" : "arn:aws:apigateway:YOURREGION:lambda:path/2015-03-31/functions/arn:aws:lambda:YOURREGION:YOURID:function:YOURFUNCTION/invocations",
           "requestTemplates" : {
-            "application/json" : "{\n\"body\": \"$util.escapeJavaScript($input.json('$'))\",\n\"headers\": {\n#foreach($param in $input.params().header.keySet())\n\"$param\": \"$util.escapeJavaScript($input.params().header.get($param))\" #if($foreach.hasNext),#end\n#end\n},\n\"queryParams\": {\n#foreach($param in $input.params().querystring.keySet())\n\"$param\": \"$util.escapeJavaScript($input.params().querystring.get($param))\" #if($foreach.hasNext),#end\n#end\n},\n\"pathParams\": {\n#foreach($param in $input.params().path.keySet())\n\"$param\": \"$util.escapeJavaScript($input.params().path.get($param))\" #if($foreach.hasNext),#end\n#end\n},\n\"context\": {\n\"apiId\":\"$context.apiId\",\n\"principalId\":\"$util.escapeJavaScript($context.authorizer.principalId)\",\n\"httpMethod\":\"$context.httpMethod\",\n\"accountId\":\"$context.identity.accountId\",\n\"apiKey\":\"$context.identity.apiKey\",\n\"caller\":\"$context.identity.caller\",\n\"cognitoAuthenticationProvider\":\"$context.identity.cognitoAuthenticationProvider\",\n\"cognitoAuthenticationType\":\"$context.identity.cognitoAuthenticationType\",\n\"cognitoIdentityId\":\"$context.identity.cognitoIdentityId\",\n\"cognitoIdentityPoolId\":\"$context.identity.cognitoIdentityPoolId\",\n\"sourceIp\":\"$context.identity.sourceIp\",\n\"user\":\"$context.identity.user\",\n\"userAgent\":\"$context.identity.userAgent\",\n\"userArn\":\"$context.identity.userArn\",\n\"requestId\":\"$context.requestId\",\n\"resourceId\":\"$context.resourceId\",\n\"resourcePath\":\"$context.resourcePath\",\n\"stage\":\"$context.stage\",\n\"stageVariables\": {\n#foreach($stageKey in $stageVariables.keySet())\n\"$stageKey\": \"$util.escapeJavaScript($stageVariables.get($stageKey))\" #if($foreach.hasNext),#end\n#end\n}\n}\n}\n"
+            "application/json" : "{\n\"body\": \"$util.escapeJavaScript($input.json('$'))\",\n\"headerParams\": {\n#foreach($param in $input.params().header.keySet())\n\"$param\": \"$util.escapeJavaScript($input.params().header.get($param))\" #if($foreach.hasNext),#end\n#end\n},\n\"queryParams\": {\n#foreach($param in $input.params().querystring.keySet())\n\"$param\": \"$util.escapeJavaScript($input.params().querystring.get($param))\" #if($foreach.hasNext),#end\n#end\n},\n\"pathParams\": {\n#foreach($param in $input.params().path.keySet())\n\"$param\": \"$util.escapeJavaScript($input.params().path.get($param))\" #if($foreach.hasNext),#end\n#end\n},\n\"context\": {\n\"apiId\":\"$context.apiId\",\n\"principalId\":\"$util.escapeJavaScript($context.authorizer.principalId)\",\n\"httpMethod\":\"$context.httpMethod\",\n\"accountId\":\"$context.identity.accountId\",\n\"apiKey\":\"$context.identity.apiKey\",\n\"caller\":\"$context.identity.caller\",\n\"cognitoAuthenticationProvider\":\"$context.identity.cognitoAuthenticationProvider\",\n\"cognitoAuthenticationType\":\"$context.identity.cognitoAuthenticationType\",\n\"cognitoIdentityId\":\"$context.identity.cognitoIdentityId\",\n\"cognitoIdentityPoolId\":\"$context.identity.cognitoIdentityPoolId\",\n\"sourceIp\":\"$context.identity.sourceIp\",\n\"user\":\"$context.identity.user\",\n\"userAgent\":\"$context.identity.userAgent\",\n\"userArn\":\"$context.identity.userArn\",\n\"requestId\":\"$context.requestId\",\n\"resourceId\":\"$context.resourceId\",\n\"resourcePath\":\"$context.resourcePath\",\n\"stage\":\"$context.stage\",\n\"stageVariables\": {\n#foreach($stageKey in $stageVariables.keySet())\n\"$stageKey\": \"$util.escapeJavaScript($stageVariables.get($stageKey))\" #if($foreach.hasNext),#end\n#end\n}\n}\n}\n"
           },
           "requestParameters" : { },
           "responses" : {
             "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"200\\\"(.|\\n)*" : {
               "statusCode" : "200",
               "responseParameters" : {
-                "method.response.header.Content-Type" : "'application/json'",
+                "method.response.header.Content-Type" : "integration.response.body.cause.errorMessage",
                 "method.response.header.Access-Control-Allow-Origin" : "'*'"
               },
               "responseTemplates" : {
@@ -166,7 +155,7 @@
             "default" : {
               "statusCode" : "301",
               "responseParameters" : {
-                "method.response.header.Content-Type" : "'application/json'",
+                "method.response.header.Content-Type" : "integration.response.body.headers.Content-Type",
                 "method.response.header.Access-Control-Allow-Origin" : "'*'"
               },
               "responseTemplates" : {
@@ -176,7 +165,7 @@
             "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"400\\\"(.|\\n)*" : {
               "statusCode" : "400",
               "responseParameters" : {
-                "method.response.header.Content-Type" : "'application/json'",
+                "method.response.header.Content-Type" : "integration.response.body.cause.errorMessage",
                 "method.response.header.Access-Control-Allow-Origin" : "'*'"
               },
               "responseTemplates" : {
@@ -186,7 +175,7 @@
             "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"415\\\"(.|\\n)*" : {
               "statusCode" : "415",
               "responseParameters" : {
-                "method.response.header.Content-Type" : "'application/json'",
+                "method.response.header.Content-Type" : "integration.response.body.cause.errorMessage",
                 "method.response.header.Access-Control-Allow-Origin" : "'*'"
               },
               "responseTemplates" : {
@@ -196,7 +185,7 @@
             "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"500\\\"(.|\\n)*" : {
               "statusCode" : "500",
               "responseParameters" : {
-                "method.response.header.Content-Type" : "'application/json'",
+                "method.response.header.Content-Type" : "integration.response.body.cause.errorMessage",
                 "method.response.header.Access-Control-Allow-Origin" : "'*'"
               },
               "responseTemplates" : {
@@ -206,7 +195,7 @@
             "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"404\\\"(.|\\n)*" : {
               "statusCode" : "404",
               "responseParameters" : {
-                "method.response.header.Content-Type" : "'application/json'",
+                "method.response.header.Content-Type" : "integration.response.body.cause.errorMessage",
                 "method.response.header.Access-Control-Allow-Origin" : "'*'"
               },
               "responseTemplates" : {
@@ -216,7 +205,7 @@
             "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"406\\\"(.|\\n)*" : {
               "statusCode" : "406",
               "responseParameters" : {
-                "method.response.header.Content-Type" : "'application/json'",
+                "method.response.header.Content-Type" : "integration.response.body.cause.errorMessage",
                 "method.response.header.Access-Control-Allow-Origin" : "'*'"
               },
               "responseTemplates" : {
@@ -226,7 +215,7 @@
             "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"204\\\"(.|\\n)*" : {
               "statusCode" : "204",
               "responseParameters" : {
-                "method.response.header.Content-Type" : "'application/json'",
+                "method.response.header.Content-Type" : "integration.response.body.cause.errorMessage",
                 "method.response.header.Access-Control-Allow-Origin" : "'*'"
               },
               "responseTemplates" : {
@@ -236,7 +225,7 @@
             "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"405\\\"(.|\\n)*" : {
               "statusCode" : "405",
               "responseParameters" : {
-                "method.response.header.Content-Type" : "'application/json'",
+                "method.response.header.Content-Type" : "integration.response.body.cause.errorMessage",
                 "method.response.header.Access-Control-Allow-Origin" : "'*'"
               },
               "responseTemplates" : {
@@ -246,7 +235,7 @@
             "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"401\\\"(.|\\n)*" : {
               "statusCode" : "401",
               "responseParameters" : {
-                "method.response.header.Content-Type" : "'application/json'",
+                "method.response.header.Content-Type" : "integration.response.body.cause.errorMessage",
                 "method.response.header.Access-Control-Allow-Origin" : "'*'"
               },
               "responseTemplates" : {
@@ -256,7 +245,7 @@
             "(.|\\n)*\\\"statusCode\\\"\\:\\s*\\n*\\s*\\\"403\\\"(.|\\n)*" : {
               "statusCode" : "403",
               "responseParameters" : {
-                "method.response.header.Content-Type" : "'application/json'",
+                "method.response.header.Content-Type" : "integration.response.body.cause.errorMessage",
                 "method.response.header.Access-Control-Allow-Origin" : "'*'"
               },
               "responseTemplates" : {

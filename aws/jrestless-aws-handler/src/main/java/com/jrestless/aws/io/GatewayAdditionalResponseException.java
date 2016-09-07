@@ -15,29 +15,35 @@
  */
 package com.jrestless.aws.io;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.ws.rs.core.Response.StatusType;
-
-import org.apache.commons.lang3.StringEscapeUtils;
-
 /**
  * The non-default response which will be thrown back to the API Gateway.
  * <p>
  * Since we want to have different return codes in AWS API Gateway, we have to
  * pass a non-default response in the form of an exception. The exception
- * message will contain the status code and the body and can be accessed in the
- * AWS API Gateway response template as "errorMessage". The response looks like
+ * message must contain the status code and the body and can be accessed in the
+ * AWS API Gateway response template as "errorMessage".
+ * TODO add explanation for headers...
+ *
+ * The response looks like this
  *
  * <pre>
  * {
  *   "errorMessage": "{\"statusCode\": "STATUSCODE", \"body\": \"ESCAPED_BODY\"}",
  *   "stackTrace": [],
- *   "errorType": "com.jrestless.aws.AdditionalGatewayResponseException"
+ *   "errorType": "com.jrestless.aws.AdditionalGatewayResponseException",
+ *   "cause": {
+ *   	"errorMessage": "headervalue0",
+ *   	"stackTrace": [],
+ *   	"errorType": "com.jrestless.aws.AdditionalGatewayResponseException",
+ *   	"cause": {
+ *   		"errorMessage": "headervalue1",
+ *   		"stackTrace": [],
+ *   		"errorType": "com.jrestless.aws.AdditionalGatewayResponseException",
+ *   		"cause": ...
+ *   	}
+ *   }
  * }
  * </pre>
- *
- * Headers aren't supported because of limitation in AWS API Gateway.
  *
  * @author Bjoern Bilger
  *
@@ -46,42 +52,7 @@ public class GatewayAdditionalResponseException extends RuntimeException {
 
 	private static final long serialVersionUID = -7108361306031768989L;
 
-	protected GatewayAdditionalResponseException(String message) {
-		super(message, null, false, false);
-	}
-
-	protected GatewayAdditionalResponseException(@Nullable String body, int statusCode) {
-		this(createJsonResponse(body, statusCode));
-	}
-
-	public GatewayAdditionalResponseException(@Nullable String body, @Nonnull StatusType statusType) {
-		this(body, statusType.getStatusCode());
-	}
-
-
-	/**
-	 * Returns the response as JSON. Only the statusCode and the body will be
-	 * part of the response.
-	 *
-	 * <pre>
-	 * {
-	 *   "statusCode": "STATUSCODE",
-	 *   "body": "BODY" //escaped!
-	 * }
-	 * </pre>
-	 *
-	 * @return
-	 */
-	protected static String createJsonResponse(String body, int statusCode) {
-		String escpapedBody = StringEscapeUtils.escapeJson(body);
-		StringBuilder strBuilder = new StringBuilder();
-		strBuilder.append("{\"statusCode\":\"");
-		strBuilder.append(statusCode);
-		if (escpapedBody != null) {
-			strBuilder.append("\",\"body\":\"");
-			strBuilder.append(escpapedBody);
-		}
-		strBuilder.append("\"}");
-		return strBuilder.toString();
+	protected GatewayAdditionalResponseException(String errorMessage, GatewayNonDefaultHeaderException headerChain) {
+		super(errorMessage, headerChain, false, false);
 	}
 }

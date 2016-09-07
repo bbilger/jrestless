@@ -44,16 +44,18 @@ public class AwsSwaggerConfigurationTest {
 	private final String defaultAccessControlAllowHeadersRef = "someDefaultAccessControlAllowHeaders";
 	private final AuthType defaultAuthTypeRef = AuthType.AUTHORIZER;
 	private final List<Map<String, List<String>>> defaultSecurityRef = ImmutableList.of(ImmutableMap.of("a", ImmutableList.of("b")));
-	private final int[] additionalResponseCodesRef = new int[] {400, 404, 500};
+	private final int[] additionalResponseCodesRef = new int[] { 400, 404, 500 };
+	private final String[] supportedNonDefaultHeadersInOrderRef = new String[] { "Content-Type", "Location" };
 
 	private final AwsSwaggerConfiguration emptyCfg = new AwsSwaggerConfiguration(null, null, null, null, null, null,
-			null, null);
+			null, null, null);
 	private final AwsSwaggerConfiguration filledCfg = new AwsSwaggerConfiguration(lambdaCredentialRef, lambdaUriRef,
 			defaultCorsEnabledRef, defaultAccessControlAllowOriginRef, defaultAccessControlAllowHeadersRef,
-			defaultAuthTypeRef, new ArrayList<>(defaultSecurityRef), additionalResponseCodesRef);
+			defaultAuthTypeRef, new ArrayList<>(defaultSecurityRef), additionalResponseCodesRef,
+			supportedNonDefaultHeadersInOrderRef);
 
 	@Test
-	public void testGetters() {
+	public void testFilledGetters() {
 		assertEquals(lambdaCredentialRef, filledCfg.getLambdaCredential());
 		assertEquals(lambdaUriRef, filledCfg.getLambdaUri());
 		assertEquals(defaultCorsEnabledRef, filledCfg.isDefaultCorsEnabled());
@@ -62,6 +64,17 @@ public class AwsSwaggerConfigurationTest {
 		assertEquals(defaultAuthTypeRef, filledCfg.getDefaultAuthType());
 		assertEquals(defaultSecurityRef, filledCfg.getDefaultSecurity());
 		assertArrayEquals(additionalResponseCodesRef, filledCfg.getAdditionalResponseCodes());
+	}
+
+	@Test
+	public void testEmptyGetters() {
+		assertNull(emptyCfg.getLambdaCredential());
+		assertNull(emptyCfg.getLambdaUri());
+		assertNull(emptyCfg.getDefaultAccessControlAllowOrigin());
+		assertNull(emptyCfg.getDefaultAccessControlAllowHeaders());
+		assertNull(emptyCfg.getDefaultAuthType());
+		assertNull(emptyCfg.getDefaultSecurity());
+		assertNull(emptyCfg.getAdditionalResponseCodes());
 	}
 
 	@Test
@@ -74,6 +87,7 @@ public class AwsSwaggerConfigurationTest {
 		assertTrue(filledCfg.isSetDefaultAuthType());
 		assertTrue(filledCfg.isSetDefaultSecurity());
 		assertTrue(filledCfg.isSetAdditionalResponseCodes());
+		assertTrue(filledCfg.isSetSupportedNonDefaultHeadersInOrder());
 	}
 
 	@Test
@@ -86,6 +100,7 @@ public class AwsSwaggerConfigurationTest {
 		assertFalse(emptyCfg.isSetDefaultAuthType());
 		assertFalse(emptyCfg.isSetDefaultSecurity());
 		assertFalse(emptyCfg.isSetAdditionalResponseCodes());
+		assertFalse(emptyCfg.isSetSupportedNonDefaultHeadersInOrder());
 	}
 
 	@Test
@@ -109,6 +124,7 @@ public class AwsSwaggerConfigurationTest {
 			.addValidArgs(6, ImmutableList.of(ImmutableMap.of("a", ImmutableList.of())))
 			.addValidArgs(6, ImmutableList.of(ImmutableMap.of("a", ImmutableList.of("b"))))
 			.addValidArgs(7, null, new int[0], new int[] {0, 1})
+			.addValidArgs(8, null, new String[0], new String[] {"x", "y"})
 			.testValidCombinations();
 	}
 
@@ -131,6 +147,7 @@ public class AwsSwaggerConfigurationTest {
 			.addArguments(6, null, ImmutableList.of())
 			.addArguments(6, ImmutableList.of(ImmutableMap.of("a", ImmutableList.of("b"))))
 			.addArguments(7, null, new int[0], new int[] {0, 1})
+			.addArguments(8, null, new String[0], new String[] {"x", "y"})
 			.testEquals();
 	}
 
@@ -154,7 +171,7 @@ public class AwsSwaggerConfigurationTest {
 	private static Constructor<AwsSwaggerConfiguration> getConstructor() {
 		try {
 			return AwsSwaggerConfiguration.class.getDeclaredConstructor(String.class, String.class, Boolean.class,
-					String.class, String.class, AuthType.class, List.class, int[].class);
+					String.class, String.class, AuthType.class, List.class, int[].class, String[].class);
 		} catch (NoSuchMethodException | SecurityException e) {
 			throw new RuntimeException(e);
 		}

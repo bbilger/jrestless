@@ -19,6 +19,7 @@ import static com.jrestless.aws.swagger.util.Strings.requireNonBlank;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
@@ -84,64 +85,25 @@ public class ApiGatewayIntegrationExtension {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((credentials == null) ? 0 : credentials.hashCode());
-		result = prime * result + ((requestParameters == null) ? 0 : requestParameters.hashCode());
-		result = prime * result + ((requestTemplates == null) ? 0 : requestTemplates.hashCode());
-		result = prime * result + ((responses == null) ? 0 : responses.hashCode());
-		result = prime * result + ((uri == null) ? 0 : uri.hashCode());
-		return result;
+	public boolean equals(final Object other) {
+		if (this == other) {
+			return true;
+		}
+		if (other == null) {
+			return false;
+		}
+		if (!getClass().equals(other.getClass())) {
+			return false;
+		}
+		ApiGatewayIntegrationExtension castOther = ApiGatewayIntegrationExtension.class.cast(other);
+		return Objects.equals(credentials, castOther.credentials) && Objects.equals(uri, castOther.uri)
+				&& Objects.equals(requestTemplates, castOther.requestTemplates)
+				&& Objects.equals(requestParameters, castOther.requestParameters)
+				&& Objects.equals(responses, castOther.responses);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		ApiGatewayIntegrationExtension other = (ApiGatewayIntegrationExtension) obj;
-		if (credentials == null) {
-			if (other.credentials != null) {
-				return false;
-			}
-		} else if (!credentials.equals(other.credentials)) {
-			return false;
-		}
-		if (requestParameters == null) {
-			if (other.requestParameters != null) {
-				return false;
-			}
-		} else if (!requestParameters.equals(other.requestParameters)) {
-			return false;
-		}
-		if (requestTemplates == null) {
-			if (other.requestTemplates != null) {
-				return false;
-			}
-		} else if (!requestTemplates.equals(other.requestTemplates)) {
-			return false;
-		}
-		if (responses == null) {
-			if (other.responses != null) {
-				return false;
-			}
-		} else if (!responses.equals(other.responses)) {
-			return false;
-		}
-		if (uri == null) {
-			if (other.uri != null) {
-				return false;
-			}
-		} else if (!uri.equals(other.uri)) {
-			return false;
-		}
-		return true;
+	public int hashCode() {
+		return Objects.hash(credentials, uri, requestTemplates, requestParameters, responses);
 	}
 }

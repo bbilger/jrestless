@@ -54,28 +54,22 @@ public class ApiGatewayAuth {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
-		return result;
+	public boolean equals(final Object other) {
+		if (this == other) {
+			return true;
+		}
+		if (other == null) {
+			return false;
+		}
+		if (!getClass().equals(other.getClass())) {
+			return false;
+		}
+		ApiGatewayAuth castOther = ApiGatewayAuth.class.cast(other);
+		return Objects.equals(type, castOther.type);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		ApiGatewayAuth other = (ApiGatewayAuth) obj;
-		if (type != other.type) {
-			return false;
-		}
-		return true;
+	public int hashCode() {
+		return Objects.hash(type);
 	}
 }
