@@ -2,6 +2,7 @@
 [![Build Status](https://travis-ci.org/bbilger/jrestless.svg?branch=master)](https://travis-ci.org/bbilger/jrestless)
 [![codecov](https://codecov.io/gh/bbilger/jrestless/branch/master/graph/badge.svg)](https://codecov.io/gh/bbilger/jrestless)
 [![GitHub issues](https://img.shields.io/github/issues/bbilger/jrestless.svg)](https://github.com/bbilger/jrestless/issues)
+[![GitHub closed issues](https://img.shields.io/github/issues-closed/bbilger/jrestless.svg)](https://github.com/bbilger/jrestless/issues?q=is%3Aissue+is%3Aclosed)
 [![License](https://img.shields.io/github/license/bbilger/jrestless.svg)](https://github.com/bbilger/jrestless/blob/master/LICENSE)
 
 JRestless allows you to create serverless applications using JAX-RS.
