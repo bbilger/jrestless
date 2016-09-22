@@ -15,104 +15,45 @@
  */
 package com.jrestless.aws.io;
 
-import static org.apache.commons.lang3.StringUtils.trimToNull;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
+import com.jrestless.aws.GatewayIdentity;
 import com.jrestless.aws.GatewayRequestContext;
 
-
 /**
- * AWS API Gateway request context object.
- * <p>
- * The implementation highly depends on the AWS API Gateway request template and
- * is designed to get de-serialized from it.
  *
  * @author Bjoern Bilger
  *
  */
 public class GatewayRequestContextImpl implements GatewayRequestContext {
 
-	private String apiId;
-	private String principalId;
-	private String httpMethod;
 	private String accountId;
-	private String apiKey;
-	private String caller;
-	private String cognitoAuthenticationProvider;
-	private String cognitoAuthenticationType;
-	private String cognitoIdentityId;
-	private String cognitoIdentityPoolId;
-	private String sourceIp;
-	private String user;
-	private String userAgent;
-	private String userArn;
-	private String requestId;
 	private String resourceId;
-	private String resourcePath;
 	private String stage;
-	private Map<String, String> stageVariables = new HashMap<>();
+	private String requestId;
+	private GatewayIdentity identity;
+	private String resourcePath;
+	private String httpMethod;
+	private String apiId;
 
 	public GatewayRequestContextImpl() {
 	}
-	// for unit test
+
+	// for unit testing, only
 	// CHECKSTYLE:OFF
-	GatewayRequestContextImpl(String apiId, String principalId, String httpMethod, String accountId, String apiKey,
-			String caller, String cognitoAuthenticationProvider, String cognitoAuthenticationType,
-			String cognitoIdentityId, String cognitoIdentityPoolId, String sourceIp, String user, String userAgent,
-			String userArn, String requestId, String resourceId, String resourcePath, String stage,
-			Map<String, String> stageVariables) {
-		setApiId(apiId);
-		setPrincipalId(principalId);
-		setHttpMethod(httpMethod);
+	GatewayRequestContextImpl(String accountId, String resourceId, String stage, String requestId,
+			GatewayIdentityImpl identity, String resourcePath, String httpMethod, String apiId) {
+		super();
 		setAccountId(accountId);
-		setApiKey(apiKey);
-		setCaller(caller);
-		setCognitoAuthenticationProvider(cognitoAuthenticationProvider);
-		setCognitoAuthenticationType(cognitoAuthenticationType);
-		setCognitoIdentityId(cognitoIdentityId);
-		setCognitoIdentityPoolId(cognitoIdentityPoolId);
-		setSourceIp(sourceIp);
-		setUser(user);
-		setUserAgent(userAgent);
-		setUserArn(userArn);
-		setRequestId(requestId);
 		setResourceId(resourceId);
-		setResourcePath(resourcePath);
 		setStage(stage);
-		setStageVariables(stageVariables);
+		setRequestId(requestId);
+		setIdentity(identity);
+		setResourcePath(resourcePath);
+		setHttpMethod(httpMethod);
+		setApiId(apiId);
 	}
 	// CHECKSTYLE:ON
-
-	@Override
-	public String getApiId() {
-		return apiId;
-	}
-
-	public void setApiId(String apiId) {
-		this.apiId = trimToNull(apiId);
-	}
-
-	@Override
-	public String getPrincipalId() {
-		return principalId;
-	}
-
-	public void setPrincipalId(String principalId) {
-		this.principalId = trimToNull(principalId);
-	}
-
-	@Override
-	public String getHttpMethod() {
-		return httpMethod;
-	}
-
-	public void setHttpMethod(String httpMethod) {
-		this.httpMethod = trimToNull(httpMethod);
-	}
 
 	@Override
 	public String getAccountId() {
@@ -120,106 +61,7 @@ public class GatewayRequestContextImpl implements GatewayRequestContext {
 	}
 
 	public void setAccountId(String accountId) {
-		this.accountId = trimToNull(accountId);
-	}
-
-	@Override
-	public String getApiKey() {
-		return apiKey;
-	}
-
-	public void setApiKey(String apiKey) {
-		this.apiKey = trimToNull(apiKey);
-	}
-
-	@Override
-	public String getCaller() {
-		return caller;
-	}
-
-	public void setCaller(String caller) {
-		this.caller = trimToNull(caller);
-	}
-
-	@Override
-	public String getCognitoAuthenticationProvider() {
-		return cognitoAuthenticationProvider;
-	}
-
-	public void setCognitoAuthenticationProvider(String cognitoAuthenticationProvider) {
-		this.cognitoAuthenticationProvider = trimToNull(cognitoAuthenticationProvider);
-	}
-
-	@Override
-	public String getCognitoAuthenticationType() {
-		return cognitoAuthenticationType;
-	}
-
-	public void setCognitoAuthenticationType(String cognitoAuthenticationType) {
-		this.cognitoAuthenticationType = trimToNull(cognitoAuthenticationType);
-	}
-
-	@Override
-	public String getCognitoIdentityId() {
-		return cognitoIdentityId;
-	}
-
-	public void setCognitoIdentityId(String cognitoIdentityId) {
-		this.cognitoIdentityId = trimToNull(cognitoIdentityId);
-	}
-
-	@Override
-	public String getCognitoIdentityPoolId() {
-		return cognitoIdentityPoolId;
-	}
-
-	public void setCognitoIdentityPoolId(String cognitoIdentityPoolId) {
-		this.cognitoIdentityPoolId = trimToNull(cognitoIdentityPoolId);
-	}
-
-	@Override
-	public String getSourceIp() {
-		return sourceIp;
-	}
-
-	public void setSourceIp(String sourceIp) {
-		this.sourceIp = trimToNull(sourceIp);
-	}
-
-	@Override
-	public String getUser() {
-		return user;
-	}
-
-	public void setUser(String user) {
-		this.user = trimToNull(user);
-	}
-
-	@Override
-	public String getUserAgent() {
-		return userAgent;
-	}
-
-	public void setUserAgent(String userAgent) {
-		this.userAgent = trimToNull(userAgent);
-	}
-
-	@Override
-	public String getUserArn() {
-		return userArn;
-	}
-
-	public void setUserArn(String userArn) {
-		this.userArn = trimToNull(userArn);
-	}
-
-	@Override
-	public String getRequestId() {
-		return requestId;
-	}
-
-	public void setRequestId(String requestId) {
-		this.requestId = trimToNull(requestId);
+		this.accountId = accountId;
 	}
 
 	@Override
@@ -228,16 +70,7 @@ public class GatewayRequestContextImpl implements GatewayRequestContext {
 	}
 
 	public void setResourceId(String resourceId) {
-		this.resourceId = trimToNull(resourceId);
-	}
-
-	@Override
-	public String getResourcePath() {
-		return resourcePath;
-	}
-
-	public void setResourcePath(String resourcePath) {
-		this.resourcePath = trimToNull(resourcePath);
+		this.resourceId = resourceId;
 	}
 
 	@Override
@@ -246,19 +79,60 @@ public class GatewayRequestContextImpl implements GatewayRequestContext {
 	}
 
 	public void setStage(String stage) {
-		this.stage = trimToNull(stage);
+		this.stage = stage;
 	}
 
 	@Override
-	public Map<String, String> getStageVariables() {
-		return Collections.unmodifiableMap(stageVariables);
+	public String getRequestId() {
+		return requestId;
 	}
 
-	public void setStageVariables(Map<String, String> stageVariables) {
-		this.stageVariables.clear();
-		if (stageVariables != null) {
-			this.stageVariables.putAll(stageVariables);
-		}
+	public void setRequestId(String requestId) {
+		this.requestId = requestId;
+	}
+
+	@Override
+	public GatewayIdentity getIdentity() {
+		return identity;
+	}
+
+	public void setIdentity(GatewayIdentityImpl identity) {
+		this.identity = identity;
+	}
+
+	@Override
+	public String getResourcePath() {
+		return resourcePath;
+	}
+
+	public void setResourcePath(String resourcePath) {
+		this.resourcePath = resourcePath;
+	}
+
+	@Override
+	public String getHttpMethod() {
+		return httpMethod;
+	}
+
+	public void setHttpMethod(String httpMethod) {
+		this.httpMethod = httpMethod;
+	}
+
+	@Override
+	public String getApiId() {
+		return apiId;
+	}
+
+	public void setApiId(String apiId) {
+		this.apiId = apiId;
+	}
+
+
+	@Override
+	public String toString() {
+		return "GatewayRequestContextImpl [accountId=" + accountId + ", resourceId=" + resourceId + ", stage=" + stage
+				+ ", requestId=" + requestId + ", identity=" + identity + ", resourcePath=" + resourcePath
+				+ ", httpMethod=" + httpMethod + ", apiId=" + apiId + "]";
 	}
 
 	@Override
@@ -273,35 +147,14 @@ public class GatewayRequestContextImpl implements GatewayRequestContext {
 			return false;
 		}
 		GatewayRequestContextImpl castOther = (GatewayRequestContextImpl) other;
-		return Objects.equals(apiId, castOther.apiId) && Objects.equals(principalId, castOther.principalId)
-				&& Objects.equals(httpMethod, castOther.httpMethod) && Objects.equals(accountId, castOther.accountId)
-				&& Objects.equals(apiKey, castOther.apiKey) && Objects.equals(caller, castOther.caller)
-				&& Objects.equals(cognitoAuthenticationProvider, castOther.cognitoAuthenticationProvider)
-				&& Objects.equals(cognitoAuthenticationType, castOther.cognitoAuthenticationType)
-				&& Objects.equals(cognitoIdentityId, castOther.cognitoIdentityId)
-				&& Objects.equals(cognitoIdentityPoolId, castOther.cognitoIdentityPoolId)
-				&& Objects.equals(sourceIp, castOther.sourceIp) && Objects.equals(user, castOther.user)
-				&& Objects.equals(userAgent, castOther.userAgent) && Objects.equals(userArn, castOther.userArn)
-				&& Objects.equals(requestId, castOther.requestId) && Objects.equals(resourceId, castOther.resourceId)
-				&& Objects.equals(resourcePath, castOther.resourcePath) && Objects.equals(stage, castOther.stage)
-				&& Objects.equals(stageVariables, castOther.stageVariables);
+		return Objects.equals(accountId, castOther.accountId) && Objects.equals(resourceId, castOther.resourceId)
+				&& Objects.equals(stage, castOther.stage) && Objects.equals(requestId, castOther.requestId)
+				&& Objects.equals(identity, castOther.identity) && Objects.equals(resourcePath, castOther.resourcePath)
+				&& Objects.equals(httpMethod, castOther.httpMethod) && Objects.equals(apiId, castOther.apiId);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(apiId, principalId, httpMethod, accountId, apiKey, caller, cognitoAuthenticationProvider,
-				cognitoAuthenticationType, cognitoIdentityId, cognitoIdentityPoolId, sourceIp, user, userAgent, userArn,
-				requestId, resourceId, resourcePath, stage, stageVariables);
-	}
-
-	@Override
-	public String toString() {
-		return "GatewayRequestContextImpl [apiId=" + apiId + ", principalId=" + principalId + ", httpMethod="
-				+ httpMethod + ", accountId=" + accountId + ", apiKey=" + apiKey + ", caller=" + caller
-				+ ", cognitoAuthenticationProvider=" + cognitoAuthenticationProvider + ", cognitoAuthenticationType="
-				+ cognitoAuthenticationType + ", cognitoIdentityId=" + cognitoIdentityId + ", cognitoIdentityPoolId="
-				+ cognitoIdentityPoolId + ", sourceIp=" + sourceIp + ", user=" + user + ", userAgent=" + userAgent
-				+ ", userArn=" + userArn + ", requestId=" + requestId + ", resourceId=" + resourceId + ", resourcePath="
-				+ resourcePath + ", stage=" + stage + ", stageVariables=" + stageVariables + "]";
+		return Objects.hash(accountId, resourceId, stage, requestId, identity, resourcePath, httpMethod, apiId);
 	}
 }

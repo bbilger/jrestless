@@ -15,13 +15,10 @@
  */
 package com.jrestless.aws.handler;
 
-import javax.annotation.Nonnull;
-
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.jrestless.aws.io.GatewayDefaultResponse;
-import com.jrestless.aws.io.GatewayRequest;
-import com.jrestless.aws.io.GatewayResponseFactory;
+import com.jrestless.aws.io.GatewayRequestImpl;
+import com.jrestless.aws.io.GatewayResponse;
 
 /**
  * AWS lambda request (object) handler that uses
@@ -34,18 +31,10 @@ import com.jrestless.aws.io.GatewayResponseFactory;
  *
  */
 public abstract class GatewayRequestObjectHandler extends GatewayRequestHandler
-		implements RequestHandler<GatewayRequest, GatewayDefaultResponse> {
-
-	public GatewayRequestObjectHandler() {
-		super();
-	}
-
-	public GatewayRequestObjectHandler(@Nonnull GatewayResponseFactory responseFactory) {
-		super(responseFactory);
-	}
+		implements RequestHandler<GatewayRequestImpl, GatewayResponse> {
 
 	@Override
-	public GatewayDefaultResponse handleRequest(GatewayRequest request, Context context) {
+	public GatewayResponse handleRequest(GatewayRequestImpl request, Context context) {
 		return delegateRequest(request, context);
 	}
 }

@@ -71,7 +71,7 @@ public abstract class PreconditionsTester {
 	 */
 	public PreconditionsTester addInvalidArgs(int paramIndex, Class<? extends Exception> expectedException,
 			Object... arguments) {
-		invalidArguments.addArg(paramIndex, (a) -> new InvalidArgument(a, expectedException), arguments);
+		invalidArguments.addArg(paramIndex, a -> new InvalidArgument(a, expectedException), arguments);
 		return this;
 	}
 

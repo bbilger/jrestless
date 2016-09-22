@@ -18,22 +18,23 @@ package com.jrestless.aws.dpi;
 import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
 
-import com.amazonaws.services.lambda.runtime.Context;
+import com.jrestless.aws.GatewayIdentity;
 import com.jrestless.core.container.dpi.ContainerRequestContextPropertyFactory;
 
 /**
- * Factory for fetching {@link Context} from the {@link ContainerRequestContext}
- * via the property name {@code 'awsLambdaContext'}.
+ * Factory for fetching {@link GatewayIdentity} from the
+ * {@link ContainerRequestContext} via the property name
+ * {@code 'awsApiGatewayIdentity'}.
  *
  * @author Bjoern Bilger
  *
  */
-public class LambdaContextFactory extends ContainerRequestContextPropertyFactory<Context> {
+public class GatewayIdentityContextFactory extends ContainerRequestContextPropertyFactory<GatewayIdentity> {
 
-	public static final String PROPERTY_NAME = "awsLambdaContext";
+	public static final String PROPERTY_NAME = "awsApiGatewayIdentity";
 
 	@Inject
-	public LambdaContextFactory(ContainerRequestContext context) {
+	public GatewayIdentityContextFactory(ContainerRequestContext context) {
 		super(context, PROPERTY_NAME);
 	}
 }

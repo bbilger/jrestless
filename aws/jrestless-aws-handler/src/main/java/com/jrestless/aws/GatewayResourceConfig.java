@@ -21,15 +21,16 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.jrestless.aws.dpi.ApiGatewayContextFactory;
+import com.jrestless.aws.dpi.GatewayIdentityContextFactory;
+import com.jrestless.aws.dpi.GatewayRequestContextContextFactory;
+import com.jrestless.aws.dpi.GatewayRequestContextFactory;
 import com.jrestless.aws.dpi.LambdaContextFactory;
-import com.jrestless.aws.filter.IsDefaultResponseFilter;
 
 /**
  * Jersey application configuration with AWS specifics.
  * <ol>
  * <li>{@link LambdaContextFactory}
- * <li>{@link ApiGatewayContextFactory}
+ * <li>{@link GatewayRequestContextFactory}
  * <li>{@link IsDefaultResponseFilter}
  * <li>{@link RolesAllowedDynamicFeature}
  * </ol>
@@ -43,18 +44,35 @@ public class GatewayResourceConfig extends ResourceConfig {
 		register(new AbstractBinder() {
 			@Override
 			protected void configure() {
-				bindFactory(LambdaContextFactory.class).to(Context.class).in(RequestScoped.class);
-
+				bindFactory(LambdaContextFactory.class)
+					.to(Context.class)
+					.in(RequestScoped.class);
 			}
 		});
 		register(new AbstractBinder() {
 			@Override
 			protected void configure() {
-				bindFactory(ApiGatewayContextFactory.class).to(GatewayRequestContext.class).in(RequestScoped.class);
-
+				bindFactory(GatewayRequestContextFactory.class)
+					.to(GatewayRequest.class)
+					.in(RequestScoped.class);
 			}
 		});
-		register(IsDefaultResponseFilter.class);
+		register(new AbstractBinder() {
+			@Override
+			protected void configure() {
+				bindFactory(GatewayRequestContextContextFactory.class)
+					.to(GatewayRequestContext.class)
+					.in(RequestScoped.class);
+			}
+		});
+		register(new AbstractBinder() {
+			@Override
+			protected void configure() {
+				bindFactory(GatewayIdentityContextFactory.class)
+					.to(GatewayIdentity.class)
+					.in(RequestScoped.class);
+			}
+		});
 		register(RolesAllowedDynamicFeature.class);
 	}
 }

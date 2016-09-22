@@ -16,7 +16,6 @@
 package com.jrestless.aws.handler;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -44,15 +43,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import com.jrestless.aws.GatewayIdentity;
+import com.jrestless.aws.GatewayRequest;
 import com.jrestless.aws.GatewayRequestContext;
 import com.jrestless.aws.GatewayResourceConfig;
-import com.jrestless.aws.io.GatewayAdditionalResponseException;
-import com.jrestless.aws.io.GatewayDefaultResponse;
-import com.jrestless.aws.io.GatewayRequest;
+import com.jrestless.aws.io.GatewayIdentityImpl;
 import com.jrestless.aws.io.GatewayRequestContextImpl;
+import com.jrestless.aws.io.GatewayRequestImpl;
+import com.jrestless.aws.io.GatewayResponse;
 import com.jrestless.core.container.dpi.InstanceBinder;
-
-import io.swagger.annotations.ApiOperation;
 
 public class GatewayRequestObjectHandlerInt {
 
@@ -74,84 +73,104 @@ public class GatewayRequestObjectHandlerInt {
 	@Test
 	public void testLambdaContextInjection() {
 		Context context = mock(Context.class);
-		GatewayRequest request = new GatewayRequest();
+		GatewayRequestImpl request = new GatewayRequestImpl();
 		GatewayRequestContextImpl requestContext = new GatewayRequestContextImpl();
-		request.setContext(requestContext);
-		requestContext.setHttpMethod("DELETE");
-		requestContext.setResourcePath("/");
+		request.setRequestContext(requestContext);
+		request.setHttpMethod("DELETE");
+		request.setPath("/");
 		handler.handleRequest(request, context);
 		verify(testService).injectLambdaContext(context);
 	}
 
 	@Test
-	public void testGatewayContextInjection() {
+	public void testGatewayRequestInjection() {
 		Context context = mock(Context.class);
-		GatewayRequest request = new GatewayRequest();
-		GatewayRequestContextImpl requestContext = new GatewayRequestContextImpl();
-		request.setContext(requestContext);
-		requestContext.setHttpMethod("PUT");
-		requestContext.setResourcePath("/");
+		GatewayRequestImpl request = new GatewayRequestImpl();
+		request.setHttpMethod("PUT");
+		request.setPath("/inject-gateway-request");
 		handler.handleRequest(request, context);
-		verify(testService).injectGatewayContext(same(requestContext));
+		verify(testService).injectGatewayRequest(same(request));
+	}
+
+	@Test
+	public void testGatewayRequestContextInjection() {
+		Context context = mock(Context.class);
+		GatewayRequestImpl request = new GatewayRequestImpl();
+		GatewayRequestContextImpl requestContext = new GatewayRequestContextImpl();
+		request.setRequestContext(requestContext);
+		request.setHttpMethod("PUT");
+		request.setPath("/inject-gateway-request-context");
+		handler.handleRequest(request, context);
+		verify(testService).injectGatewayRequestContext(same(requestContext));
+	}
+
+	@Test
+	public void testGatewayRequestIdentityInjection() {
+		Context context = mock(Context.class);
+		GatewayRequestImpl request = new GatewayRequestImpl();
+		GatewayRequestContextImpl requestContext = new GatewayRequestContextImpl();
+		GatewayIdentityImpl identity = new GatewayIdentityImpl();
+		requestContext.setIdentity(identity);
+		request.setRequestContext(requestContext);
+		request.setHttpMethod("PUT");
+		request.setPath("/inject-gateway-identity");
+		handler.handleRequest(request, context);
+		verify(testService).injectGatewayIdentity(same(identity));
 	}
 
 	@Test
 	public void testDefaultResponse() {
 		Context context = mock(Context.class);
-		GatewayRequest request = new GatewayRequest();
+		GatewayRequestImpl request = new GatewayRequestImpl();
 		GatewayRequestContextImpl requestContext = new GatewayRequestContextImpl();
-		request.setContext(requestContext);
-		requestContext.setHttpMethod("GET");
-		requestContext.setResourcePath("/default");
-		request.setHeaderParams(ImmutableMap.of("Accept", "application/json"));
-		GatewayDefaultResponse response = handler.handleRequest(request, context);
-		Map<String, String> headers = ImmutableMap.of("X-Is-Default-Response", "1", "Content-Type", "application/json");
-		assertEquals(new GatewayDefaultResponse("{\"value\":\"default\"}", headers, Status.OK), response);
+		request.setRequestContext(requestContext);
+		request.setHttpMethod("GET");
+		request.setPath("/default");
+		request.setHeaders(ImmutableMap.of("Accept", "application/json"));
+		GatewayResponse response = handler.handleRequest(request, context);
+		Map<String, String> headers = ImmutableMap.of("Content-Type", "application/json");
+		assertEquals(new GatewayResponse("{\"value\":\"default\"}", headers, Status.OK), response);
 	}
 
 	@Test
 	public void testNonDefaultResponse() {
 		Context context = mock(Context.class);
-		GatewayRequest request = new GatewayRequest();
+		GatewayRequestImpl request = new GatewayRequestImpl();
 		GatewayRequestContextImpl requestContext = new GatewayRequestContextImpl();
-		request.setContext(requestContext);
-		requestContext.setHttpMethod("GET");
-		requestContext.setResourcePath("/nondefault");
-		request.setHeaderParams(ImmutableMap.of("Accept", "application/json"));
-		try {
-			handler.handleRequest(request, context);
-			fail("expected response to be returned as exception");
-		} catch (GatewayAdditionalResponseException gare) {
-			assertEquals("{\"statusCode\":\"301\",\"body\":\"{\\\"value\\\":\\\"nonDefault\\\"}\"}", gare.getMessage());
-		}
+		request.setRequestContext(requestContext);
+		request.setHttpMethod("GET");
+		request.setPath("/nondefault");
+		request.setHeaders(ImmutableMap.of("Accept", "application/json"));
+		GatewayResponse response = handler.handleRequest(request, context);
+		assertEquals(301, response.getStatusCode());
+		assertEquals(ImmutableMap.of("Content-Type", "application/json"), response.getHeaders());
+		assertEquals("{\"value\":\"nonDefault\"}", response.getBody());
 	}
 
 	@Test
 	public void testCustomNonDefaultResponse() {
 		Context context = mock(Context.class);
-		GatewayRequest request = new GatewayRequest();
+		GatewayRequestImpl request = new GatewayRequestImpl();
 		GatewayRequestContextImpl requestContext = new GatewayRequestContextImpl();
-		request.setContext(requestContext);
-		requestContext.setHttpMethod("GET");
-		requestContext.setResourcePath("/customnondefault");
-		request.setHeaderParams(ImmutableMap.of("Accept", "application/json"));
-		try {
-			handler.handleRequest(request, context);
-			fail("expected response to be returned as exception");
-		} catch (GatewayAdditionalResponseException gare) {
-			assertEquals("{\"statusCode\":\"200\",\"body\":\"{\\\"value\\\":\\\"nonCustomDefault\\\"}\"}", gare.getMessage());
-		}
+		request.setRequestContext(requestContext);
+		request.setHttpMethod("GET");
+		request.setPath("/customnondefault");
+		request.setHeaders(ImmutableMap.of("Accept", "application/json"));
+		GatewayResponse response = handler.handleRequest(request, context);
+		assertEquals(200, response.getStatusCode());
+		assertEquals(ImmutableMap.of("Content-Type", "application/json"), response.getHeaders());
+		assertEquals("{\"value\":\"nonCustomDefault\"}", response.getBody());
 	}
 
 	@Test
 	public void testRequestBodyPassed() throws JsonProcessingException {
 		Context context = mock(Context.class);
-		GatewayRequest request = new GatewayRequest();
+		GatewayRequestImpl request = new GatewayRequestImpl();
 		GatewayRequestContextImpl requestContext = new GatewayRequestContextImpl();
-		request.setContext(requestContext);
-		requestContext.setHttpMethod("POST");
-		requestContext.setResourcePath("/requestbody");
-		request.setHeaderParams(ImmutableMap.of("Content-Type", "application/json"));
+		request.setRequestContext(requestContext);
+		request.setHttpMethod("POST");
+		request.setPath("/requestbody");
+		request.setHeaders(ImmutableMap.of("Content-Type", "application/json"));
 		request.setBody(new ObjectMapper().writeValueAsString(new Entity("requestBody")));
 		handler.handleRequest(request, context);
 		verify(testService).requestBody(new Entity("requestBody"));
@@ -173,9 +192,24 @@ public class GatewayRequestObjectHandlerInt {
 			return Response.ok().build();
 		}
 
+		@Path("/inject-gateway-request")
 		@PUT
-		public Response injectGatewayContext(@javax.ws.rs.core.Context GatewayRequestContext context) {
-			service.injectGatewayContext(context);
+		public Response injectGatewayRequest(@javax.ws.rs.core.Context GatewayRequest request) {
+			service.injectGatewayRequest(request);
+			return Response.ok().build();
+		}
+
+		@Path("/inject-gateway-request-context")
+		@PUT
+		public Response injectGatewayRequestContext(@javax.ws.rs.core.Context GatewayRequestContext requestContext) {
+			service.injectGatewayRequestContext(requestContext);
+			return Response.ok().build();
+		}
+
+		@Path("/inject-gateway-identity")
+		@PUT
+		public Response injectGatewayRequestContext(@javax.ws.rs.core.Context GatewayIdentity identity) {
+			service.injectGatewayIdentity(identity);
 			return Response.ok().build();
 		}
 
@@ -193,7 +227,6 @@ public class GatewayRequestObjectHandlerInt {
 
 		@Path("/customnondefault")
 		@GET
-		@ApiOperation(value = "", code = 301)
 		public Response customNonDefaultResponse() {
 			return Response.ok(new Entity("nonCustomDefault")).build();
 		}
@@ -201,7 +234,6 @@ public class GatewayRequestObjectHandlerInt {
 		@Path("/requestbody")
 		@POST
 		@Consumes("application/json")
-		@ApiOperation(value = "", code = 204)
 		public void requestBody(Entity entity) {
 			service.requestBody(entity);
 		}
@@ -209,7 +241,9 @@ public class GatewayRequestObjectHandlerInt {
 
 	public static interface TestService {
 		void injectLambdaContext(Context context);
-		void injectGatewayContext(GatewayRequestContext context);
+		void injectGatewayRequest(GatewayRequest request);
+		void injectGatewayRequestContext(GatewayRequestContext requestContext);
+		void injectGatewayIdentity(GatewayIdentity identity);
 		void requestBody(Entity entity);
 	}
 

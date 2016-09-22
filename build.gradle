@@ -80,9 +80,9 @@ subprojects {
 			websiteUrl = 'https://github.com/bbilger/jrestless'
 			githubRepo = 'bbilger/jrestless'
 			version {
-				name = "$globaleModuleVersion"
-				vcsTag = 'v' + "$globaleModuleVersion"
-				desc = "$globaleModuleVersion"
+				name = "$project.version"
+				vcsTag = 'v' + "$project.version"
+				desc = "$project.version"
 			}
 		}
 		publications = ['BintrayPublication']
@@ -111,8 +111,6 @@ subprojects {
 }
 
 dependencies {
-	compile project(":core:jrestless-core-container")
-	compile project(":aws:jrestless-aws-swagger")
 	compile project(":aws:jrestless-aws-core")
 	compile project(":aws:jrestless-aws-handler")
 	compile project(":test:jrestless-test")

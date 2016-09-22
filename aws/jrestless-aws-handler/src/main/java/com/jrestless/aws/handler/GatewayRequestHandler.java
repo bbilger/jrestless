@@ -18,9 +18,15 @@ package com.jrestless.aws.handler;
 import static java.util.Objects.requireNonNull;
 import static jersey.repackaged.com.google.common.base.Preconditions.checkState;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,13 +45,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.jrestless.aws.dpi.ApiGatewayContextFactory;
+import com.jrestless.aws.GatewayRequest;
+import com.jrestless.aws.GatewayRequestContext;
+import com.jrestless.aws.dpi.GatewayIdentityContextFactory;
+import com.jrestless.aws.dpi.GatewayRequestContextContextFactory;
+import com.jrestless.aws.dpi.GatewayRequestContextFactory;
 import com.jrestless.aws.dpi.LambdaContextFactory;
-import com.jrestless.aws.filter.IsDefaultResponseFilter;
-import com.jrestless.aws.io.GatewayDefaultResponse;
-import com.jrestless.aws.io.GatewayRequest;
-import com.jrestless.aws.io.GatewayResponseFactory;
-import com.jrestless.aws.io.GatewayResponseFactoryImpl;
+import com.jrestless.aws.io.GatewayResponse;
+import com.jrestless.aws.util.HeaderUtils;
 import com.jrestless.core.container.JRestlessHandlerContainer;
 import com.jrestless.core.container.io.JRestlessResponseWriter;
 import com.jrestless.core.security.AnonSecurityContext;
@@ -65,21 +72,12 @@ import com.jrestless.core.security.AnonSecurityContext;
 public abstract class GatewayRequestHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GatewayRequestHandler.class);
+	private static final URI ROOT_URI = URI.create("/");
 
-	private JRestlessHandlerContainer<GatewayRequest> container;
-	private final GatewayResponseFactory responseFactory;
+	private JRestlessHandlerContainer<GatewayContainerRequest> container;
 
 	private boolean initialized = false;
 	private boolean started = false;
-
-	public GatewayRequestHandler() {
-		this(new GatewayResponseFactoryImpl());
-	}
-
-	public GatewayRequestHandler(@Nonnull GatewayResponseFactory responseFactory) {
-		requireNonNull(responseFactory);
-		this.responseFactory = responseFactory;
-	}
 
 	/**
 	 * Initializes the container using the given application.
@@ -113,7 +111,7 @@ public abstract class GatewayRequestHandler {
 	 *
 	 * @param application
 	 */
-	protected final void init(@Nonnull JRestlessHandlerContainer<GatewayRequest> handlerContainer) {
+	protected final void init(@Nonnull JRestlessHandlerContainer<GatewayContainerRequest> handlerContainer) {
 		requireNonNull(handlerContainer);
 		checkState(!initialized, "handler has already been initlialized");
 		this.container = handlerContainer;
@@ -145,24 +143,28 @@ public abstract class GatewayRequestHandler {
 	 *             an exception.
 	 * @return
 	 */
-	protected final GatewayDefaultResponse delegateRequest(@Nonnull GatewayRequest request, @Nonnull Context context) {
+	protected final GatewayResponse delegateRequest(@Nonnull GatewayRequest request, @Nonnull Context context) {
 		GatewayContainerResponse containerResponse;
+		GatewayContainerRequest containerRequest = null;
 		try {
 			checkState(started, "handler has not been started");
 			requireNonNull(request);
 			requireNonNull(context);
-			beforeHandleRequest(request, context);
+			containerRequest = createContainerRequest(request);
+			GatewayContainerRequest containerRequestFinal = containerRequest;
+			beforeHandleRequest(request, containerRequest, context);
 			GatewayContainerResponseWriter responseWriter = createResponseWriter();
-			container.handleRequest(request, responseWriter, createSecurityContext(request, context), (cReq) -> {
-				extendContainerRequest(cReq, request, context);
-			});
+			container.handleRequest(containerRequest, responseWriter,
+					createSecurityContext(request, containerRequest, context), cReq -> {
+						extendActualContainerRequest(cReq, containerRequestFinal, request, context);
+					});
 			containerResponse = responseWriter.getResponse();
 			requireNonNull(containerResponse);
-			containerResponse = onRequestSuccess(containerResponse, request, context);
+			containerResponse = onRequestSuccess(containerResponse, request, containerRequest, context);
 		} catch (Exception e) {
 			LOG.error("request failed", e);
 			try {
-				containerResponse = onRequestFailure(e, request, context);
+				containerResponse = onRequestFailure(e, request, containerRequest, context);
 			} catch (Exception requestFailureException) {
 				LOG.error("onRequestFailure hook failed", requestFailureException);
 				containerResponse = GatewayContainerResponse.createInternalServerErrorResponse();
@@ -175,9 +177,52 @@ public abstract class GatewayRequestHandler {
 		return createGatewayResponse(containerResponse);
 	}
 
-	// for unit testing
+	// for unit testing, only
 	GatewayContainerResponseWriter createResponseWriter() {
 		return new GatewayContainerResponseWriter();
+	}
+
+	protected GatewayContainerRequest createContainerRequest(GatewayRequest request) {
+		requireNonNull(request);
+		requireNonNull(request.getPath());
+		String body = request.getBody();
+		InputStream entityStream;
+		if (body != null) {
+			entityStream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
+		} else {
+			entityStream = new ByteArrayInputStream(new byte[0]);
+		}
+		URI requestUri = URI.create(appendQueryParams(request.getPath(), request.getQueryStringParameters()));
+		return new GatewayContainerRequest(ROOT_URI, requestUri, request.getHttpMethod(), entityStream,
+				HeaderUtils.expandHeaders(request.getHeaders()));
+	}
+
+	private String appendQueryParams(String requestUri, Map<String, String> queryParameters) {
+		if (!queryParameters.isEmpty()) {
+			StringBuilder requestUriBuilder = new StringBuilder(requestUri);
+			requestUriBuilder.append("?");
+			boolean first = true;
+			for (Map.Entry<String, String> queryParam : queryParameters.entrySet()) {
+				if (!first) {
+					requestUriBuilder.append("&");
+				}
+				requestUriBuilder.append(encodeQueryParam(queryParam.getKey()));
+				requestUriBuilder.append("=");
+				requestUriBuilder.append(encodeQueryParam(queryParam.getValue()));
+				first = false;
+			}
+			return requestUriBuilder.toString();
+		} else {
+			return requestUri;
+		}
+	}
+
+	private String encodeQueryParam(String param) {
+		try {
+			return URLEncoder.encode(param, StandardCharsets.UTF_8.name());
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
@@ -190,35 +235,22 @@ public abstract class GatewayRequestHandler {
 	 *             exceptions.
 	 * @return
 	 */
-	protected GatewayDefaultResponse createGatewayResponse(GatewayContainerResponse containerResponse) {
+	protected GatewayResponse createGatewayResponse(GatewayContainerResponse containerResponse) {
 		String body = containerResponse.getBody();
 		Map<String, List<String>> headers = containerResponse.getHeaders();
 		StatusType statusType = containerResponse.getStatusType();
-		return responseFactory.createResponse(body, headers, statusType, isDefaultResponse(containerResponse));
-	}
-
-	/**
-	 * Checks if the container response is the default response or not.
-	 *
-	 * @param containerResponse
-	 * @return
-	 */
-	protected boolean isDefaultResponse(GatewayContainerResponse containerResponse) {
-		List<String> isDefaultHeader = containerResponse.getHeaders()
-				.get(IsDefaultResponseFilter.IS_DEFAULT_RESPONSE_HEADER_NAME);
-		if (isDefaultHeader == null || isDefaultHeader.isEmpty()) {
-			return Status.OK.equals(containerResponse.getStatusType());
-		} else {
-			return "1".equals(isDefaultHeader.get(0));
-		}
+		return new GatewayResponse(body, HeaderUtils.flattenHeaders(headers), statusType);
 	}
 
 	/**
 	 * Hook that is invoked before the request is handled by the container.
 	 *
+	 * @param request
+	 * @param containerRequest
 	 * @param context
 	 */
-	protected void beforeHandleRequest(GatewayRequest request, Context context) {
+	protected void beforeHandleRequest(GatewayRequest request, GatewayContainerRequest containerRequest,
+			Context context) {
 	}
 
 	/**
@@ -227,13 +259,14 @@ public abstract class GatewayRequestHandler {
 	 *
 	 * @param responseStatusCode
 	 * @param request
+	 * @param containerRequest
 	 * @param responseBody
 	 * @param responseHeaders
 	 * @param context
 	 * @return the container response
 	 */
 	protected GatewayContainerResponse onRequestSuccess(GatewayContainerResponse response, GatewayRequest request,
-			Context context) {
+			GatewayContainerRequest containerRequest, Context context) {
 		return response;
 	}
 
@@ -244,29 +277,39 @@ public abstract class GatewayRequestHandler {
 	 * By default an internal server error is created.
 	 *
 	 * @param e
+	 * @param request
+	 * @param containerRequest
 	 * @param context
 	 * @return the error container response
 	 */
-	protected GatewayContainerResponse onRequestFailure(Exception e, GatewayRequest request, Context context) {
+	protected GatewayContainerResponse onRequestFailure(Exception e, GatewayRequest request,
+			@Nullable GatewayContainerRequest containerRequest, Context context) {
 		return GatewayContainerResponse.createInternalServerErrorResponse();
 	}
 
 	/**
-	 * Hook that allows to extend the containerRequest.
+	 * Hook that allows to extend the actual containerRequest passed to the Jersey container.
 	 * <p>
 	 * By default {@link Context} is registered as property 'awsLambdaContext'
-	 * and {@link com.jrestless.aws.GatewayRequestContext} is registered as
-	 * property 'awsApiGatewayContext'.
+	 * and {@link com.jrestless.aws.GatewayRequest} is registered as
+	 * property 'awsApiGatewayRequest'.
 	 *
 	 *
+	 * @param actualContainerRequest
 	 * @param containerRequest
 	 * @param request
 	 * @param context
 	 */
-	protected void extendContainerRequest(ContainerRequest containerRequest, GatewayRequest request, Context context) {
-		containerRequest.setProperty(LambdaContextFactory.AWS_LAMBDA_CONTEXT_PROPERTY_NAME, context);
-		containerRequest.setProperty(ApiGatewayContextFactory.AWS_API_GATEWAY_CONTEXT_PROPERTY_NAME,
-				request.getContext());
+	protected void extendActualContainerRequest(ContainerRequest actualContainerRequest,
+			GatewayContainerRequest containerRequest, GatewayRequest request, Context context) {
+		actualContainerRequest.setProperty(LambdaContextFactory.PROPERTY_NAME, context);
+		actualContainerRequest.setProperty(GatewayRequestContextFactory.PROPERTY_NAME, request);
+		GatewayRequestContext requestContext = request.getRequestContext();
+		actualContainerRequest.setProperty(GatewayRequestContextContextFactory.PROPERTY_NAME, requestContext);
+		if (requestContext != null) {
+			actualContainerRequest.setProperty(GatewayIdentityContextFactory.PROPERTY_NAME,
+					requestContext.getIdentity());
+		}
 	}
 
 	/**
@@ -279,7 +322,8 @@ public abstract class GatewayRequestHandler {
 	 * @return
 	 */
 	@Nonnull
-	protected SecurityContext createSecurityContext(GatewayRequest request, Context context) {
+	protected SecurityContext createSecurityContext(GatewayRequest request, GatewayContainerRequest containerRequest,
+			Context context) {
 		return new AnonSecurityContext();
 	}
 

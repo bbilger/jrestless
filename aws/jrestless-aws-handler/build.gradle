@@ -4,10 +4,6 @@ version = "${globaleModuleVersion}"
 dependencies {
 	compile project(':aws:jrestless-aws-core')
 	compile project(':core:jrestless-core-container')
-	compile (
-		'org.apache.commons:commons-lang3:3.4',
-		'io.swagger:swagger-annotations:1.5.9'
-	)
 	testCompile project(':test:jrestless-test')
 	testCompile (
 		'junit:junit:4.12',

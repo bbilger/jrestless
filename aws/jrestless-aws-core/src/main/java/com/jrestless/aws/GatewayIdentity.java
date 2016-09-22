@@ -16,20 +16,20 @@
 package com.jrestless.aws;
 
 /**
- * API Gateway's context for a request.
- * <p>
- * It can be injected into resources via {@code @Context}.
  *
  * @author Bjoern Bilger
  *
  */
-public interface GatewayRequestContext {
+public interface GatewayIdentity {
+	String getCognitoIdentityPoolId();
 	String getAccountId();
-	String getResourceId();
-	String getStage();
-	String getRequestId();
-	GatewayIdentity getIdentity();
-	String getResourcePath();
-	String getHttpMethod();
-	String getApiId();
+	String getCognitoIdentityId();
+	String getCaller();
+	String getApiKey();
+	String getSourceIp();
+	String getCognitoAuthenticationType();
+	String getCognitoAuthenticationProvider();
+	String getUserArn();
+	String getUserAgent();
+	String getUser();
 }

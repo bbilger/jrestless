@@ -15,8 +15,9 @@
  */
 package com.jrestless.aws.handler;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -27,6 +28,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -43,17 +48,16 @@ import org.mockito.ArgumentCaptor;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.jrestless.aws.GatewayRequestContext;
+import com.jrestless.aws.GatewayRequest;
 import com.jrestless.aws.handler.GatewayRequestHandler.GatewayContainerResponse;
 import com.jrestless.aws.handler.GatewayRequestHandler.GatewayContainerResponseWriter;
-import com.jrestless.aws.io.GatewayAdditionalResponseException;
-import com.jrestless.aws.io.GatewayDefaultResponse;
-import com.jrestless.aws.io.GatewayRequest;
+import com.jrestless.aws.io.GatewayRequestImpl;
+import com.jrestless.aws.io.GatewayResponse;
 import com.jrestless.core.container.JRestlessHandlerContainer;
 
 public class GatewayRequestHandlerTest {
 
-	private JRestlessHandlerContainer<GatewayRequest> container;
+	private JRestlessHandlerContainer<GatewayContainerRequest> container;
 	private GatewayRequestHandler gatewayHandler;
 
 	@SuppressWarnings("unchecked")
@@ -82,7 +86,7 @@ public class GatewayRequestHandlerTest {
 
 	@Test(expected = NullPointerException.class)
 	public void init2_NullHandlerContainerGiven_ShouldThrowNpe() {
-		new GatewayRequestHandlerImpl().init((JRestlessHandlerContainer<GatewayRequest>) null);
+		new GatewayRequestHandlerImpl().init((JRestlessHandlerContainer<GatewayContainerRequest>) null);
 	}
 
 	@Test(expected = IllegalStateException.class)
@@ -102,83 +106,73 @@ public class GatewayRequestHandlerTest {
 
 	@Test
 	public void delegateRequest_NotStarted_ShouldReturnInternalServerError() {
-		try {
-			new GatewayRequestHandlerImpl().delegateRequest(mock(GatewayRequest.class), mock(Context.class));
-			fail("expected internal server error");
-		} catch (GatewayAdditionalResponseException gare) {
-			assertEquals("{\"statusCode\":\"500\"}", gare.getMessage());
-		}
+		GatewayResponse response = new GatewayRequestHandlerImpl().delegateRequest(mock(GatewayRequestImpl.class), mock(Context.class));
+		assertEquals(500, response.getStatusCode());
+		assertTrue(response.getHeaders().isEmpty());
+		assertEquals(null, response.getBody());
 	}
 
 	@Test
 	public void delegateRequest_NullRequestGiven_ShouldNotProcessRequest() {
-		try {
-			gatewayHandler.delegateRequest(null, mock(Context.class));
-			fail("expected internal server error");
-		} catch (GatewayAdditionalResponseException gare) {
-			assertEquals("{\"statusCode\":\"500\"}", gare.getMessage());
-		}
-		verify(gatewayHandler, times(0)).beforeHandleRequest(any(), any());
+		GatewayResponse response = gatewayHandler.delegateRequest(null, mock(Context.class));
+		assertEquals(500, response.getStatusCode());
+		assertTrue(response.getHeaders().isEmpty());
+		assertEquals(null, response.getBody());
+		verify(gatewayHandler, times(0)).beforeHandleRequest(any(), any(), any());
 	}
 
 	@Test
 	public void delegateRequest_NullContextGiven_ShouldNotProcessRequest() {
-		try {
-			gatewayHandler.delegateRequest(mock(GatewayRequest.class), null);
-			fail("expected internal server error");
-		} catch (GatewayAdditionalResponseException gare) {
-			assertEquals("{\"statusCode\":\"500\"}", gare.getMessage());
-		}
-		verify(gatewayHandler, times(0)).beforeHandleRequest(any(), any());
+		GatewayResponse response = gatewayHandler.delegateRequest(mock(GatewayRequestImpl.class), null);
+		assertEquals(500, response.getStatusCode());
+		assertTrue(response.getHeaders().isEmpty());
+		assertEquals(null, response.getBody());
+		verify(gatewayHandler, times(0)).beforeHandleRequest(any(), any(), any());
 	}
 
 	@Test
 	public void delegateRequest_ContainerException_ShouldInvokeCallbacks() {
-		GatewayRequest request = mock(GatewayRequest.class);
+		GatewayRequest request = createMinimalRequest();
 		Context context = mock(Context.class);
-		doThrow(new RuntimeException()).when(container).handleRequest(eq(request), any(), any());
-		try {
-			gatewayHandler.delegateRequest(request, context);
-			fail("expected internal server error");
-		} catch (GatewayAdditionalResponseException gare) {
-			assertEquals("{\"statusCode\":\"500\"}", gare.getMessage());
-		}
-		verify(gatewayHandler, times(1)).beforeHandleRequest(request, context);
+		doThrow(new RuntimeException()).when(container).handleRequest(any(), any(), any());
+		GatewayResponse response = gatewayHandler.delegateRequest(request, context);
+		assertEquals(500, response.getStatusCode());
+		assertTrue(response.getHeaders().isEmpty());
+		assertEquals(null, response.getBody());
+		verify(gatewayHandler, times(1)).beforeHandleRequest(eq(request), any(), eq(context));
 	}
 
 	@Test
 	public void delegateRequest_DefaultContainerResponseGiven_ShouldReturnGatewayDefaultResponse() {
-		GatewayRequest request = mock(GatewayRequest.class);
+		GatewayRequestImpl request = createMinimalRequest();
 		Context context = mock(Context.class);
 		Map<String, List<String>> headers = ImmutableMap.of("k", ImmutableList.of("k", "v"));
 		GatewayContainerResponse containerResponse = new GatewayContainerResponse(Status.OK, "testBody", headers);
 		GatewayContainerResponseWriter responseWriter = mock(GatewayContainerResponseWriter.class);
 		when(responseWriter.getResponse()).thenReturn(containerResponse);
 		doReturn(responseWriter).when(gatewayHandler).createResponseWriter();
-		GatewayDefaultResponse response = gatewayHandler.delegateRequest(request, context);
-		assertEquals(new GatewayDefaultResponse("testBody", ImmutableMap.of("k", "k,v"), Status.OK), response);
+		GatewayResponse response = gatewayHandler.delegateRequest(request, context);
+		assertEquals(new GatewayResponse("testBody", ImmutableMap.of("k", "k,v"), Status.OK), response);
 	}
 
 	@Test
 	public void delegateRequest_NonDefaultContainerResponseGiven_ShouldThrowResponse() {
-		GatewayRequest request = mock(GatewayRequest.class);
+		GatewayRequestImpl request = createMinimalRequest();
 		Context context = mock(Context.class);
 		Map<String, List<String>> headers = ImmutableMap.of("k", ImmutableList.of("k", "v"));
 		GatewayContainerResponse containerResponse = new GatewayContainerResponse(Status.MOVED_PERMANENTLY, "testBody", headers);
 		GatewayContainerResponseWriter responseWriter = mock(GatewayContainerResponseWriter.class);
 		when(responseWriter.getResponse()).thenReturn(containerResponse);
 		doReturn(responseWriter).when(gatewayHandler).createResponseWriter();
-		try {
-			gatewayHandler.delegateRequest(request, context);
-			fail("expected non-default response to be returned as GatewayAdditionalResponseException");
-		} catch (GatewayAdditionalResponseException gare) {
-			assertEquals("{\"statusCode\":\"301\",\"body\":\"testBody\"}", gare.getMessage());
-		}
+		GatewayResponse response = gatewayHandler.delegateRequest(request, context);
+		assertEquals(301, response.getStatusCode());
+		assertEquals(ImmutableMap.of("k", "k,v"), response.getHeaders());
+		assertEquals("testBody", response.getBody());
 	}
 
 	@Test
 	public void delegateRequest_DefaultContainerResponseGiven_ShouldInvokeCallbacks() {
-		GatewayRequest request = mock(GatewayRequest.class);
+		GatewayRequestImpl request = createMinimalRequest();
 		Context context = mock(Context.class);
 		Map<String, List<String>> headers = ImmutableMap.of("k", ImmutableList.of("k", "v"));
 		GatewayContainerResponse containerResponse = new GatewayContainerResponse(Status.OK, "testBody", headers);
@@ -186,22 +180,20 @@ public class GatewayRequestHandlerTest {
 		when(responseWriter.getResponse()).thenReturn(containerResponse);
 		doReturn(responseWriter).when(gatewayHandler).createResponseWriter();
 		gatewayHandler.delegateRequest(request, context);
-		verify(gatewayHandler).beforeHandleRequest(request, context);
-		verify(gatewayHandler).onRequestSuccess(containerResponse, request, context);
+		verify(gatewayHandler).beforeHandleRequest(eq(request), any(), eq(context));
+		verify(gatewayHandler).onRequestSuccess(eq(containerResponse), eq(request), any(), eq(context));
 	}
 
 	@Test
 	public void delegateRequest_ExceptionInOnRequestFailure_ShouldResultInAnInternalServerError() {
 		GatewayRequest request = mock(GatewayRequest.class);
 		Context context = mock(Context.class);
-		doThrow(new RuntimeException()).when(container).handleRequest(eq(request), any(), any());
-		doThrow(new RuntimeException()).when(gatewayHandler).onRequestFailure(any(), eq(request), eq(context));
-		try {
-			gatewayHandler.delegateRequest(request, context);
-			fail("expected internal server error");
-		} catch (GatewayAdditionalResponseException gare) {
-			assertEquals("{\"statusCode\":\"500\"}", gare.getMessage());
-		}
+		doThrow(new RuntimeException()).when(container).handleRequest(any(), any(), any());
+		doThrow(new RuntimeException()).when(gatewayHandler).onRequestFailure(any(), eq(request), any(), eq(context));
+		GatewayResponse response = gatewayHandler.delegateRequest(request, context);
+		assertEquals(500, response.getStatusCode());
+		assertTrue(response.getHeaders().isEmpty());
+		assertEquals(null, response.getBody());
 	}
 
 	@Test
@@ -213,21 +205,17 @@ public class GatewayRequestHandlerTest {
 		GatewayContainerResponseWriter responseWriter = mock(GatewayContainerResponseWriter.class);
 		when(responseWriter.getResponse()).thenReturn(containerResponse);
 		doReturn(responseWriter).when(gatewayHandler).createResponseWriter();
-		doReturn(null).when(gatewayHandler).onRequestSuccess(containerResponse, request, context);
-		try {
-			gatewayHandler.delegateRequest(request, context);
-			fail("expected internal server error");
-		} catch (GatewayAdditionalResponseException gare) {
-			assertEquals("{\"statusCode\":\"500\"}", gare.getMessage());
-		}
+		doReturn(null).when(gatewayHandler).onRequestSuccess(eq(containerResponse), eq(request), any(), eq(context));
+		GatewayResponse response = gatewayHandler.delegateRequest(request, context);
+		assertEquals(500, response.getStatusCode());
+		assertTrue(response.getHeaders().isEmpty());
+		assertEquals(null, response.getBody());
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	public void delegateRequest_ValidRequestGiven_ShouldRegisterContextsOnRequest() {
-		GatewayRequest request = mock(GatewayRequest.class);
-		GatewayRequestContext requestContext = mock(GatewayRequestContext.class);
-		when(request.getContext()).thenReturn(requestContext);
+		GatewayRequest request = createMinimalRequest();
 		Context context = mock(Context.class);
 		Map<String, List<String>> headers = ImmutableMap.of("k", ImmutableList.of("k", "v"));
 		GatewayContainerResponse containerResponse = new GatewayContainerResponse(Status.OK, "testBody", headers);
@@ -236,14 +224,139 @@ public class GatewayRequestHandlerTest {
 		doReturn(responseWriter).when(gatewayHandler).createResponseWriter();
 		ArgumentCaptor<Consumer> containerEnhancerCapure = ArgumentCaptor.forClass(Consumer.class);
 		gatewayHandler.delegateRequest(request, context);
-		verify(container).handleRequest(eq(request), eq(responseWriter), any(), containerEnhancerCapure.capture());
+		verify(container).handleRequest(any(), eq(responseWriter), any(), containerEnhancerCapure.capture());
 
 		ContainerRequest containerRequest = mock(ContainerRequest.class);
 		containerEnhancerCapure.getValue().accept(containerRequest);
 		verify(containerRequest).setProperty("awsLambdaContext", context);
-		verify(containerRequest).setProperty("awsApiGatewayContext", requestContext);
+		verify(containerRequest).setProperty("awsApiGatewayRequest", request);
 	}
 
+	@Test(expected = NullPointerException.class)
+	public void createContainerRequest_NoPathGiven_ShouldThrowNpe() {
+		GatewayRequestImpl request = createMinimalRequest();
+		request.setPath(null);
+		gatewayHandler.createContainerRequest(request);
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void createContainerRequest_NoHttpMethodGiven_ShouldThrowNpe() {
+		GatewayRequestImpl request = createMinimalRequest();
+		request.setHttpMethod(null);
+		gatewayHandler.createContainerRequest(request);
+	}
+
+	@Test
+	public void createContainerRequest_NoBodyGiven_ShouldUseEmptyBaos() {
+		GatewayRequestImpl request = createMinimalRequest();
+		GatewayContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
+		InputStream is = containerRequest.getEntityStream();
+		assertEquals(ByteArrayInputStream.class, is.getClass());
+		assertEquals("", toString((ByteArrayInputStream) is));
+	}
+
+	@Test
+	public void createContainerRequest_BodyGiven_ShouldUseBody() {
+		GatewayRequestImpl request = createMinimalRequest();
+		request.setBody("abc");
+		GatewayContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
+		InputStream is = containerRequest.getEntityStream();
+		assertEquals(ByteArrayInputStream.class, is.getClass());
+		assertEquals("abc", toString((ByteArrayInputStream) is));
+	}
+
+	@Test
+	public void createContainerRequest_HttpMethodGiven_ShouldUseHttpMethod() {
+		GatewayRequestImpl request = createMinimalRequest();
+		request.setHttpMethod("POST");
+		GatewayContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
+		assertEquals("POST", containerRequest.getHttpMethod());
+	}
+
+	@Test
+	public void createContainerRequest_PathWithNoQueryParamsGiven_ShouldUsePathAsRequestUri() {
+		GatewayRequestImpl request = createMinimalRequest();
+		request.setPath("/abc");
+		GatewayContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
+		assertEquals(URI.create("/abc"), containerRequest.getRequestUri());
+	}
+
+	@Test
+	public void createContainerRequest_PathWithOneQueryParamsGiven_ShouldUseQueryParamsInRequestUri() {
+		GatewayRequestImpl request = createMinimalRequest();
+		request.setPath("/abc");
+		request.setQueryStringParameters(ImmutableMap.of("a_k", "a_v"));
+		GatewayContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
+		assertEquals(URI.create("/abc?a_k=a_v"), containerRequest.getRequestUri());
+	}
+
+	@Test
+	public void createContainerRequest_PathWithMultipleQueryParamsGiven_ShouldUseQueryParamsInRequestUri() {
+		GatewayRequestImpl request = createMinimalRequest();
+		request.setPath("/abc");
+		request.setQueryStringParameters(ImmutableMap.of("a_k", "a_v", "b_k", "b_v"));
+		GatewayContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
+		assertEquals(URI.create("/abc?a_k=a_v&b_k=b_v"), containerRequest.getRequestUri());
+	}
+
+	@Test
+	public void createContainerRequest_HeadersGiven_ShouldUseHeaders() {
+		GatewayRequestImpl request = createMinimalRequest();
+		request.setHeaders(ImmutableMap.of("a_k", "a_v", "b_k", "b_v"));
+		GatewayContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
+		assertEquals(ImmutableMap.of("a_k", singletonList("a_v"), "b_k", singletonList("b_v")), containerRequest.getHeaders());
+	}
+
+	@Test
+	public void createContainerRequest_NullHeaderKeyGiven_ShouldFilterHeader() {
+		GatewayRequestImpl request = createMinimalRequest();
+		Map<String, String> headers = new HashMap<>();
+		headers.put(null, "a_v");
+		headers.put("b_k", "b_v");
+		request.setHeaders(headers);
+		GatewayContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
+		assertEquals(ImmutableMap.of("b_k", singletonList("b_v")), containerRequest.getHeaders());
+	}
+
+	@Test
+	public void createContainerRequest_NullHeaderValueGiven_ShouldFilterHeader() {
+		GatewayRequestImpl request = createMinimalRequest();
+		Map<String, String> headers = new HashMap<>();
+		headers.put("a_k", null);
+		headers.put("b_k", "b_v");
+		request.setHeaders(headers);
+		GatewayContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
+		assertEquals(ImmutableMap.of("b_k", singletonList("b_v")), containerRequest.getHeaders());
+	}
+
+	@Test
+	public void createContainerRequest_CommaSeparatedHeaderValueGiven_ShouldNotSpreadHeader() {
+		GatewayRequestImpl request = createMinimalRequest();
+		Map<String, String> headers = new HashMap<>();
+		headers.put("a_k", "a_v0,a_v1");
+		request.setHeaders(headers);
+		GatewayContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
+		assertEquals(ImmutableMap.of("a_k", singletonList("a_v0,a_v1")), containerRequest.getHeaders());
+	}
+
+	private GatewayRequestImpl createMinimalRequest() {
+		GatewayRequestImpl request = new GatewayRequestImpl();
+		request.setPath("/");
+		request.setHttpMethod("GET");
+		return request;
+	}
+
+	public static String toString(ByteArrayInputStream bais) {
+		int size = bais.available();
+		char[] chars = new char[size];
+		byte[] bytes = new byte[size];
+
+		bais.read(bytes, 0, size);
+		for (int i = 0; i < size;)
+			chars[i] = (char) (bytes[i++] & 0xff);
+
+		return new String(chars);
+	}
 	private static class GatewayRequestHandlerImpl extends GatewayRequestHandler {
 	}
 }

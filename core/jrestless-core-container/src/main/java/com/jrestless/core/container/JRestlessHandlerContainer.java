@@ -109,7 +109,7 @@ public class JRestlessHandlerContainer<RequestT extends JRestlessContainerReques
 	 */
 	public void handleRequest(@Nonnull RequestT request, @Nonnull JRestlessResponseWriter responseWriter,
 			@Nonnull SecurityContext securityContext) {
-		handleRequest(request, responseWriter, securityContext, (req) -> { });
+		handleRequest(request, responseWriter, securityContext, req -> { });
 	}
 
 	/**

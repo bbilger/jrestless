@@ -185,7 +185,7 @@ public class ConstructorPreconditionsTesterTest {
 	@Test
 	public void addArgs_NullAsVarargs_ShouldAccept() {
 		tester.addValidArgs(0, 0);
-		tester.addInvalidArgs(0, NullPointerException.class, null);
+		tester.addInvalidArgs(0, NullPointerException.class, (Object[]) null);
 		tester.addValidArgs(1, 0.0);
 		tester.testPreconditions();
 		assertEquals(1, invalidCaptures.size());

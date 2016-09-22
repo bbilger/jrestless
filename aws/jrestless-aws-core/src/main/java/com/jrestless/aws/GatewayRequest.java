@@ -15,21 +15,22 @@
  */
 package com.jrestless.aws;
 
+import java.util.Map;
+
 /**
- * API Gateway's context for a request.
- * <p>
- * It can be injected into resources via {@code @Context}.
  *
  * @author Bjoern Bilger
  *
  */
-public interface GatewayRequestContext {
-	String getAccountId();
-	String getResourceId();
-	String getStage();
-	String getRequestId();
-	GatewayIdentity getIdentity();
-	String getResourcePath();
+public interface GatewayRequest {
+	String getResource();
+	String getPath();
 	String getHttpMethod();
-	String getApiId();
+	Map<String, String> getHeaders();
+	Map<String, String> getQueryStringParameters();
+	Map<String, String> getPathParameters();
+	Map<String, String> getStageVariables();
+	GatewayRequestContext getRequestContext();
+	String getBody();
+
 }
