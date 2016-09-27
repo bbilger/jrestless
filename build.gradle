@@ -111,8 +111,8 @@ subprojects {
 }
 
 dependencies {
-	compile project(":aws:jrestless-aws-core")
-	compile project(":aws:jrestless-aws-handler")
+	compile project(":aws:gateway:jrestless-aws-gateway-core")
+	compile project(":aws:gateway:jrestless-aws-gateway-handler")
 	compile project(":test:jrestless-test")
 }
 

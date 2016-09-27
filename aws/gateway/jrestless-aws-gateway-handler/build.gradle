@@ -2,7 +2,7 @@ group = 'com.jrestless.aws'
 version = "${globaleModuleVersion}"
 
 dependencies {
-	compile project(':aws:jrestless-aws-core')
+	compile project(':aws:gateway:jrestless-aws-gateway-core')
 	compile project(':core:jrestless-core-container')
 	testCompile project(':test:jrestless-test')
 	testCompile (
