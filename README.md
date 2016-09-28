@@ -79,7 +79,7 @@ public class SampleRequestHandler extends GatewayRequestObjectHandler {
 
 Upload the function to a supported region (e.g. `us-west-2`) and give it a name (e.g. `JRestlessSampleFunction`).
 
-Create a new API in API Gateway using `Lambda Function Proxy` and a method using a catch-all path variable that invokes your lambda function, or simply create a new API by importing this swagger definition.
+Create a new API in API Gateway using `Lambda Function Proxy` and add a method using a catch-all path variable that invokes your lambda function, or simply create a new API by importing this swagger definition.
 
 ```json
 {
