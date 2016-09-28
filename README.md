@@ -25,16 +25,16 @@ AWS Lambda is the only FaaS environment that supports Java at the moment and so 
 ```
 repositories {
   ...
-	maven {
-		url 'https://dl.bintray.com/bbilger/maven/'
-	}
+  maven {
+    url 'https://dl.bintray.com/bbilger/maven/'
+  }
 }
 
 dependencies {
-	compile(
-		'com.jrestless.aws:jrestless-aws-gateway-handler:0.2.0',
+  compile(
+    'com.jrestless.aws:jrestless-aws-gateway-handler:0.2.0',
     ...
-	)
+  )
   ...
 }
 ```
