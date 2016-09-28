@@ -60,7 +60,7 @@ import com.jrestless.core.util.HeaderUtils;
  * @author Bjoern Bilger
  *
  */
-public class GatewayRequestHandler extends SimpleRequestHandler<GatewayRequestAndLambdaContext, GatewayResponse> {
+public abstract class GatewayRequestHandler extends SimpleRequestHandler<GatewayRequestAndLambdaContext, GatewayResponse> {
 
 	private static final URI ROOT_URI = URI.create("/");
 
