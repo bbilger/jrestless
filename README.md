@@ -22,7 +22,7 @@ AWS Lambda is the only FaaS environment that supports Java at the moment and so 
 
 #### Gradle
 
-```
+```gradle
 repositories {
   ...
   maven {
