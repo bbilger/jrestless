@@ -121,10 +121,10 @@ Create a new API in API Gateway using `Lambda Function Proxy` and a method using
 
 Deploy your API.
 
-Hit `YOUR_INVOKE_URL/health`:
+Hit `YOUR_INVOKE_URL/sample/health`:
 
 ```sh
-curl -H 'Accept: application/json' 'YOUR_INVOKE_URL/health'
+curl -H 'Accept: application/json' 'YOUR_INVOKE_URL/sample/health'
 ```
 
 ## Release History
