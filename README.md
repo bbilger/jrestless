@@ -2,13 +2,13 @@
 
 JRestless allows you to create serverless applications using JAX-RS.
 
+![](jrestless_512_256.png)
+
 [![Build Status](https://img.shields.io/travis/bbilger/jrestless.svg?maxAge=2592000&style=flat-square)](https://travis-ci.org/bbilger/jrestless)
 [![codecov](https://img.shields.io/codecov/c/github/bbilger/jrestless.svg?maxAge=2592000&style=flat-square)](https://codecov.io/gh/bbilger/jrestless)
 [![GitHub issues](https://img.shields.io/github/issues/bbilger/jrestless.svg?maxAge=2592000&style=flat-square)](https://github.com/bbilger/jrestless/issues)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/bbilger/jrestless.svg?maxAge=2592000&style=flat-square)](https://github.com/bbilger/jrestless/issues?q=is%3Aissue+is%3Aclosed)
 [![License](https://img.shields.io/github/license/bbilger/jrestless.svg?maxAge=2592000&style=flat-square)](https://github.com/bbilger/jrestless/blob/master/LICENSE)
-
-![](jrestless_512_256.png)
 
 JRestless is a framework that makes it possible to run JAX-RS applications in FasS environments like AWS Lambda. This is achieved by providing a generic Jersey container that handles requests in the form of POJOs. For each FaaS environment there is a separate module acting as an integration layer between the actual environment and the generic Jersey container.
 
