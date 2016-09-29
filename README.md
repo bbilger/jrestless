@@ -49,19 +49,34 @@ public class SampleResource {
   @GET
   @Path("/health")
   public Response getInfo() {
-    return Response.ok(new HealthStatusDto("up and running")).build();    
+    return Response.ok(new HealthStatusDto("up and running")).build();
   }
-  
+  @XmlRootElement // for JAXB
   public static class HealthStatusDto {
     private String statusMessage;
+    @SuppressWarnings("unused")
+    private HealthStatusDto() {
+      // for JAXB
+    }
     HealthStatusDto(String statusMessage) {
       this.statusMessage = statusMessage;
     }
+    @XmlElement // for JAXB
     public String getStatusMessage() {
       return statusMessage;
     }
   }
 }
+```
+
+Add the following dependencies:
+```gradle
+compile(
+  'com.jrestless.aws:jrestless-aws-gateway-core:0.2.0',
+  'org.glassfish.jersey.media:jersey-media-json-jackson:2.23',
+  'org.glassfish.jersey.media:jersey-media-jaxb:2.23', // if you want to use JAXB
+  ...
+)
 ```
 
 ### AWS
@@ -125,6 +140,10 @@ Hit `YOUR_INVOKE_URL/sample/health`:
 
 ```sh
 curl -H 'Accept: application/json' 'YOUR_INVOKE_URL/sample/health'
+```
+
+```sh
+curl -H 'Accept: application/xml' 'YOUR_INVOKE_URL/sample/health'
 ```
 
 ## Release History
