@@ -48,6 +48,7 @@ Create a JAX-RS resource:
 public class SampleResource {
   @GET
   @Path("/health")
+  @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
   public Response getInfo() {
     return Response.ok(new HealthStatusDto("up and running")).build();
   }
