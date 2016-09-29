@@ -69,6 +69,8 @@ public class SampleResource {
 }
 ```
 
+### AWS
+
 Add the following dependencies:
 ```gradle
 compile(
@@ -78,8 +80,6 @@ compile(
   ...
 )
 ```
-
-### AWS
 
 Extend the request handler provided by the framework, register your resource in Gateway's default resource config, pass the resource config and start the container:
 
