@@ -119,7 +119,7 @@ Create a new API in API Gateway using `Lambda Function Proxy` and add a method u
         ],
         "responses": {},
         "x-amazon-apigateway-integration": {
-          "uri": "arn:aws:apigateway:YOUR_REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:YOUR_REGION:YOUR_ID:function:MyFunction/YOUR_FUNCTION_NAME",
+          "uri": "arn:aws:apigateway:YOUR_REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:YOUR_REGION:YOUR_ID:function:YOUR_FUNCTION_NAME/invocations",
           "passthroughBehavior": "when_no_match",
           "httpMethod": "POST",
           "responses": {
