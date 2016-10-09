@@ -24,7 +24,7 @@ import org.glassfish.hk2.api.Factory;
 /**
  * HK2 factory to provide instances from the request context.
  * <p>
- * Subclasses must inject the {@link RequestContext} via constructor injection.
+ * Subclasses must inject the {@link ContainerRequestContext} via constructor injection.
  *
  * @author Bjoern Bilger
  *

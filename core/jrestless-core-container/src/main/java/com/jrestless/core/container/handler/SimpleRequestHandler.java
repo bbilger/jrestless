@@ -82,7 +82,7 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	/**
 	 * Initializes the container using the given application, binder and locator.
 	 *
-	 * @param application
+	 * @param handlerContainer
 	 */
 	public final void init(@Nonnull JRestlessHandlerContainer<JRestlessContainerRequest> handlerContainer) {
 		requireNonNull(handlerContainer);
@@ -163,11 +163,9 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	 * Hook that is invoked when the container was able to handle the incoming
 	 * request.
 	 *
-	 * @param responseStatusCode
+	 * @param response
 	 * @param request
 	 * @param containerRequest
-	 * @param responseBody
-	 * @param responseHeaders
 	 * @return the container response
 	 */
 	public ResponseT onRequestSuccess(ResponseT response, RequestT request,

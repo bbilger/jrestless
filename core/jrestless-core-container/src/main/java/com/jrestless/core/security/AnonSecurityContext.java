@@ -33,7 +33,7 @@ public class AnonSecurityContext implements SecurityContext {
 	 * Creates a new anonymous security context - assuming the request was made
 	 * via a secure channel (HTTPS).
 	 *
-	 * @see {@link #AnonSecurityContext(boolean) AnonSecurityContext(true)}
+	 * see {@link #AnonSecurityContext(boolean) AnonSecurityContext(true)}
 	 */
 	public AnonSecurityContext() {
 		this(true);

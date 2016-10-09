@@ -67,7 +67,23 @@ subprojects {
 		}
 	}
 	check.dependsOn jacocoTestReport
-	
+
+	// custom tasks for creating source/javadoc jars
+	task sourcesJar(type: Jar, dependsOn: classes) {
+		classifier = 'sources'
+		from sourceSets.main.allSource
+	}
+
+	task javadocJar(type: Jar, dependsOn: javadoc) {
+		classifier = 'javadoc'
+		from javadoc.destinationDir
+	}
+
+	// add javadoc/source jar tasks as artifacts
+	artifacts {
+		archives sourcesJar, javadocJar
+	}
+
 	bintray {
 		user = bintrayUser
 		key = bintrayKey
@@ -95,6 +111,8 @@ subprojects {
 				groupId "$group"
 				artifactId "$project.name"
 				version "$version"
+				artifact sourcesJar 
+				artifact javadocJar
 			}
 			// change from runtime to compile time
 			all {

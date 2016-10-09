@@ -26,7 +26,7 @@ import javax.ws.rs.core.Response.StatusType;
 
 /**
  * A simplified response writer that can be injected into
- * {@link com.jrestless.core.container.JRestlessHandlerContainer.JRestlessContainerResponseWriter}
+ * com.jrestless.core.container.JRestlessHandlerContainer.JRestlessContainerResponseWriter
  * to provide a {@link org.glassfish.jersey.server.spi.ContainerResponseWriter}
  * required by Jersey.
  *
