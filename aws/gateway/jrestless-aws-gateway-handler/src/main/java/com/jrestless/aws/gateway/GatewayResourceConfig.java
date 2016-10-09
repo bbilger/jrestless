@@ -36,7 +36,6 @@ import com.jrestless.aws.gateway.io.GatewayRequestContext;
  * <li>{@link GatewayRequestContextFactory}
  * <li>{@link GatewayRequestContextContextFactory}
  * <li>{@link GatewayIdentityContextFactory}
- * <li>{@link IsDefaultResponseFilter}
  * <li>{@link RolesAllowedDynamicFeature}
  * </ol>
  *

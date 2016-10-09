@@ -19,6 +19,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.jrestless.aws.gateway.io.GatewayRequest;
 
 /**
+ * Pair of {@link GatewayRequest} and {@link Context}.
  *
  * @author Bjoern Bilger
  *
