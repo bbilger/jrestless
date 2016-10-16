@@ -30,7 +30,7 @@ public final class StatusTypeEquality {
 		// no instance
 	}
 
-	public static boolean equals(StatusType s1, StatusType s2) {
+	public static boolean isEqual(StatusType s1, StatusType s2) {
 		if (s1 == s2) {
 			return true;
 		}

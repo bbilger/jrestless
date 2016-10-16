@@ -71,7 +71,7 @@ class InvokableArguments<T extends Argument> {
 	void checkAllArgumentsSet() {
 		int paramIndex = 0;
 		for (Set<T> validArgs : argumentsSets) {
-			if (validArgs.size() < 1) {
+			if (validArgs.isEmpty()) {
 				throw new IllegalStateException("no valid arguments defined for parameter with index " + paramIndex);
 			}
 			paramIndex++;

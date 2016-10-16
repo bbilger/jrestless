@@ -66,13 +66,22 @@ public class SimpleImmutableValueObjectEqualsTester {
 					Object o1 = constructor.newInstance(invokeArgs);
 					Object o2 = constructor.newInstance(invokeArgs);
 					tester.addEqualityGroup(o1, o2);
-				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-						| InvocationTargetException e) {
-					throw new RuntimeException(e);
+				} catch (IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException | InstantiationException e) {
+					throw new ConstructorInvocationException(e);
 				}
 			}
 			tester.testEquals();
 			return null;
 		});
+	}
+
+	public static class ConstructorInvocationException extends RuntimeException {
+
+		private static final long serialVersionUID = -1533324172719220974L;
+
+		ConstructorInvocationException(Exception cause) {
+			super(cause);
+		}
 	}
 }

@@ -107,7 +107,7 @@ public abstract class GatewayRequestHandler
 		try {
 			return URLEncoder.encode(param, StandardCharsets.UTF_8.name());
 		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
+			throw new QueryParameterEncodingException(e);
 		}
 	}
 
@@ -155,5 +155,14 @@ public abstract class GatewayRequestHandler
 	@Override
 	public GatewayResponse createInternalServerErrorResponse() {
 		return new GatewayResponse(null, Collections.emptyMap(), Status.INTERNAL_SERVER_ERROR);
+	}
+
+	public static class QueryParameterEncodingException extends RuntimeException {
+
+		private static final long serialVersionUID = -7545175514996382745L;
+
+		QueryParameterEncodingException(Exception cause) {
+			super(cause);
+		}
 	}
 }

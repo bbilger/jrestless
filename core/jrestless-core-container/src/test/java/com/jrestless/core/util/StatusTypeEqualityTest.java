@@ -29,86 +29,86 @@ import org.junit.Test;
 public class StatusTypeEqualityTest {
 	@Test
 	public void equals_BothNullGiven_ShouldBeEqual() {
-		assertTrue(StatusTypeEquality.equals(null, null));
+		assertTrue(StatusTypeEquality.isEqual(null, null));
 	}
 
 	@Test
 	public void equals_SameGiven_ShouldBeEqual() {
 		StatusType s1 = mock(StatusType.class);
-		assertTrue(StatusTypeEquality.equals(s1, s1));
+		assertTrue(StatusTypeEquality.isEqual(s1, s1));
 	}
 
 	@Test
 	public void equals_FirstNullGiven_ShouldBeUnequal() {
-		assertFalse(StatusTypeEquality.equals(null, mock(StatusType.class)));
+		assertFalse(StatusTypeEquality.isEqual(null, mock(StatusType.class)));
 	}
 
 	@Test
 	public void equals_SecondNullGiven_ShouldBeUnequal() {
-		assertFalse(StatusTypeEquality.equals(mock(StatusType.class), null));
+		assertFalse(StatusTypeEquality.isEqual(mock(StatusType.class), null));
 	}
 
 	@Test
 	public void equals_DiffStatusCodesGiven_ShouldBeUnequal() {
 		StatusType s1 = createSt(1, Status.Family.SUCCESSFUL, "reason");
 		StatusType s2 = createSt(2, Status.Family.SUCCESSFUL, "reason");
-		assertFalse(StatusTypeEquality.equals(s1, s2));
+		assertFalse(StatusTypeEquality.isEqual(s1, s2));
 	}
 
 	@Test
 	public void equals_DiffFamiliesGiven_ShouldBeUnequal() {
 		StatusType s1 = createSt(1, Status.Family.SUCCESSFUL, "reason");
 		StatusType s2 = createSt(1, Status.Family.OTHER, "reason");
-		assertFalse(StatusTypeEquality.equals(s1, s2));
+		assertFalse(StatusTypeEquality.isEqual(s1, s2));
 	}
 
 	@Test
 	public void equals_FirstNullFamilyGiven_ShouldBeUnequal() {
 		StatusType s1 = createSt(1, null, "reason");
 		StatusType s2 = createSt(1, Status.Family.SUCCESSFUL, "reason");
-		assertFalse(StatusTypeEquality.equals(s1, s2));
+		assertFalse(StatusTypeEquality.isEqual(s1, s2));
 	}
 
 	@Test
 	public void equals_SecondNullFamilyGiven_ShouldBeUnequal() {
 		StatusType s1 = createSt(1, Status.Family.SUCCESSFUL, "reason");
 		StatusType s2 = createSt(1, null, "reason");
-		assertFalse(StatusTypeEquality.equals(s1, s2));
+		assertFalse(StatusTypeEquality.isEqual(s1, s2));
 	}
 
 	@Test
 	public void equals_BothNullFamiliesGiven_ShouldBeUnequal() {
 		StatusType s1 = createSt(1, null, "reason");
 		StatusType s2 = createSt(1, null, "reason");
-		assertTrue(StatusTypeEquality.equals(s1, s2));
+		assertTrue(StatusTypeEquality.isEqual(s1, s2));
 	}
 
 	@Test
 	public void equals_DiffReasonsGiven_ShouldBeUnequal() {
 		StatusType s1 = createSt(1, Status.Family.SUCCESSFUL, "reason0");
 		StatusType s2 = createSt(1, Status.Family.SUCCESSFUL, "reason1");
-		assertFalse(StatusTypeEquality.equals(s1, s2));
+		assertFalse(StatusTypeEquality.isEqual(s1, s2));
 	}
 
 	@Test
 	public void equals_FirstNullReasonGiven_ShouldBeUnequal() {
 		StatusType s1 = createSt(1, Status.Family.SUCCESSFUL, null);
 		StatusType s2 = createSt(1, Status.Family.SUCCESSFUL, "reason");
-		assertFalse(StatusTypeEquality.equals(s1, s2));
+		assertFalse(StatusTypeEquality.isEqual(s1, s2));
 	}
 
 	@Test
 	public void equals_SecondNullReasonGiven_ShouldBeUnequal() {
 		StatusType s1 = createSt(1, Status.Family.SUCCESSFUL, "reason");
 		StatusType s2 = createSt(1, Status.Family.SUCCESSFUL, null);
-		assertFalse(StatusTypeEquality.equals(s1, s2));
+		assertFalse(StatusTypeEquality.isEqual(s1, s2));
 	}
 
 	@Test
 	public void equals_BothNullReasonsGiven_ShouldBeEqual() {
 		StatusType s1 = createSt(1, Status.Family.SUCCESSFUL, null);
 		StatusType s2 = createSt(1, Status.Family.SUCCESSFUL, null);
-		assertTrue(StatusTypeEquality.equals(s1, s2));
+		assertTrue(StatusTypeEquality.isEqual(s1, s2));
 	}
 
 	@Test

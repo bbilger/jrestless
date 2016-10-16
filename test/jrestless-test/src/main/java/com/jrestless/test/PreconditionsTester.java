@@ -138,7 +138,7 @@ public abstract class PreconditionsTester {
 		for (int i = 0; i < validArguments.getCapturedArgumentsSets().size(); i++) {
 			List<Set<Argument>> argumentsLists = new ArrayList<>(validArguments.getCapturedArgumentsSets());
 			Set<InvalidArgument> currInvalidArgs = invalidArguments.getCapturedArgumentsSets().get(i);
-			if (currInvalidArgs.size() > 0) {
+			if (!currInvalidArgs.isEmpty()) {
 				for (InvalidArgument invalidParam : currInvalidArgs) {
 					argumentsLists.set(i, Collections.singleton(invalidParam));
 					testArguments(argumentsLists, invalidParam.getExpectedException());
@@ -160,7 +160,8 @@ public abstract class PreconditionsTester {
 					throw new AssertionError(
 							"expected " + expectedException.getName() + " to be thrown for arguments: " + argVals);
 				}
-			} catch (Throwable t) {
+			} catch (Exception e) {
+				Throwable t = e;
 				if (t instanceof InvocationTargetException) {
 					t = ((InvocationTargetException) t).getTargetException();
 				}
