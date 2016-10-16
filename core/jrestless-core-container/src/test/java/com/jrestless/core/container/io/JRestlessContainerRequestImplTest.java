@@ -1,7 +1,6 @@
 package com.jrestless.core.container.io;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -69,17 +68,7 @@ public class JRestlessContainerRequestImplTest {
 	}
 
 	@Test
-	public void testNullHeaderNamesAllowed() throws IOException {
-		Map<String, List<String>> headers = new HashMap<>();
-		headers.put(null, ImmutableList.of("0"));
-		JRestlessContainerRequest request = new JRestlessContainerRequestImpl(URI.create("/123"), URI.create("/456"), "DELETE",
-				new ByteArrayInputStream("123".getBytes()), headers);
-		assertFalse(request.getHeaders().isEmpty());
-		assertEquals(ImmutableList.of("0"), request.getHeaders().get(null));
-	}
-
-	@Test
-	public void testNullHeaderValueAllowed() throws IOException {
+	public void testNullHeaderValuesFiltered() throws IOException {
 		Map<String, List<String>> headers = new HashMap<>();
 		List<String> bVal = new ArrayList<>();
 		bVal.add(null);
@@ -91,25 +80,24 @@ public class JRestlessContainerRequestImplTest {
 		assertNull(request.getHeaders().get("a"));
 		assertNull(request.getHeaders().get("b").get(0));
 		assertEquals("b_0", request.getHeaders().get("b").get(1));
+		assertEquals(1, request.getHeaders().size());
 	}
 
 	@Test
 	public void testEquals() {
-		Map<String, String> nullHeader = new HashMap<>();
-		nullHeader.put("headerName", null);
-			new SimpleImmutableValueObjectEqualsTester(getConstructor())
-			// baseUri
-			.addArguments(0, URI.create("/"), URI.create("/123"))
-			// requestUri
-			.addArguments(1, URI.create("/"), URI.create("/123"))
-			// httpMethod
-			.addArguments(2, "GET", "POST")
-			// entityStream
-			.addArguments(3, new ByteArrayInputStream(new byte[0]), new ByteArrayInputStream("123".getBytes()))
-			// headers
-			.addArguments(4, ImmutableMap.of(), ImmutableMap.of("a", ImmutableList.of()))
-			.addArguments(4, ImmutableMap.of("a", ImmutableList.of("a", "b")), nullHeader)
-			.testEquals();
+		new SimpleImmutableValueObjectEqualsTester(getConstructor())
+		// baseUri
+		.addArguments(0, URI.create("/"), URI.create("/123"))
+		// requestUri
+		.addArguments(1, URI.create("/"), URI.create("/123"))
+		// httpMethod
+		.addArguments(2, "GET", "POST")
+		// entityStream
+		.addArguments(3, new ByteArrayInputStream(new byte[0]), new ByteArrayInputStream("123".getBytes()))
+		// headers
+		.addArguments(4, ImmutableMap.of(), ImmutableMap.of("a", ImmutableList.of()))
+		.addArguments(4, ImmutableMap.of("a", ImmutableList.of("a", "b")))
+		.testEquals();
 	}
 
 	@Test

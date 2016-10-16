@@ -17,8 +17,8 @@ package com.jrestless.core.container;
 
 import static com.jrestless.test.MockitoExt.emptyBaos;
 import static com.jrestless.test.MockitoExt.eqBaos;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -64,7 +64,7 @@ import com.jrestless.core.container.io.JRestlessContainerRequest;
 import com.jrestless.core.container.io.JRestlessResponseWriter;
 import com.jrestless.test.AbstractTestRequest;
 
-public class JRestlessHandlerContainerInt {
+public class JRestlessHandlerContainerIntTest {
 
 	private ArticleService testService;
 	private JRestlessHandlerContainer<JRestlessContainerRequest> container;

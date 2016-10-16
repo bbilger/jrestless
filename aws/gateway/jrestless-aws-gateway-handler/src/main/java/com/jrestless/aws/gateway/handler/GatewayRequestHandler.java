@@ -26,7 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -141,7 +141,8 @@ public abstract class GatewayRequestHandler
 			public void writeResponse(StatusType statusType, Map<String, List<String>> headers,
 					OutputStream entityOutputStream) throws IOException {
 				Map<String, String> flattenedHeaders = HeaderUtils.flattenHeaders(headers);
-				response = new GatewayResponse(entityOutputStream.toString(), flattenedHeaders, statusType);
+				String body = ((ByteArrayOutputStream) entityOutputStream).toString(StandardCharsets.UTF_8.name());
+				response = new GatewayResponse(body, flattenedHeaders, statusType);
 			}
 
 			@Override
@@ -153,6 +154,6 @@ public abstract class GatewayRequestHandler
 
 	@Override
 	public GatewayResponse createInternalServerErrorResponse() {
-		return new GatewayResponse(null, new HashMap<>(), Status.INTERNAL_SERVER_ERROR);
+		return new GatewayResponse(null, Collections.emptyMap(), Status.INTERNAL_SERVER_ERROR);
 	}
 }

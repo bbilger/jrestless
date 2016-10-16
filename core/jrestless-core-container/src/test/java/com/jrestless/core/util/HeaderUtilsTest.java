@@ -54,7 +54,7 @@ public class HeaderUtilsTest {
 		Map<String, String> flattenedHeaders = flattenHeaders(listHeaders);
 		assertEquals(ImmutableMap.of("a_k", "a_v", "c_k", "c_v"), flattenedHeaders);
 	}
-	
+
 	@Test(expected = UnsupportedOperationException.class)
 	public void flattenHeaders_AnyGiven_ShouldReturnImmutableMap() {
 		flattenHeaders(new HashMap<>()).put("k", "v");
@@ -110,12 +110,12 @@ public class HeaderUtilsTest {
 		Map<String, List<String>> expandedHeaders = expandHeaders(flatHeaders);
 		assertEquals(ImmutableMap.of("a_k", singletonList("a_v0,a_v1")), expandedHeaders);
 	}
-	
+
 	@Test(expected = UnsupportedOperationException.class)
 	public void exandHeaders_AnyGiven_ShouldReturnImmutableMap() {
 		expandHeaders(new HashMap<>()).put("k", new ArrayList<>());
 	}
-	
+
 	@Test(expected = UnsupportedOperationException.class)
 	public void exandHeaders_AnyGiven_ShouldReturnImmutableList() {
 		expandHeaders(ImmutableMap.of("k", "v0")).get("k").add("v1");

@@ -1,0 +1,18 @@
+group = 'com.jrestless.aws'
+version = "${globaleModuleVersion}"
+
+dependencies {
+	compile(
+		'com.google.code.findbugs:jsr305:3.0.1'
+	)
+
+	testCompile project(':test:jrestless-test')
+	testCompile (
+		'junit:junit:4.12',
+		'org.mockito:mockito-core:2.2.0'
+	)
+}
+
+findbugs {
+	excludeFilter = file("$projectDir/config/findbugs/excludeFilter.xml")
+}

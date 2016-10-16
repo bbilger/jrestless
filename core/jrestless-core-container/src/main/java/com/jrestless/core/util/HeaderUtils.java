@@ -52,14 +52,15 @@ public final class HeaderUtils {
 	 * @return flattened headers (unmodifiable!)
 	 */
 	public static Map<String, String> flattenHeaders(Map<String, List<String>> headers) {
-		return Collections.unmodifiableMap(headers.entrySet().stream()
+		return headers.entrySet().stream()
 				.filter(h -> h.getKey() != null)
 				.filter(h -> h.getValue() != null)
 				.filter(h -> !h.getValue().isEmpty())
-				.collect(Collectors.toMap(
-						h -> h.getKey(),
-						h -> asHeaderString(h.getValue())
-				)));
+				.collect(Collectors.collectingAndThen(
+						Collectors.toMap(
+								h -> h.getKey(),
+								h -> asHeaderString(h.getValue())),
+						Collections::unmodifiableMap));
 	}
 
 	private static String asHeaderString(List<String> headerValues) {
@@ -80,9 +81,13 @@ public final class HeaderUtils {
 	 */
 	public static Map<String, List<String>> expandHeaders(Map<String, String> headers) {
 		Function<Map.Entry<String, String>, List<String>> toList = h -> Collections.singletonList(h.getValue());
-		return Collections.unmodifiableMap(headers.entrySet().stream()
+		return headers.entrySet().stream()
 				.filter(h -> h.getKey() != null)
 				.filter(h -> h.getValue() != null)
-				.collect(Collectors.toMap(h -> h.getKey(), toList)));
+				.collect(Collectors.collectingAndThen(
+						Collectors.toMap(
+								h -> h.getKey(),
+								toList),
+						Collections::unmodifiableMap));
 	}
 }

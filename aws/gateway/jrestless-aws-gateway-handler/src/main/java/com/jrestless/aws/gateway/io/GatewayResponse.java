@@ -34,18 +34,12 @@ import javax.ws.rs.core.Response.StatusType;
  * @author Bjoern Bilger
  *
  */
-public class GatewayResponse {
+public final class GatewayResponse {
 
 	private final String body;
 	private final Map<String, String> headers;
 	private final int statusCode;
 
-	/**
-	 *
-	 * @param body
-	 * @param headers
-	 * @param statusType
-	 */
 	public GatewayResponse(@Nullable String body, @Nonnull Map<String, String> headers,
 			@Nonnull StatusType statusType) {
 		requireNonNull(headers);

@@ -15,11 +15,10 @@
  */
 package com.jrestless.test;
 
-import static org.mockito.Matchers.argThat;
+import static org.mockito.ArgumentMatchers.argThat;
 
 import java.io.ByteArrayOutputStream;
 
-import org.hamcrest.Description;
 import org.mockito.ArgumentMatcher;
 
 public final class MockitoExt {
@@ -30,16 +29,12 @@ public final class MockitoExt {
 	public static ByteArrayOutputStream eqBaos(final String expected) {
 		return argThat(new ArgumentMatcher<ByteArrayOutputStream>() {
 			@Override
-			public boolean matches(Object actual) {
-				if (actual instanceof ByteArrayOutputStream) {
-					return expected.equals(actual.toString());
+			public boolean matches(ByteArrayOutputStream argument) {
+				if (argument instanceof ByteArrayOutputStream) {
+					return expected.equals(argument.toString());
 				} else {
 					return false;
 				}
-			}
-			@Override
-			public void describeTo(Description description) {
-				description.appendText(expected);
 			}
 		});
 	}

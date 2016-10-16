@@ -15,6 +15,7 @@
  */
 package com.jrestless.core.container.handler;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -26,7 +27,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +67,7 @@ public class SimpleRequestHandlerIntTest {
 
 	private static final URI BASE_URI = URI.create("/");
 	private static final ByteArrayInputStream EMPTY_ENTITY_STREAM = new ByteArrayInputStream(new byte[0]);
-	private static final List<String> APPLICATION_JSON_HEADER = Collections.singletonList("application/json");
+	private static final List<String> APPLICATION_JSON_HEADER = singletonList("application/json");
 	private static final Map<String, List<String>> JSON_CONTENT_HEADER = ImmutableMap.of("Content-Type", APPLICATION_JSON_HEADER);
 	private SimpleRequestHandler<JRestlessContainerRequest, SimpleContainerResponse> handler;
 	private TestService testService;
@@ -119,7 +119,7 @@ public class SimpleRequestHandlerIntTest {
 		SimpleContainerResponse response = handler.delegateRequest(request);
 		assertEquals("{\"value\":\"value\"}", response.getBody());
 
-		request = createRequest("/responsetype", "GET", null, ImmutableMap.of("Accept", Collections.singletonList("application/xml")));
+		request = createRequest("/responsetype", "GET", null, ImmutableMap.of("Accept", singletonList("application/xml")));
 		response = handler.delegateRequest(request);
 		assertEquals(
 				"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><entity><value>value</value></entity>",
@@ -141,7 +141,7 @@ public class SimpleRequestHandlerIntTest {
 	public void testResponseHeaders() {
 		JRestlessContainerRequest request = createJsonRequest("/responseheaders", "GET", null);
 		SimpleContainerResponse response = handler.delegateRequest(request);
-		assertEquals(ImmutableMap.of("hk0", Collections.singletonList("hv0_0"),
+		assertEquals(ImmutableMap.of("hk0", singletonList("hv0_0"),
 				"hk1", ImmutableList.of("hv0_1", "hv1_1")),
 				response.getHeaders());
 	}
@@ -170,7 +170,7 @@ public class SimpleRequestHandlerIntTest {
 
 	@Test
 	public void testRequestHeadersInjection() {
-		Map<String, List<String>> headers = ImmutableMap.of("hk0", Collections.singletonList("hv0"));
+		Map<String, List<String>> headers = ImmutableMap.of("hk0", singletonList("hv0"));
 		JRestlessContainerRequest request = createRequest("/requestheaders", "GET", null, headers);
 		handler.delegateRequest(request);
 		verify(testService).requestHeaders(headers);

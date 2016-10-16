@@ -29,7 +29,7 @@ import java.util.Objects;
  * @author Bjoern Bilger
  *
  */
-public class GatewayRequestImpl implements GatewayRequest {
+public final class GatewayRequestImpl implements GatewayRequest {
 
 	private String resource;
 	private String path;

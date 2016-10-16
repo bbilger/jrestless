@@ -21,10 +21,11 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
@@ -44,22 +45,21 @@ public class JRestlessContainerRequestImpl implements JRestlessContainerRequest 
 
 	public JRestlessContainerRequestImpl(@Nonnull URI baseUri, @Nonnull URI requestUri, @Nonnull String httpMethod,
 			@Nonnull InputStream entityStream, @Nonnull Map<String, List<String>> headers) {
-		requireNonNull(baseUri);
-		requireNonNull(requestUri);
-		requireNonNull(httpMethod);
-		requireNonNull(entityStream);
+		this.baseUri = requireNonNull(baseUri);
+		this.requestUri = requireNonNull(requestUri);
+		this.httpMethod = requireNonNull(httpMethod);
+		this.entityStream = requireNonNull(entityStream);
 		requireNonNull(headers);
-		this.baseUri = baseUri;
-		this.requestUri = requestUri;
-		this.httpMethod = httpMethod;
-		this.entityStream = entityStream;
-		this.headers = new HashMap<>();
-		for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
-			List<String> value = entry.getValue();
-			List<String> valueCopy = (value == null) ? null : Collections.unmodifiableList(new ArrayList<>(value));
-			this.headers.put(entry.getKey(), valueCopy);
-		}
-		this.headers = Collections.unmodifiableMap(this.headers);
+		Function<Map.Entry<String, List<String>>, List<String>> toImmutableCollection =
+				e -> Collections.unmodifiableList(new ArrayList<>(e.getValue()));
+		this.headers = headers.entrySet().stream()
+				.filter(e -> e.getKey() != null)
+				.filter(e -> e.getValue() != null)
+				.collect(Collectors.collectingAndThen(
+						Collectors.toMap(
+								e -> e.getKey(),
+								toImmutableCollection),
+						Collections::unmodifiableMap));
 	}
 
 	@Override

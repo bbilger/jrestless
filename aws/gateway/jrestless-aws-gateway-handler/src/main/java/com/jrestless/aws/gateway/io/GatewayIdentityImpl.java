@@ -26,7 +26,7 @@ import java.util.Objects;
  * @author Bjoern Bilger
  *
  */
-public class GatewayIdentityImpl implements GatewayIdentity {
+public final class GatewayIdentityImpl implements GatewayIdentity {
 
 	private String cognitoIdentityPoolId;
 	private String accountId;

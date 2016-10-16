@@ -26,7 +26,7 @@ import java.util.Objects;
  * @author Bjoern Bilger
  *
  */
-public class GatewayRequestContextImpl implements GatewayRequestContext {
+public final class GatewayRequestContextImpl implements GatewayRequestContext {
 
 	private String accountId;
 	private String resourceId;

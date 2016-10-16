@@ -16,8 +16,8 @@
 package com.jrestless.core.container;
 
 import static com.jrestless.test.MockitoExt.eqBaos;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNotNull;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
 import org.junit.Before;
@@ -55,20 +54,18 @@ public class JRestlessContainerResponseTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void close_ResponseNotYetClosed_ShouldWriteResponse() throws IOException {
 		containerResponse.close();
-		verify(responseWriter, times(1)).writeResponse(isNotNull(Status.class), isNotNull(MultivaluedMap.class),
-				isNotNull(ByteArrayOutputStream.class));
+		verify(responseWriter, times(1)).writeResponse(isNotNull(), isNotNull(),
+				isNotNull());
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void close_StatusTypeSet_ShouldWriteResponseUsingSetStatus() throws IOException {
 		containerResponse.setStatusType(Status.CONFLICT);
 		containerResponse.close();
-		verify(responseWriter, times(1)).writeResponse(eq(Status.CONFLICT), isNotNull(MultivaluedMap.class),
-				isNotNull(ByteArrayOutputStream.class));
+		verify(responseWriter, times(1)).writeResponse(eq(Status.CONFLICT), isNotNull(),
+				isNotNull());
 	}
 
 	@Test
@@ -78,16 +75,15 @@ public class JRestlessContainerResponseTest {
 		headers.put("header1", asList("value1_0"));
 		containerResponse.getHeaders().putAll(headers);
 		containerResponse.close();
-		verify(responseWriter, times(1)).writeResponse(isNotNull(Status.class), eq(headers),
-				isNotNull(ByteArrayOutputStream.class));
+		verify(responseWriter, times(1)).writeResponse(isNotNull(), eq(headers),
+				isNotNull());
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void close_OutputStreamUpdated_ShouldWriteOutputStream() throws IOException {
 		containerResponse.getEntityOutputStream().write("response".getBytes());
 		containerResponse.close();
-		verify(responseWriter, times(1)).writeResponse(isNotNull(Status.class), isNotNull(MultivaluedMap.class),
+		verify(responseWriter, times(1)).writeResponse(isNotNull(), isNotNull(),
 				eqBaos("response"));
 	}
 

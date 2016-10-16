@@ -1,0 +1,18 @@
+group = 'com.jrestless.aws'
+version = "${globaleModuleVersion}"
+
+dependencies {
+	compile project(':aws:service:jrestless-aws-service-core')
+	compile project(':core:jrestless-core-container')
+	compile(
+		'com.amazonaws:aws-lambda-java-core:1.1.0'
+	)
+
+	testCompile project(':test:jrestless-test')
+	testCompile (
+		'junit:junit:4.12',
+		'org.mockito:mockito-core:2.2.0',
+		'org.slf4j:slf4j-simple:1.7.21',
+		'org.glassfish.jersey.media:jersey-media-json-jackson:2.23.1'
+	)
+}

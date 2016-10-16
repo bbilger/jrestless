@@ -17,8 +17,8 @@ package com.jrestless.core.container;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -41,15 +41,11 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.jrestless.core.container.io.JRestlessContainerRequest;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(ApplicationHandler.class)
+//@RunWith(PowerMockRunner.class)
+//@PrepareForTest(ApplicationHandler.class)
 public class JRestlessHandlerContainerTest {
 
 	private ApplicationHandler appHandler;
@@ -57,7 +53,7 @@ public class JRestlessHandlerContainerTest {
 
 	@Before
 	public void setup() {
-		appHandler = PowerMockito.mock(ApplicationHandler.class);
+		appHandler = mock(ApplicationHandler.class);
 		container = spy(new JRestlessHandlerContainer<JRestlessContainerRequest>(appHandler));
 	}
 
@@ -90,7 +86,7 @@ public class JRestlessHandlerContainerTest {
 	@Test
 	public void reload_ConfigGiven_ShouldReloadNewAppHandler() {
 		ResourceConfig config = new ApplicationHandler().getConfiguration();
-		ApplicationHandler newAppHandler = PowerMockito.mock(ApplicationHandler.class);
+		ApplicationHandler newAppHandler = mock(ApplicationHandler.class);
 		doReturn(newAppHandler).when(container).createNewApplicationHandler(any());
 		container.reload(config);
 		verify(newAppHandler, times(1)).onReload(container);
@@ -99,7 +95,7 @@ public class JRestlessHandlerContainerTest {
 	@Test
 	public void reload_ConfigGiven_ShouldStartNewAppHandler() {
 		ResourceConfig config = new ApplicationHandler().getConfiguration();
-		ApplicationHandler newAppHandler = PowerMockito.mock(ApplicationHandler.class);
+		ApplicationHandler newAppHandler = mock(ApplicationHandler.class);
 		doReturn(newAppHandler).when(container).createNewApplicationHandler(any());
 		container.reload(config);
 		verify(newAppHandler, times(1)).onStartup(container);
@@ -108,7 +104,7 @@ public class JRestlessHandlerContainerTest {
 	@Test
 	public void reload_ConfigGiven_ShouldResetAppHandler() {
 		ResourceConfig config = new ApplicationHandler().getConfiguration();
-		ApplicationHandler newAppHandler = PowerMockito.mock(ApplicationHandler.class);
+		ApplicationHandler newAppHandler = mock(ApplicationHandler.class);
 		doReturn(newAppHandler).when(container).createNewApplicationHandler(any());
 		container.reload(config);
 		assertSame(newAppHandler, container.getApplicationHandler());

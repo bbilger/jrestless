@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<FindBugsFilter>
+	<Match>
+		<Class name="com.jrestless.aws.micro.io.MicroRequestImpl" />
+		<Method name="setBody" params="byte[]" returns="void" />
+		<Bug pattern="EI_EXPOSE_REP2"/>
+	</Match>
+	<Match>
+		<Class name="com.jrestless.aws.micro.io.MicroRequestImpl" />
+		<Method name="getBody" params="" returns="byte[]" />
+		<Bug pattern="EI_EXPOSE_REP"/>
+	</Match>
+	<Match>
+		<Class name="com.jrestless.aws.micro.io.MicroResponseImpl" />
+		<Method name="getBody" params="" returns="byte[]" />
+		<Bug pattern="EI_EXPOSE_REP"/>
+	</Match>
+	<Match>
+		<Class name="com.jrestless.aws.micro.io.MicroResponseImpl" />
+		<Method name="setBody" params="byte[]" returns="void" />
+		<Bug pattern="EI_EXPOSE_REP2"/>
+	</Match>
+</FindBugsFilter>
