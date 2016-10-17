@@ -323,8 +323,7 @@ public class JRestlessHandlerContainer<RequestT extends JRestlessContainerReques
 		}
 
 		@Override
-		public OutputStream writeResponseStatusAndHeaders(long contentLength, ContainerResponse context)
-				throws ContainerException {
+		public OutputStream writeResponseStatusAndHeaders(long contentLength, ContainerResponse context) {
 			response.setStatusType(context.getStatusInfo());
 			response.getHeaders().putAll(context.getStringHeaders());
 			return response.getEntityOutputStream();
@@ -353,7 +352,7 @@ public class JRestlessHandlerContainer<RequestT extends JRestlessContainerReques
 		}
 
 		@Override
-		public void setSuspendTimeout(long timeOut, TimeUnit timeUnit) throws IllegalStateException {
+		public void setSuspendTimeout(long timeOut, TimeUnit timeUnit) {
 			throw new UnsupportedOperationException("#setSuspendTimeout is not supported by the container.");
 		}
 

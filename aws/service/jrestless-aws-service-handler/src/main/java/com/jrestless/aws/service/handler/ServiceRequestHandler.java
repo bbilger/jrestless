@@ -87,32 +87,34 @@ public abstract class ServiceRequestHandler
 
 	@Override
 	public SimpleResponseWriter<ServiceResponse> createResponseWriter() {
-		return new SimpleResponseWriter<ServiceResponse>() {
-			private ServiceResponse response;
-
-			@Override
-			public OutputStream getEntityOutputStream() {
-				return new ByteArrayOutputStream();
-			}
-
-			@Override
-			public void writeResponse(StatusType statusType, Map<String, List<String>> headers,
-					OutputStream entityOutputStream) throws IOException {
-				String body = ((ByteArrayOutputStream) entityOutputStream).toString(StandardCharsets.UTF_8.name());
-				response = new ServiceResponseImpl(body, headers, statusType.getStatusCode(),
-						statusType.getReasonPhrase());
-			}
-
-			@Override
-			public ServiceResponse getResponse() {
-				return response;
-			}
-		};
+		return new ResponseWriter();
 	}
 
 	@Override
 	public ServiceResponse createInternalServerErrorResponse() {
 		return new ServiceResponseImpl(null, Collections.emptyMap(), Status.INTERNAL_SERVER_ERROR.getStatusCode(),
 				Status.INTERNAL_SERVER_ERROR.getReasonPhrase());
+	}
+
+	protected static class ResponseWriter implements SimpleResponseWriter<ServiceResponse> {
+		private ServiceResponse response;
+
+		@Override
+		public OutputStream getEntityOutputStream() {
+			return new ByteArrayOutputStream();
+		}
+
+		@Override
+		public void writeResponse(StatusType statusType, Map<String, List<String>> headers,
+				OutputStream entityOutputStream) throws IOException {
+			String body = ((ByteArrayOutputStream) entityOutputStream).toString(StandardCharsets.UTF_8.name());
+			response = new ServiceResponseImpl(body, headers, statusType.getStatusCode(),
+					statusType.getReasonPhrase());
+		}
+
+		@Override
+		public ServiceResponse getResponse() {
+			return response;
+		}
 	}
 }

@@ -15,12 +15,13 @@
  */
 package com.jrestless.core.container.dpi;
 
+import static java.util.Objects.requireNonNull;
+
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -109,12 +110,9 @@ public final class InstanceBinder extends AbstractBinder {
 		private final Class<? extends Annotation> scope;
 
 		public InstanceFactory(T instance, Class<T> type, Class<? extends Annotation> scope) {
-			Objects.requireNonNull(instance);
-			Objects.requireNonNull(type);
-			Objects.requireNonNull(scope);
-			this.instance = instance;
-			this.type = type;
-			this.scope = scope;
+			this.instance = requireNonNull(instance);
+			this.type = requireNonNull(type);
+			this.scope = requireNonNull(scope);
 		}
 
 		public Class<? extends Annotation> getScope() {
@@ -127,6 +125,7 @@ public final class InstanceBinder extends AbstractBinder {
 
 		@Override
 		public void dispose(T t) {
+			// hook; nothing to do by default
 		}
 
 		@Override

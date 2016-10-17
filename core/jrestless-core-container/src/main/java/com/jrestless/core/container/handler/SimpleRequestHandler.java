@@ -121,10 +121,8 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 			JRestlessContainerRequest containerRequestFinal = containerRequest;
 			beforeHandleRequest(request, containerRequest);
 			SimpleResponseWriter<ResponseT> responseWriter = createResponseWriter();
-			container.handleRequest(containerRequest, responseWriter,
-					createSecurityContext(request, containerRequest), cReq -> {
-						extendActualJerseyContainerRequest(cReq, containerRequestFinal, request);
-					});
+			container.handleRequest(containerRequest, responseWriter, createSecurityContext(request, containerRequest),
+					cReq -> extendActualJerseyContainerRequest(cReq, containerRequestFinal, request));
 			containerResponse = responseWriter.getResponse();
 			requireNonNull(containerResponse);
 			containerResponse = onRequestSuccess(containerResponse, request, containerRequest);

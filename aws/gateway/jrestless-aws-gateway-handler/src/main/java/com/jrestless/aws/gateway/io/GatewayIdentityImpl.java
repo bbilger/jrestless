@@ -41,6 +41,7 @@ public final class GatewayIdentityImpl implements GatewayIdentity {
 	private String user;
 
 	public GatewayIdentityImpl() {
+		// for de-serialization
 	}
 
 	// for unit testing, only

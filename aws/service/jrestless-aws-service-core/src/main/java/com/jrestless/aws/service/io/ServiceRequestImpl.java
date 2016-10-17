@@ -46,6 +46,7 @@ public final class ServiceRequestImpl implements ServiceRequest {
 	 * For de-serialization frameworks, only.
 	 */
 	public ServiceRequestImpl() {
+		// for de-serialization
 	}
 
 	public ServiceRequestImpl(@Nullable String body, @Nonnull Map<String, List<String>> headers,

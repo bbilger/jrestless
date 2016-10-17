@@ -15,6 +15,8 @@
  */
 package com.jrestless.core.util;
 
+import java.util.Objects;
+
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 
@@ -40,22 +42,10 @@ public final class StatusTypeEquality {
 		if (s1.getStatusCode() != s2.getStatusCode()) {
 			return false;
 		}
-		Status.Family statusFamily = s1.getFamily();
-		Status.Family otherStatusFamily = s2.getFamily();
-		if (statusFamily == null) {
-			if (otherStatusFamily != null) {
-				return false;
-			}
-		} else if (!statusFamily.equals(otherStatusFamily)) {
+		if (!Objects.equals(s1.getFamily(), s2.getFamily())) {
 			return false;
 		}
-		String reasonPhrase = s1.getReasonPhrase();
-		String otherReasonPhrase = s2.getReasonPhrase();
-		if (reasonPhrase == null) {
-			if (otherReasonPhrase != null) {
-				return false;
-			}
-		} else if (!reasonPhrase.equals(otherReasonPhrase)) {
+		if (!Objects.equals(s1.getReasonPhrase(), s2.getReasonPhrase())) {
 			return false;
 		}
 		return true;

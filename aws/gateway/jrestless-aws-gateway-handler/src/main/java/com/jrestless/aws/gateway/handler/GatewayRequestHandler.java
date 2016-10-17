@@ -128,28 +128,7 @@ public abstract class GatewayRequestHandler
 
 	@Override
 	public SimpleResponseWriter<GatewayResponse> createResponseWriter() {
-		return new SimpleResponseWriter<GatewayResponse>() {
-
-			private GatewayResponse response;
-
-			@Override
-			public OutputStream getEntityOutputStream() {
-				return new ByteArrayOutputStream();
-			}
-
-			@Override
-			public void writeResponse(StatusType statusType, Map<String, List<String>> headers,
-					OutputStream entityOutputStream) throws IOException {
-				Map<String, String> flattenedHeaders = HeaderUtils.flattenHeaders(headers);
-				String body = ((ByteArrayOutputStream) entityOutputStream).toString(StandardCharsets.UTF_8.name());
-				response = new GatewayResponse(body, flattenedHeaders, statusType);
-			}
-
-			@Override
-			public GatewayResponse getResponse() {
-				return response;
-			}
-		};
+		return new ResponseWriter();
 	}
 
 	@Override
@@ -163,6 +142,31 @@ public abstract class GatewayRequestHandler
 
 		QueryParameterEncodingException(Exception cause) {
 			super(cause);
+		}
+	}
+
+	protected static class ResponseWriter implements SimpleResponseWriter<GatewayResponse> {
+		private GatewayResponse response;
+
+		public ResponseWriter() {
+		}
+
+		@Override
+		public OutputStream getEntityOutputStream() {
+			return new ByteArrayOutputStream();
+		}
+
+		@Override
+		public void writeResponse(StatusType statusType, Map<String, List<String>> headers,
+				OutputStream entityOutputStream) throws IOException {
+			Map<String, String> flattenedHeaders = HeaderUtils.flattenHeaders(headers);
+			String body = ((ByteArrayOutputStream) entityOutputStream).toString(StandardCharsets.UTF_8.name());
+			response = new GatewayResponse(body, flattenedHeaders, statusType);
+		}
+
+		@Override
+		public GatewayResponse getResponse() {
+			return response;
 		}
 	}
 }

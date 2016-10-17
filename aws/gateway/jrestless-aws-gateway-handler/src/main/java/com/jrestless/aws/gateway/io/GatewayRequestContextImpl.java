@@ -38,6 +38,7 @@ public final class GatewayRequestContextImpl implements GatewayRequestContext {
 	private String apiId;
 
 	public GatewayRequestContextImpl() {
+		// for de-serialization
 	}
 
 	// for unit testing, only

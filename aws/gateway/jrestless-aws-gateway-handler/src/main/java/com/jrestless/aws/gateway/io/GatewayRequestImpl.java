@@ -42,6 +42,7 @@ public final class GatewayRequestImpl implements GatewayRequest {
 	private String body;
 
 	public GatewayRequestImpl() {
+		// for de-serialization
 	}
 
 	// for unit testing, only

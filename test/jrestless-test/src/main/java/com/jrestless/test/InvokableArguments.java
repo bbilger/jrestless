@@ -127,9 +127,8 @@ class InvokableArguments<T extends Argument> {
 		}
 
 	}
-
+	@FunctionalInterface
 	protected interface Invokable {
-		Object invoke(Object... args) throws InstantiationException, IllegalAccessException, IllegalArgumentException,
-				InvocationTargetException;
+		Object invoke(Object... args) throws InstantiationException, IllegalAccessException, InvocationTargetException;
 	}
 }

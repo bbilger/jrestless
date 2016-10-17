@@ -45,6 +45,7 @@ public final class ServiceResponseImpl implements ServiceResponse {
 	 * For de-serialization frameworks, only.
 	 */
 	public ServiceResponseImpl() {
+		// for de-serialization
 	}
 
 	public ServiceResponseImpl(@Nullable String body, @Nonnull Map<String, List<String>> headers, int statusCode,
