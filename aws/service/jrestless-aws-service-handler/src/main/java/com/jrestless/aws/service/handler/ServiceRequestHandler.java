@@ -99,6 +99,10 @@ public abstract class ServiceRequestHandler
 	protected static class ResponseWriter implements SimpleResponseWriter<ServiceResponse> {
 		private ServiceResponse response;
 
+		public ResponseWriter() {
+			// allow usage by ServiceRequestHandler subclasses
+		}
+
 		@Override
 		public OutputStream getEntityOutputStream() {
 			return new ByteArrayOutputStream();

@@ -204,8 +204,8 @@ public abstract class PreconditionsTester {
 
 	}
 
+	@FunctionalInterface
 	protected interface Invokable {
-		Object invoke(Object... args) throws InstantiationException, IllegalAccessException, IllegalArgumentException,
-				InvocationTargetException;
+		Object invoke(Object... args) throws InstantiationException, IllegalAccessException, InvocationTargetException;
 	}
 }

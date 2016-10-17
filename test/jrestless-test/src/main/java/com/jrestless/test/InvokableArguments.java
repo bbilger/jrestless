@@ -15,7 +15,6 @@
  */
 package com.jrestless.test;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -125,10 +124,5 @@ class InvokableArguments<T extends Argument> {
 		public int hashCode() {
 			return Objects.hash(value);
 		}
-
-	}
-	@FunctionalInterface
-	protected interface Invokable {
-		Object invoke(Object... args) throws InstantiationException, IllegalAccessException, InvocationTargetException;
 	}
 }

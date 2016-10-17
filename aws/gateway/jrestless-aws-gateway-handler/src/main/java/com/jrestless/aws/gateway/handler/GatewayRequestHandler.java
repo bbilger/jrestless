@@ -149,6 +149,7 @@ public abstract class GatewayRequestHandler
 		private GatewayResponse response;
 
 		public ResponseWriter() {
+			// allow usage by GatewayRequestHandler subclasses
 		}
 
 		@Override
