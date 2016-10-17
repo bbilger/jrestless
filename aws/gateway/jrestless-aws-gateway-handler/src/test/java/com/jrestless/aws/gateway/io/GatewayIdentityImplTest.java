@@ -7,13 +7,13 @@ import java.lang.reflect.Constructor;
 import org.junit.Test;
 
 import com.jrestless.aws.gateway.io.GatewayIdentityImpl;
-import com.jrestless.test.SimpleImmutableValueObjectEqualsTester;
+import com.jrestless.test.CopyConstructorEqualsTester;
 
 public class GatewayIdentityImplTest {
 
 	@Test
 	public void testEquals() {
-		new SimpleImmutableValueObjectEqualsTester(getConstructor())
+		new CopyConstructorEqualsTester(getConstructor())
 			.addArguments(0, null, "cognitoIdentityPoolId")
 			.addArguments(1, null, "accountId")
 			.addArguments(2, null, "cognitoIdentityId")

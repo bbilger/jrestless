@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import com.jrestless.aws.gateway.io.GatewayRequestContextImpl;
 import com.jrestless.aws.gateway.io.GatewayRequestImpl;
-import com.jrestless.test.SimpleImmutableValueObjectEqualsTester;
+import com.jrestless.test.CopyConstructorEqualsTester;
 
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 
@@ -145,7 +145,7 @@ public class GatewayRequestImplTest {
 	@Test
 	public void testEquals() {
 		GatewayRequestContextImpl requestContext = new GatewayRequestContextImpl();
-		new SimpleImmutableValueObjectEqualsTester(getConstructor())
+		new CopyConstructorEqualsTester(getConstructor())
 			.addArguments(0, null, "resource")
 			.addArguments(1, null, "path")
 			.addArguments(2, null, "httpMethod")

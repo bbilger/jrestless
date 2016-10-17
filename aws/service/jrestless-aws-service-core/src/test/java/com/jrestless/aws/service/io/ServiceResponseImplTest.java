@@ -20,7 +20,7 @@ import com.google.common.testing.EqualsTester;
 import com.jrestless.aws.service.io.ServiceResponse;
 import com.jrestless.aws.service.io.ServiceResponseImpl;
 import com.jrestless.test.ConstructorPreconditionsTester;
-import com.jrestless.test.SimpleImmutableValueObjectEqualsTester;
+import com.jrestless.test.CopyConstructorEqualsTester;
 
 public class ServiceResponseImplTest {
 
@@ -87,7 +87,7 @@ public class ServiceResponseImplTest {
 
 	@Test
 	public void testEquals() {
-		new SimpleImmutableValueObjectEqualsTester(getConstructor())
+		new CopyConstructorEqualsTester(getConstructor())
 			// body
 			.addArguments(0, null, "", "123")
 			// headers

@@ -39,17 +39,17 @@ import com.jrestless.test.InvokableArguments.Argument;
  * @author Bjoern Bilger
  *
  */
-public class SimpleImmutableValueObjectEqualsTester {
+public class CopyConstructorEqualsTester {
 
 	private final InvokableArguments<Argument> arguments;
 	private final Constructor<?> constructor;
 
-	public SimpleImmutableValueObjectEqualsTester(Constructor<?> constructor) {
+	public CopyConstructorEqualsTester(Constructor<?> constructor) {
 		this.constructor = constructor;
 		this.arguments = new InvokableArguments<>(constructor.getParameterTypes());
 	}
 
-	public SimpleImmutableValueObjectEqualsTester addArguments(int argIndex, Object... args) {
+	public CopyConstructorEqualsTester addArguments(int argIndex, Object... args) {
 		this.arguments.addArg(argIndex, Argument::new, args);
 		return this;
 	}

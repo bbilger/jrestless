@@ -28,7 +28,7 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableMap;
 import com.jrestless.aws.gateway.io.GatewayResponse;
 import com.jrestless.test.ConstructorPreconditionsTester;
-import com.jrestless.test.SimpleImmutableValueObjectEqualsTester;
+import com.jrestless.test.CopyConstructorEqualsTester;
 
 public class GatewayResponseTest {
 
@@ -42,7 +42,7 @@ public class GatewayResponseTest {
 	public void testEquals() {
 		Map<String, String> nullHeader = new HashMap<>();
 		nullHeader.put("headerName", null);
-		new SimpleImmutableValueObjectEqualsTester(getConstructor())
+		new CopyConstructorEqualsTester(getConstructor())
 			// body
 			.addArguments(0, null, "body", "")
 			// headers

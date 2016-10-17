@@ -8,14 +8,14 @@ import org.junit.Test;
 
 import com.jrestless.aws.gateway.io.GatewayIdentityImpl;
 import com.jrestless.aws.gateway.io.GatewayRequestContextImpl;
-import com.jrestless.test.SimpleImmutableValueObjectEqualsTester;
+import com.jrestless.test.CopyConstructorEqualsTester;
 
 public class GatewayRequestContextImplTest {
 
 	@Test
 	public void testEquals() {
 		GatewayIdentityImpl identity = new GatewayIdentityImpl();
-		new SimpleImmutableValueObjectEqualsTester(getConstructor())
+		new CopyConstructorEqualsTester(getConstructor())
 			.addArguments(0, null, "accountId")
 			.addArguments(1, null, "resourceId")
 			.addArguments(2, null, "stage")

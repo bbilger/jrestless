@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import com.jrestless.aws.service.client.LambdaServiceFunctionTarget;
 import com.jrestless.test.ConstructorPreconditionsTester;
-import com.jrestless.test.SimpleImmutableValueObjectEqualsTester;
+import com.jrestless.test.CopyConstructorEqualsTester;
 
 import feign.RequestTemplate;
 import feign.Target;
@@ -59,7 +59,7 @@ public class LambdaServiceFunctionTargetTest {
 
 	@Test
 	public void testEquality() {
-		new SimpleImmutableValueObjectEqualsTester(getConstructor())
+		new CopyConstructorEqualsTester(getConstructor())
 			.addArguments(0, ApiInterface1.class, ApiInterface2.class)
 			.addArguments(1, "a", "b")
 			.testEquals();

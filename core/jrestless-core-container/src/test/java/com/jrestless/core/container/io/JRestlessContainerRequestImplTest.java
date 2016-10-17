@@ -22,7 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.CharStreams;
 import com.jrestless.test.ConstructorPreconditionsTester;
-import com.jrestless.test.SimpleImmutableValueObjectEqualsTester;
+import com.jrestless.test.CopyConstructorEqualsTester;
 
 public class JRestlessContainerRequestImplTest {
 
@@ -85,7 +85,7 @@ public class JRestlessContainerRequestImplTest {
 
 	@Test
 	public void testEquals() {
-		new SimpleImmutableValueObjectEqualsTester(getConstructor())
+		new CopyConstructorEqualsTester(getConstructor())
 		// baseUri
 		.addArguments(0, URI.create("/"), URI.create("/123"))
 		// requestUri
