@@ -22,7 +22,7 @@ JRestless is a framework that makes it possible to build serverless JAX-RS appli
 
 Since this framework is just a wrapper around Jersey it is possible to use the features provided by JAX-RS. This includes   filters, for example, but also Jersey's custom extensions like Spring integration - not Spring MVC, though since this functionality is provided by JAX-RS itself.
 
-AWS Lambda is the only FaaS environment that supports Java at the moment and so that is the only supported environment for now.
+AWS Lambda is the only FaaS environment that supports Java at the moment and so it is the only supported environment for now.
 
 The project's main goal is to avoid any cloud vendor lock-in and to allow you to test your code locally.
 
