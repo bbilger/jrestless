@@ -57,7 +57,7 @@ public class SampleResource {
   @GET
   @Path("/health")
   @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-  public Response getInfo() {
+  public Response getHealth() {
     return Response.ok(new HealthStatusDto("up and running")).build();
   }
   @XmlRootElement // for JAXB
