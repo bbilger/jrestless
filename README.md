@@ -24,6 +24,10 @@ Since this framework is just a wrapper around Jersey it is possible to use the f
 
 AWS Lambda is the only FaaS environment that supports Java at the moment and so the that is the only supported environment for now.
 
+## Goals
+
+The main goal of this project is to avoid any vendor lock-in and to allow you to test your code locally.
+
 ## Installation
 
 ### AWS
