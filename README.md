@@ -154,7 +154,9 @@ curl -H 'Accept: application/xml' 'YOUR_INVOKE_URL/sample/health'
 ```
 
 ## Release History
-
+* 0.3.0
+  * Add support for `AWS Lambda service functions`.
+  * Add support to call `AWS Lambda service functions` using [feign](https://github.com/OpenFeign/feign) and the AWS SDK - allowing you to call those functions transparently via REST without using API Gateway.
 * 0.2.0 
   * use the new `Lambda Function Proxy` and catch-all paths provided by API Gateway (this reduces the framework's complexity and limitations significantly especially since the generation of a swagger definition is not necessary anymore)
 * 0.1.0 (-SNAPSHOT)
