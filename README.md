@@ -26,51 +26,90 @@ AWS Lambda is the only FaaS environment that supports Java at the moment and so 
 
 The project's main goal is to avoid any cloud vendor lock-in and to allow you to run and test your code locally.
 
-## Modules
-JRestless is split up into multiple modules. All modules are available in jcenter.
-
-* **jrestless-aws-gateway-handler** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-gateway-handler/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-gateway-handler/_latestVersion)
-  * Provides an AWS Lambda RequestHandler (com.jrestless.aws.gateway.handler.GatewayRequestObjectHandler) that delegates requests from AWS API Gateway to Jersey. [Read More...](aws/gateway/jrestless-aws-gateway-core)
-* **jrestless-aws-gateway-core** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-gateway-core/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-gateway-core/_latestVersion)
-  * Contains interfaces used by jrestless-aws-gateway-handler that might be of interest for local development, as well. [Read More...](aws/gateway/jrestless-aws-gateway-core)
-* **jrestless-aws-service-handler** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-handler/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-handler/_latestVersion)
-  * Provides an  AWS Lambda RequestHandler (com.jrestless.aws.service.handler.ServiceRequestObjectHandler) that delegates requests - in a HTTP format - to Jersey. This is intentended but not limited to call one Lambda function from another. [Read More...](aws/service/jrestless-aws-service-handler)
-* **jrestless-aws-service-core** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-core/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-core/_latestVersion)
-  * Contains interfaces and classes used by `jrestless-aws-service-handler` that are of interest for `jrestless-aws-service-feign-client` and might be of interest for local development, as well. [Read More...](aws/service/jrestless-aws-service-core)
-* **jrestless-aws-service-feign-client** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-feign-client/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-feign-client/_latestVersion)
-  * Provides a feign client to call Lambda functions that use jrestless-aws-service-handler a.k.a. Lamda service functions. This allows to call Lambda service functions transparantly through feign. [Read More...](aws/service/jrestless-aws-service-feign-client)
-* **jrestless-core-container** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-core-container/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-core-container/_latestVersion)
-  * Provides a generic (provider independent) Jersey container that handles requests in the form of POJOs. [Read More...](core/jrestless-core-container)
-* **jrestless-test** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-test/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-test/_latestVersion)
-  * Provides common test functionality. [Read More...](test/jrestless-test)
-
-## Installation
+## Usage example
 
 ### AWS
 
-#### Gradle
+JRestless does not depend on the [serverless framework](https://github.com/serverless/serverless) but it simplifies the necessary AWS configuration tremendously and will be used for this example. 
 
-```gradle
-repositories {
-  jcenter()
-  ...
-}
+Install serverless as described in the docs https://serverless.com/framework/docs/guide/installing-serverless/
 
-dependencies {
-  compile(
-    'com.jrestless.aws:jrestless-aws-gateway-handler:0.2.0',
-    ...
-  )
-  ...
-}
+Setup your AWS account as described in the docs https://serverless.com/framework/docs/providers/aws/setup/
+
+Create a new function with serverless
+
+```bash
+mkdir aws-gateway-usage-example
+cd aws-gateway-usage-example
+serverless create --template aws-java-gradle --name aws-gateway-usage-example
+rm -rf src/main/java/hello
+mkdir -p src/main/java/com/jrestless/aws/examples
+```
+Replace `aws-gateway-usage-example/serverless.yml` with the following contents:
+
+```yml
+service: aws-gateway-usage-example-service
+
+provider:
+  name: aws
+  runtime: java8
+  stage: dev
+  region: us-west-2
+
+package:
+  artifact: build/distributions/aws-gateway-usage-example.zip
+
+functions:
+  sample:
+    handler: com.jrestless.aws.examples.RequestHandler
+    events:
+      - http:
+          path: sample/{proxy+}
+          method: any
+
 ```
 
-## Usage example
+Replace `aws-gateway-usage-example/build.gradle` with the following contents:
 
-Create a JAX-RS resource:
+```gradle
+apply plugin: 'java'
+
+repositories {
+  jcenter()
+  mavenCentral()
+}
+dependencies {
+  compile(
+    'com.jrestless.aws:jrestless-aws-gateway-handler:0.3.0',
+    'org.glassfish.jersey.media:jersey-media-json-jackson:2.23'
+  )
+}
+task buildZip(type: Zip) {
+  archiveName = "${project.name}.zip"
+  from compileJava
+  from processResources
+  into('lib') {
+    from configurations.runtime
+  }
+}
+build.dependsOn buildZip
+
+```
+
+Create a new JAX-RS resource and a JAXB DTO (`aws-gateway-usage-example/src/main/java/com/jrestless/aws/examples/SampleResource.java`):
 
 ```java
-@Path("/sample")
+package com.jrestless.aws.examples;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@Path("/hello")
 public class SampleResource {
   @GET
   @Path("/health")
@@ -96,72 +135,33 @@ public class SampleResource {
 }
 ```
 
-### AWS
-
-Add the following dependencies:
-```gradle
-compile(
-  'com.jrestless.aws:jrestless-aws-gateway-core:0.2.0',
-  'org.glassfish.jersey.media:jersey-media-json-jackson:2.23',
-  'org.glassfish.jersey.media:jersey-media-jaxb:2.23', // if you want to use JAXB
-  ...
-)
-```
-
-Extend the request handler provided by the framework, register your resource in Gateway's default resource config, pass the resource config and start the container:
-
+Create the request handler (`aws-gateway-usage-example/src/main/java/com/jrestless/aws/examples/RequestHandler.java`):
 ```java
-public class SampleRequestHandler extends GatewayRequestObjectHandler {
-  public SampleRequestHandler() {
-    init(new GatewayResourceConfig().register(SampleResource.class));
+package com.jrestless.aws.examples;
+
+import com.jrestless.aws.gateway.GatewayResourceConfig;
+import com.jrestless.aws.gateway.handler.GatewayRequestObjectHandler;
+
+public class RequestHandler extends GatewayRequestObjectHandler {
+  public RequestHandler() {
+    init(new GatewayResourceConfig().packages("com.jrestless.aws.examples"));
     start();
   }
 }
 ```
 
-Upload the function to a supported region (e.g. `us-west-2`) and give it a name (e.g. `JRestlessSampleFunction`).
+Build your function from within the directory `aws-gateway-usage-example`:
+```bash
+gradle build
+```
+This creates a deployable zip file (`aws-gateway-usage-example/build/distributions/aws-gateway-usage-example.zip`) using the dependent task `buildZip`.
 
-Create a new API in API Gateway using `Lambda Function Proxy` and add a method using a catch-all path variable that invokes your lambda function, or simply create a new API by importing this swagger definition.
+Now you can deploy the function using serverless:
 
-```json
-{
-  "swagger": "2.0",
-  "info": {
-    "title": "JRestless Example"
-  },
-  "paths": {
-    "/{proxy+}": {
-      "x-amazon-apigateway-any-method": {
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "proxy",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {},
-        "x-amazon-apigateway-integration": {
-          "uri": "arn:aws:apigateway:YOUR_REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:YOUR_REGION:YOUR_ID:function:YOUR_FUNCTION_NAME/invocations",
-          "passthroughBehavior": "when_no_match",
-          "httpMethod": "POST",
-          "responses": {
-            "default": {
-              "statusCode": "500"
-            }
-          },
-          "type": "aws_proxy"
-        }
-      }
-    }
-  }
-}
+```bash
+serverless deploy
 ```
 
-Deploy your API.
 
 Hit `YOUR_INVOKE_URL/sample/health`:
 
@@ -172,6 +172,24 @@ curl -H 'Accept: application/json' 'YOUR_INVOKE_URL/sample/health'
 ```sh
 curl -H 'Accept: application/xml' 'YOUR_INVOKE_URL/sample/health'
 ```
+
+## Modules
+JRestless is split up into multiple modules wheras one has to depend on the \*-handler modules, only, and jrestless-aws-gateway-handler in particular. All modules are available in jcenter.
+
+* **jrestless-aws-gateway-handler** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-gateway-handler/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-gateway-handler/_latestVersion)
+  * Provides an AWS Lambda RequestHandler (com.jrestless.aws.gateway.handler.GatewayRequestObjectHandler) that delegates requests from AWS API Gateway to Jersey. [Read More...](aws/gateway/jrestless-aws-gateway-core)
+* **jrestless-aws-gateway-core** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-gateway-core/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-gateway-core/_latestVersion)
+  * Contains interfaces used by jrestless-aws-gateway-handler that might be of interest for local development, as well. [Read More...](aws/gateway/jrestless-aws-gateway-core)
+* **jrestless-aws-service-handler** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-handler/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-handler/_latestVersion)
+  * Provides an  AWS Lambda RequestHandler (com.jrestless.aws.service.handler.ServiceRequestObjectHandler) that delegates requests - in a HTTP format - to Jersey. This is intentended but not limited to call one Lambda function from another. [Read More...](aws/service/jrestless-aws-service-handler)
+* **jrestless-aws-service-core** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-core/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-core/_latestVersion)
+  * Contains interfaces and classes used by `jrestless-aws-service-handler` that are of interest for `jrestless-aws-service-feign-client` and might be of interest for local development, as well. [Read More...](aws/service/jrestless-aws-service-core)
+* **jrestless-aws-service-feign-client** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-feign-client/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-feign-client/_latestVersion)
+  * Provides a feign client to call Lambda functions that use jrestless-aws-service-handler a.k.a. Lamda service functions. This allows to call Lambda service functions transparantly through feign. [Read More...](aws/service/jrestless-aws-service-feign-client)
+* **jrestless-core-container** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-core-container/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-core-container/_latestVersion)
+  * Provides a generic (provider independent) Jersey container that handles requests in the form of POJOs. [Read More...](core/jrestless-core-container)
+* **jrestless-test** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-test/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-test/_latestVersion)
+  * Provides common test functionality. [Read More...](test/jrestless-test)
 
 ## Release History
 * 0.3.0
