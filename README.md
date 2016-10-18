@@ -18,13 +18,26 @@ JRestless allows you to create serverless applications using JAX-RS.
 [![SonarQube Technical Debt](https://img.shields.io/sonar/http/sonarqube.com/jrestless/tech_debt.svg?maxAge=60&style=flat-square&label=SonarQube Technical Debt)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|facetMode=effort|types=CODE_SMELL)
 [![SonarQube Code Smells](https://img.shields.io/sonar/http/sonarqube.com/jrestless/code_smells.svg?maxAge=60&style=flat-square&label=SonarQube%20Code%20Smells)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=CODE_SMELL)
 
-JRestless is a framework that makes it possible to build serverless JAX-RS applications or rather to run JAX-RS applications in FasS (Function as a Service) environments like AWS Lambda. This is achieved by providing a generic Jersey container that handles requests in the form of POJOs. For each FaaS environment there is a separate module acting as an integration layer between the actual environment and the generic Jersey container.
+JRestless is a framework allowing you to build serverless JAX-RS applications or rather to run JAX-RS applications in FasS (Function as a Service) environments like AWS Lambda. This is achieved by providing a generic Jersey container that handles requests in the form of POJOs. For each FaaS environment there is a separate module acting as an integration layer between the actual environment and the generic Jersey container.
 
 Since this framework is just a wrapper around Jersey it is possible to use the features provided by JAX-RS. This includes   filters, for example, but also Jersey's custom extensions like Spring integration - not Spring MVC, though since this functionality is provided by JAX-RS itself.
 
 AWS Lambda is the only FaaS environment that supports Java at the moment and so it is the only supported environment for now.
 
-The project's main goal is to avoid any cloud vendor lock-in and to allow you to test your code locally.
+The project's main goal is to avoid any cloud vendor lock-in and to allow you to run and test your code locally.
+
+## Modules
+JRestless is split up into multiple modules. All modules are available in jcenter.
+
+|Group ID            |Artifact ID                         |Latest Version|Description|
+|--------------------|------------------------------------|--------------|-----------|
+|`com.jrestless.aws` |`jrestless-aws-gateway-handler`     |[ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-gateway-handler/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-gateway-handler/_latestVersion)|Provides an AWS Lambda RequestHandler (com.jrestless.aws.gateway.handler.GatewayRequestObjectHandler) that delegates requests from AWS API Gateway to Jersey. [Read More...](aws/gateway/jrestless-aws-gateway-core)|
+|`com.jrestless.aws` |`jrestless-aws-gateway-core`        |[ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-gateway-core/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-gateway-core/_latestVersion)|Contains interfaces used by jrestless-aws-gateway-handler that might be of interest for local development, as well. [Read More...](aws/gateway/jrestless-aws-gateway-core)|
+|`com.jrestless.aws` |`jrestless-aws-service-handler`     |[ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-handler/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-handler/_latestVersion)|Provides an  AWS Lambda RequestHandler (com.jrestless.aws.service.handler.ServiceRequestObjectHandler) that delegates requests - in a HTTP format - to Jersey. This is intentended but not limited to call one Lambda function from another. [Read More...](aws/service/jrestless-aws-service-handler)|
+|`com.jrestless.aws` |`jrestless-aws-service-core`        |[ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-core/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-core/_latestVersion)|Contains interfaces and classes used by `jrestless-aws-service-handler` that are of interest for `jrestless-aws-service-feign-client` and might be of interest for local development, as well. [Read More...](aws/service/jrestless-aws-service-core)|
+|`com.jrestless.aws` |`jrestless-aws-service-feign-client`|[ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-feign-client/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-feign-client/_latestVersion)|Provides a feign client to call Lambda functions that use `jrestless-aws-service-handler` a.k.a. Lamda service functions. This allows you to call Lambda service functions transparantly through feign. [Read More...](aws/service/jrestless-aws-service-feign-client)|
+|`com.jrestless.core`|`jrestless-core-container`          |[ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-core-container/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-core-container/_latestVersion)|Provides a generic Jersey container that handles request in the form of POJOs. [Read More...](core/jrestless-core-container)|
+|com.jrestless.test|jrestless-test                    |[ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-test/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-test/_latestVersion)|Provides common test functionality. [Read More...](test/jrestless-test)|
 
 ## Installation
 
