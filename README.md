@@ -192,7 +192,7 @@ curl -H 'Accept: application/xml' 'https://<SOMEID>.execute-api.eu-central-1.ama
 ```
 
 ## Modules
-JRestless is split up into multiple modules wheras one has to depend on the \*-handler modules, only. [jrestless-aws-gateway-handler](aws/gateway/jrestless-aws-gateway-handler) is probably the most interesting one.
+JRestless is split up into multiple modules whereas one has to depend on the \*-handler modules, only. [jrestless-aws-gateway-handler](aws/gateway/jrestless-aws-gateway-handler) is probably the most interesting one.
 
 All modules are available in jcenter.
 
