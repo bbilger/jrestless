@@ -39,7 +39,7 @@ All examples can be found in a separate repository: https://github.com/bbilger/j
 
 ### AWS Usage Example
 
-JRestless does not depend on the [serverless framework](https://github.com/serverless/serverless) but it simplifies the necessary AWS configuration tremendously and will be used for this example. 
+JRestless does not depend on the [serverless framework](https://github.com/serverless/serverless) but it simplifies the necessary AWS configuration tremendously and will be used for this example.
 
 Install `serverless` as described in the docs https://serverless.com/framework/docs/guide/installing-serverless/
 
@@ -174,7 +174,7 @@ serverless deploy
 If `serverless` is configured correctly, it should show you an endpoint in its output.
 ```
 ...
-endpoints 
+endpoints
   ANY - https://<SOMEID>.execute-api.us-west-2.amazonaws.com/dev/sample/{proxy+}
 ...
 ```
@@ -192,7 +192,7 @@ curl -H 'Accept: application/xml' 'https://<SOMEID>.execute-api.us-west-2.amazon
 ```
 
 ## Modules
-JRestless is split up into multiple modules wheras one has to depend on the \*-handler modules, only. `jrestless-aws-gateway-handler` is probably the most interesting one. 
+JRestless is split up into multiple modules wheras one has to depend on the \*-handler modules, only. `jrestless-aws-gateway-handler` is probably the most interesting one.
 
 All modules are available in jcenter.
 
@@ -201,11 +201,11 @@ All modules are available in jcenter.
 * **jrestless-aws-gateway-core** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-gateway-core/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-gateway-core/_latestVersion)
   * Contains interfaces used by `jrestless-aws-gateway-handler` and might be of interest for local development, as well. [Read More...](aws/gateway/jrestless-aws-gateway-core)
 * **jrestless-aws-service-handler** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-handler/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-handler/_latestVersion)
-  * Provides an  AWS Lambda RequestHandler (ServiceRequestObjectHandler) that delegates requests - in a HTTP format - to Jersey. This is intentended but not limited to call one Lambda function from another. [Read More...](aws/service/jrestless-aws-service-handler)
+  * Provides an  AWS Lambda RequestHandler (ServiceRequestObjectHandler) that delegates requests - in a HTTP format - to Jersey. This is intended but not limited to call one Lambda function from another. [Read More...](aws/service/jrestless-aws-service-handler)
 * **jrestless-aws-service-core** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-core/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-core/_latestVersion)
   * Contains interfaces and classes used by `jrestless-aws-service-handler`, `jrestless-aws-service-feign-client` and might be of interest for local development, as well. [Read More...](aws/service/jrestless-aws-service-core)
 * **jrestless-aws-service-feign-client** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-feign-client/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-feign-client/_latestVersion)
-  * Provides a feign client to call Lambda functions that use `jrestless-aws-service-handler` a.k.a. Lamda service functions. This allows to call Lambda service functions transparantly through feign. [Read More...](aws/service/jrestless-aws-service-feign-client)
+  * Provides a [feign](https://github.com/OpenFeign/feign) client to call Lambda functions that use `jrestless-aws-service-handler` a.k.a. Lamda service functions. This allows to call Lambda service functions transparently through feign. [Read More...](aws/service/jrestless-aws-service-feign-client)
 * **jrestless-core-container** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-core-container/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-core-container/_latestVersion)
   * Provides a generic (provider independent) Jersey container that handles requests in the form of POJOs. [Read More...](core/jrestless-core-container)
 * **jrestless-test** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-test/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-test/_latestVersion)
@@ -215,7 +215,7 @@ All modules are available in jcenter.
 * 0.3.0
   * Add support for `AWS Lambda service functions`.
   * Add support to call `AWS Lambda service functions` using [feign](https://github.com/OpenFeign/feign) and the AWS SDK - allowing you to call those functions transparently via REST without using API Gateway.
-* 0.2.0 
+* 0.2.0
   * use the new `Lambda Function Proxy` and catch-all paths provided by API Gateway (this reduces the framework's complexity and limitations significantly especially since the generation of a swagger definition is not necessary anymore)
 * 0.1.0 (-SNAPSHOT)
   * (never released since the new features `Lambda Function Proxy` and catch-all paths were released before)
@@ -223,8 +223,8 @@ All modules are available in jcenter.
   * add support for custom response headers
 * 0.0.1
   * intial release
-  
-## Meta 
+
+## Meta
 
 ### License
 
