@@ -28,6 +28,8 @@ The project's main goal is to avoid any cloud vendor lock-in and to allow you to
 
 ## Usage example
 
+All examples can be found in a separate repository: https://github.com/bbilger/jrestless
+
 ### AWS
 
 JRestless does not depend on the [serverless framework](https://github.com/serverless/serverless) but it simplifies the necessary AWS configuration tremendously and will be used for this example. 
