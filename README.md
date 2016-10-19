@@ -175,7 +175,7 @@ If `serverless` is configured correctly, it should show you an endpoint in its o
 ```
 ...
 endpoints
-  ANY - https://<SOMEID>.execute-api.us-west-2.amazonaws.com/dev/sample/{proxy+}
+  ANY - https://<SOMEID>.execute-api.eu-central-1.amazonaws.com/dev/sample/{proxy+}
 ...
 ```
 
