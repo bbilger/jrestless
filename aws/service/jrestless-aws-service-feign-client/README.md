@@ -8,7 +8,7 @@ Provides a [feign](https://github.com/OpenFeign/feign) client to call Lambda fun
 
 Lambda service function invocation through feign.
 
-_Note that AWSLambdaClient and the proxy are thread-safe so you can externalize the generation._
+_Note that AWSLambdaClient and the proxy are thread-safe so you can centralize the proxy creation._
 
 ```java
 import com.amazonaws.regions.Regions;
