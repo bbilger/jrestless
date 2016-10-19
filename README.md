@@ -63,7 +63,7 @@ provider:
   name: aws
   runtime: java8
   stage: dev
-  region: us-west-2
+  region: eu-central-1
 
 package:
   artifact: build/distributions/aws-gateway-usage-example.zip
@@ -182,12 +182,12 @@ endpoints
 Hit the endpoint:
 
 ```sh
-curl -H 'Accept: application/json' 'https://<SOMEID>.execute-api.us-west-2.amazonaws.com/dev/sample/health'
+curl -H 'Accept: application/json' 'https://<SOMEID>.execute-api.eu-central-1.amazonaws.com/dev/sample/health'
 # {"statusMessage":"up and running"}
 ```
 
 ```sh
-curl -H 'Accept: application/xml' 'https://<SOMEID>.execute-api.us-west-2.amazonaws.com/dev/sample/health'
+curl -H 'Accept: application/xml' 'https://<SOMEID>.execute-api.eu-central-1.amazonaws.com/dev/sample/health'
 # <?xml version="1.0" encoding="UTF-8" standalone="yes"?><healthStatusDto><statusMessage>up and running</statusMessage></healthStatusDto>
 ```
 
