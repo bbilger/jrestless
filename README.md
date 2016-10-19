@@ -25,7 +25,7 @@ JRestless allows you to create serverless applications using JAX-RS.
 
 JRestless is a framework allowing you to build serverless JAX-RS applications or rather to run JAX-RS applications in FasS (Function as a Service) environments like AWS Lambda. This is achieved by providing a generic Jersey container that handles requests in the form of POJOs. For each FaaS environment there is a separate module acting as an integration layer between the actual environment and the generic Jersey container.
 
-Since this framework is just a wrapper around Jersey it is possible to use the features provided by JAX-RS. This includes   filters, for example, but also Jersey's custom extensions like Spring integration - not Spring MVC, though since this functionality is provided by JAX-RS itself.
+Since this framework is just a wrapper around Jersey it is possible to use the features provided by JAX-RS. This includes   filters, for example, but also Jersey's custom extensions like **Spring integration** - not Spring MVC, though since this functionality is provided by JAX-RS itself.
 
 AWS Lambda is the only FaaS environment that supports Java at the moment and so it is the only supported environment for now.
 
