@@ -10,14 +10,9 @@ JRestless allows you to create serverless applications using JAX-RS.
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/bbilger/jrestless.svg?maxAge=60&style=flat-square)](https://github.com/bbilger/jrestless/issues?q=is%3Aissue+is%3Aclosed)
 [![License](https://img.shields.io/github/license/bbilger/jrestless.svg?maxAge=60&style=flat-square)](https://github.com/bbilger/jrestless/blob/master/LICENSE)
 
-JRestless is a framework allowing you to build serverless JAX-RS applications or rather to run JAX-RS applications in FasS (Function as a Service) environments like AWS Lambda. This is achieved by providing a generic Jersey container that handles requests in the form of POJOs. For each FaaS environment there is a separate module acting as an integration layer between the actual environment and the generic Jersey container.
 
-Since this framework is just a wrapper around Jersey it is possible to use the features provided by JAX-RS. This includes   filters, for example, but also Jersey's custom extensions like Spring integration - not Spring MVC, though since this functionality is provided by JAX-RS itself.
-
-AWS Lambda is the only FaaS environment that supports Java at the moment and so it is the only supported environment for now.
-
-The project's main goal is to avoid any cloud vendor lock-in and to allow you to run and test your code locally.
-
+* [Description](#description)
+* [Motivation](#motivation)
 * [Usage Example](#usage-example)
   * [AWS Usage Example](#aws-usage-example)
 * [Modules](#modules)
@@ -25,6 +20,18 @@ The project's main goal is to avoid any cloud vendor lock-in and to allow you to
 * [Meta](#meta)
   * [License](#license)
   * [SonarQube Metrics](#sonarqube-metrics)
+
+## Description
+
+JRestless is a framework allowing you to build serverless JAX-RS applications or rather to run JAX-RS applications in FasS (Function as a Service) environments like AWS Lambda. This is achieved by providing a generic Jersey container that handles requests in the form of POJOs. For each FaaS environment there is a separate module acting as an integration layer between the actual environment and the generic Jersey container.
+
+Since this framework is just a wrapper around Jersey it is possible to use the features provided by JAX-RS. This includes   filters, for example, but also Jersey's custom extensions like Spring integration - not Spring MVC, though since this functionality is provided by JAX-RS itself.
+
+AWS Lambda is the only FaaS environment that supports Java at the moment and so it is the only supported environment for now.
+
+## Motivation
+
+The motivation for this project is to avoid a cloud vendor lock-in and to allow developers to run and test their code locally.
 
 ## Usage Example
 
