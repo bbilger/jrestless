@@ -32,11 +32,11 @@ The project's main goal is to avoid any cloud vendor lock-in and to allow you to
 
 JRestless does not depend on the [serverless framework](https://github.com/serverless/serverless) but it simplifies the necessary AWS configuration tremendously and will be used for this example. 
 
-Install serverless as described in the docs https://serverless.com/framework/docs/guide/installing-serverless/
+Install `serverless` as described in the docs https://serverless.com/framework/docs/guide/installing-serverless/
 
 Setup your AWS account as described in the docs https://serverless.com/framework/docs/providers/aws/setup/
 
-Create a new function with serverless
+Create a new function using `serverless`
 
 ```bash
 mkdir aws-gateway-usage-example
@@ -45,7 +45,7 @@ serverless create --template aws-java-gradle --name aws-gateway-usage-example
 rm -rf src/main/java/hello # remove the classes created by the template
 mkdir -p src/main/java/com/jrestless/aws/examples # create the package structure
 ```
-Replace `aws-gateway-usage-example/serverless.yml` with the following contents:
+Replace `serverless.yml` with the following contents:
 
 ```yml
 service: aws-gateway-usage-example-service
@@ -69,7 +69,7 @@ functions:
 
 ```
 
-Replace `aws-gateway-usage-example/build.gradle` with the following contents:
+Replace `build.gradle` with the following contents:
 
 ```gradle
 apply plugin: 'java'
@@ -96,7 +96,7 @@ build.dependsOn buildZip
 
 ```
 
-Create a new JAX-RS resource and a JAXB DTO (`aws-gateway-usage-example/src/main/java/com/jrestless/aws/examples/SampleResource.java`):
+Create a new JAX-RS resource and a JAXB DTO (`src/main/java/com/jrestless/aws/examples/SampleResource.java`):
 
 ```java
 package com.jrestless.aws.examples;
@@ -135,7 +135,7 @@ public class SampleResource {
 }
 ```
 
-Create the request handler (`aws-gateway-usage-example/src/main/java/com/jrestless/aws/examples/RequestHandler.java`):
+Create the request handler (`src/main/java/com/jrestless/aws/examples/RequestHandler.java`):
 ```java
 package com.jrestless.aws.examples;
 
@@ -156,13 +156,19 @@ gradle build
 ```
 This, amongst other things, creates a deployable version of your function (`aws-gateway-usage-example/build/distributions/aws-gateway-usage-example.zip`) using the dependent task `buildZip`.
 
-Now you can deploy the function using serverless:
+Now you can deploy the function using `serverless`:
 
 ```bash
 serverless deploy
 ```
 
-If you configured `serverless` correctly, it should show you an endpoint like this `https://<SOMEID>.execute-api.us-west-2.amazonaws.com/dev/sample/{proxy+}` in its output.
+If `serverless` is configured correctly, it should show you an endpoint in its output.
+```
+...
+endpoints 
+  ANY - https://<SOMEID>.execute-api.us-west-2.amazonaws.com/dev/sample/{proxy+}
+...
+```
 
 Hit the endpoint:
 
