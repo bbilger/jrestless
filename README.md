@@ -18,11 +18,13 @@ AWS Lambda is the only FaaS environment that supports Java at the moment and so 
 
 The project's main goal is to avoid any cloud vendor lock-in and to allow you to run and test your code locally.
 
-* [Usage example](#usage-example)
-  * [AWS](#aws-usage-example)
+* [Usage Example](#usage-example)
+  * [AWS Usage Example](#aws-usage-example)
 * [Modules](#modules)
 * [Release History](#release-history)
 * [Meta](#meta)
+  * [License](#license)
+  * [SonarQube Metrics](#sonarqube-metrics)
 
 ## Usage Example
 
