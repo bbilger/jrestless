@@ -1,6 +1,6 @@
 # JRestless
 
-JRestless allows you to create serverless applications using JAX-RS.
+JRestless allows you to create serverless (AWS Lamda) applications using JAX-RS.
 
 ![](jrestless_512_256.png)
 
