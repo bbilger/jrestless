@@ -163,7 +163,7 @@ Build your function from within the directory `aws-gateway-usage-example`:
 ```bash
 gradle build
 ```
-This, amongst other things, creates a deployable version of your function (`aws-gateway-usage-example/build/distributions/aws-gateway-usage-example.zip`) using the dependent task `buildZip`.
+This, amongst other things, creates a deployable version of your function (`build/distributions/aws-gateway-usage-example.zip`) using the dependent task `buildZip`.
 
 Now you can deploy the function using `serverless`:
 
