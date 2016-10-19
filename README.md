@@ -42,8 +42,8 @@ Create a new function with serverless
 mkdir aws-gateway-usage-example
 cd aws-gateway-usage-example
 serverless create --template aws-java-gradle --name aws-gateway-usage-example
-rm -rf src/main/java/hello
-mkdir -p src/main/java/com/jrestless/aws/examples
+rm -rf src/main/java/hello # remove the classes created by the template
+mkdir -p src/main/java/com/jrestless/aws/examples # create the package structure
 ```
 Replace `aws-gateway-usage-example/serverless.yml` with the following contents:
 
@@ -109,7 +109,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@Path("/hello")
+@Path("/sample")
 public class SampleResource {
   @GET
   @Path("/health")
@@ -154,7 +154,7 @@ Build your function from within the directory `aws-gateway-usage-example`:
 ```bash
 gradle build
 ```
-This creates a deployable zip file (`aws-gateway-usage-example/build/distributions/aws-gateway-usage-example.zip`) using the dependent task `buildZip`.
+This, amongst other things, creates a deployable version of your function (`aws-gateway-usage-example/build/distributions/aws-gateway-usage-example.zip`) using the dependent task `buildZip`.
 
 Now you can deploy the function using serverless:
 
@@ -162,19 +162,24 @@ Now you can deploy the function using serverless:
 serverless deploy
 ```
 
+If you configured `serverless` correctly, it should show you an endpoint like this `https://<SOMEID>.execute-api.us-west-2.amazonaws.com/dev/sample/{proxy+}` in its output.
 
-Hit `YOUR_INVOKE_URL/sample/health`:
+Hit the endpoint:
 
 ```sh
-curl -H 'Accept: application/json' 'YOUR_INVOKE_URL/sample/health'
+curl -H 'Accept: application/json' 'https://<SOMEID>.execute-api.us-west-2.amazonaws.com/dev/sample/health'
+# {"statusMessage":"up and running"}
 ```
 
 ```sh
-curl -H 'Accept: application/xml' 'YOUR_INVOKE_URL/sample/health'
+curl -H 'Accept: application/xml' 'https://<SOMEID>.execute-api.us-west-2.amazonaws.com/dev/sample/health'
+# <?xml version="1.0" encoding="UTF-8" standalone="yes"?><healthStatusDto><statusMessage>up and running</statusMessage></healthStatusDto>
 ```
 
 ## Modules
-JRestless is split up into multiple modules wheras one has to depend on the \*-handler modules, only, and jrestless-aws-gateway-handler in particular. All modules are available in jcenter.
+JRestless is split up into multiple modules wheras one has to depend on the \*-handler modules, only. `jrestless-aws-gateway-handler` is the most interesting one. 
+
+All modules are available in jcenter.
 
 * **jrestless-aws-gateway-handler** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-gateway-handler/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-gateway-handler/_latestVersion)
   * Provides an AWS Lambda RequestHandler (com.jrestless.aws.gateway.handler.GatewayRequestObjectHandler) that delegates requests from AWS API Gateway to Jersey. [Read More...](aws/gateway/jrestless-aws-gateway-core)
