@@ -35,7 +35,7 @@ The motivation for this project is to avoid a cloud vendor lock-in and to allow 
 
 ## Usage Example
 
-All examples can be found in a separate repository: https://github.com/bbilger/jrestless
+All examples can be found in a separate repository: https://github.com/bbilger/jrestless-examples
 
 ### AWS Usage Example
 
