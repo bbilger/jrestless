@@ -197,19 +197,26 @@ JRestless is split up into multiple modules wheras one has to depend on the \*-h
 All modules are available in jcenter.
 
 * **jrestless-aws-gateway-handler** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-gateway-handler/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-gateway-handler/_latestVersion)
-  * Provides an AWS Lambda RequestHandler that delegates requests from AWS API Gateway to Jersey. [Read More...](aws/gateway/jrestless-aws-gateway-handler)
+  * Provides an AWS Lambda RequestHandler that delegates requests from AWS API Gateway to Jersey.
+  * [Read More...](aws/gateway/jrestless-aws-gateway-handler)
 * **jrestless-aws-gateway-core** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-gateway-core/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-gateway-core/_latestVersion)
-  * Contains interfaces used by [jrestless-aws-gateway-handler](aws/gateway/jrestless-aws-gateway-handler) and might be of interest for local development, as well. [Read More...](aws/gateway/jrestless-aws-gateway-core)
+  * Contains interfaces used by [jrestless-aws-gateway-handler](aws/gateway/jrestless-aws-gateway-handler) and might be of interest for local development, as well.
+  * [Read More...](aws/gateway/jrestless-aws-gateway-core)
 * **jrestless-aws-service-handler** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-handler/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-handler/_latestVersion)
-  * Provides an  AWS Lambda RequestHandler that delegates requests - in a HTTP format - to Jersey. This is intended but not limited to call one Lambda function from another. [Read More...](aws/service/jrestless-aws-service-handler)
+  * Provides an  AWS Lambda RequestHandler that delegates requests - in a HTTP format - to Jersey. This is intended but not limited to call one Lambda function from another.
+  * [Read More...](aws/service/jrestless-aws-service-handler)
 * **jrestless-aws-service-core** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-core/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-core/_latestVersion)
-  * Contains interfaces and classes used by [jrestless-aws-service-handler](aws/service/jrestless-aws-service-handler), [jrestless-aws-service-feign-client](aws/service/jrestless-aws-service-feign-client) and might be of interest for local development, as well. [Read More...](aws/service/jrestless-aws-service-core)
+  * Contains interfaces and classes used by [jrestless-aws-service-handler](aws/service/jrestless-aws-service-handler), [jrestless-aws-service-feign-client](aws/service/jrestless-aws-service-feign-client) and might be of interest for local development, as well.
+  * [Read More...](aws/service/jrestless-aws-service-core)
 * **jrestless-aws-service-feign-client** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-feign-client/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-feign-client/_latestVersion)
-  * Provides a [feign](https://github.com/OpenFeign/feign) client to call Lambda functions that use [jrestless-aws-service-handler](aws/service/jrestless-aws-service-handler) a.k.a. Lambda service functions. This allows to call Lambda service functions transparently through feign. [Read More...](aws/service/jrestless-aws-service-feign-client)
+  * Provides a [feign](https://github.com/OpenFeign/feign) client to call Lambda functions that use [jrestless-aws-service-handler](aws/service/jrestless-aws-service-handler) a.k.a. Lambda service functions. This allows to call Lambda service functions transparently through feign.
+  * [Read More...](aws/service/jrestless-aws-service-feign-client)
 * **jrestless-core-container** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-core-container/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-core-container/_latestVersion)
-  * Provides a generic (provider independent) Jersey container that handles requests in the form of POJOs. [Read More...](core/jrestless-core-container)
+  * Provides a generic (provider independent) Jersey container that handles requests in the form of POJOs.
+  * [Read More...](core/jrestless-core-container)
 * **jrestless-test** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-test/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-test/_latestVersion)
-  * Provides common test functionality. [Read More...](test/jrestless-test)
+  * Provides common test functionality.
+  * [Read More...](test/jrestless-test)
 
 ## Release History
 * 0.3.0
