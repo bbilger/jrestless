@@ -80,8 +80,8 @@ public abstract class ServiceRequestHandler
 	public void extendActualJerseyContainerRequest(ContainerRequest actualContainerRequest,
 			JRestlessContainerRequest containerRequest, ServiceRequestAndLambdaContext requestAndLambdaContext) {
 		ServiceRequest request = requestAndLambdaContext.getServiceRequest();
-		Context lamdaContext = requestAndLambdaContext.getLambdaContext();
-		actualContainerRequest.setProperty(LambdaContextFactory.PROPERTY_NAME, lamdaContext);
+		Context lambdaContext = requestAndLambdaContext.getLambdaContext();
+		actualContainerRequest.setProperty(LambdaContextFactory.PROPERTY_NAME, lambdaContext);
 		actualContainerRequest.setProperty(ServiceRequestContextFactory.PROPERTY_NAME, request);
 	}
 

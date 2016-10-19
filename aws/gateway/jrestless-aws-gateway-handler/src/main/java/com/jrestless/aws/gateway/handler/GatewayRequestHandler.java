@@ -115,8 +115,8 @@ public abstract class GatewayRequestHandler
 	public void extendActualJerseyContainerRequest(ContainerRequest actualContainerRequest,
 			JRestlessContainerRequest containerRequest, GatewayRequestAndLambdaContext requestAndLambdaContext) {
 		GatewayRequest request = requestAndLambdaContext.getGatewayRequest();
-		Context lamdaContext = requestAndLambdaContext.getLambdaContext();
-		actualContainerRequest.setProperty(LambdaContextFactory.PROPERTY_NAME, lamdaContext);
+		Context lambdaContext = requestAndLambdaContext.getLambdaContext();
+		actualContainerRequest.setProperty(LambdaContextFactory.PROPERTY_NAME, lambdaContext);
 		actualContainerRequest.setProperty(GatewayRequestContextFactory.PROPERTY_NAME, request);
 		GatewayRequestContext requestContext = request.getRequestContext();
 		actualContainerRequest.setProperty(GatewayRequestContextContextFactory.PROPERTY_NAME, requestContext);

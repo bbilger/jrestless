@@ -2,7 +2,7 @@
 
 [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-gateway-handler/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-gateway-handler/_latestVersion)
 
-This module provides an AWS Lambda RequestHandler (GatewayRequestObjectHandler) that delegates requests from AWS API Gateway to Jersey.
+This module provides an AWS Lambda RequestHandler that delegates requests from AWS API Gateway to Jersey.
 
 ```java
 import com.jrestless.aws.gateway.GatewayResourceConfig;

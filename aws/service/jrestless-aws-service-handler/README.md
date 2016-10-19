@@ -4,6 +4,8 @@
 
 This module provides an AWS Lambda RequestHandler that delegates requests - in a HTTP format - to Jersey. This is intended but not limited to call one Lambda function from another.
 
+Check [jrestless-aws-service-feign-client](../jrestless-aws-service-feign-client) to see how to invoke those functions.
+
 
 ```java
 import com.jrestless.aws.service.ServiceResourceConfig;

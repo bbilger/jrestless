@@ -14,7 +14,6 @@ import org.junit.Test;
 
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.lambda.AWSLambdaClient;
-import com.jrestless.aws.service.client.FeignLambdaServiceInvokerClient;
 
 public class FeignLambdaInvokerServiceClientBuilderTest {
 
@@ -87,7 +86,7 @@ public class FeignLambdaInvokerServiceClientBuilderTest {
 	}
 
 	@Test
-	public void setFunctionName_LambdaClientGiven_ShouldUseLamdaClient() {
+	public void setFunctionName_LambdaClientGiven_ShouldUseLambdaClient() {
 		AWSLambdaClient myLambdaClient = mock(AWSLambdaClient.class);
 		builder.setFunctionName(FUNCTION_NAME);
 		builder.setAwsLambdaClient(myLambdaClient);
