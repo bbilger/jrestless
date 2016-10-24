@@ -3,16 +3,16 @@ version = "${globaleModuleVersion}"
 
 dependencies {
 	compile(
-		'org.glassfish.jersey.containers:project',
-		'org.slf4j:slf4j-api',
-		'com.google.code.findbugs:jsr305'
+		libraries.jersey_containers_project,
+		libraries.slf4j_api,
+		libraries.findbugs_jsr305
 	)
 
 	testCompile project(":test:jrestless-test")
 	testCompile (
-		'junit:junit',
-		'org.mockito:mockito-core',
-		'org.glassfish.jersey.media:jersey-media-json-jackson',
-		'org.slf4j:slf4j-simple'
+		libraries.junit,
+		libraries.mockito_core,
+		libraries.slf4j_simple,
+		libraries.jersey_media_json_jackson
 	)
 }

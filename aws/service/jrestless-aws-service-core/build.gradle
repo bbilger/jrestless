@@ -3,13 +3,13 @@ version = "${globaleModuleVersion}"
 
 dependencies {
 	compile(
-		'com.google.code.findbugs:jsr305'
+		libraries.findbugs_jsr305
 	)
 
 	testCompile project(':test:jrestless-test')
 	testCompile (
-		'junit:junit',
-		'org.mockito:mockito-core'
+		libraries.junit,
+		libraries.mockito_core
 	)
 }
 

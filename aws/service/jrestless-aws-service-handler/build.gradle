@@ -5,14 +5,14 @@ dependencies {
 	compile project(':aws:service:jrestless-aws-service-core')
 	compile project(':core:jrestless-core-container')
 	compile(
-		'com.amazonaws:aws-lambda-java-core'
+		libraries.aws_lambda_core
 	)
 
 	testCompile project(':test:jrestless-test')
 	testCompile (
-		'junit:junit',
-		'org.mockito:mockito-core',
-		'org.slf4j:slf4j-simple',
-		'org.glassfish.jersey.media:jersey-media-json-jackson'
+		libraries.junit,
+		libraries.mockito_core,
+		libraries.slf4j_simple,
+		libraries.jersey_media_json_jackson
 	)
 }

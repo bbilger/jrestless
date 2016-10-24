@@ -10,7 +10,7 @@ dependencies {
 	)
 	testCompile project(':test:jrestless-test')
 	testCompile (
-		'junit:junit',
-		'org.mockito:mockito-core'
+		libraries.junit,
+		libraries.mockito_core
 	)
 }

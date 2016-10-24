@@ -13,7 +13,6 @@ buildscript {
 	dependencies {
 		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
 		classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.1'
-		classpath 'io.spring.gradle:dependency-management-plugin:0.6.1.RELEASE'
 	}
 }
 apply plugin: 'org.sonarqube'
@@ -43,32 +42,22 @@ subprojects {
 	apply plugin: 'jacoco'
 	apply plugin: 'com.jfrog.bintray'
 	apply plugin: 'maven-publish'
-	apply plugin: 'io.spring.dependency-management'
 
 	repositories {
 		mavenCentral()
 	}
 	
-	dependencyManagement {
-		dependencies {
-			dependency 'org.glassfish.jersey.containers:project:2.23.2'
-			dependency 'com.google.code.findbugs:jsr305:3.0.1'
-			dependency 'com.amazonaws:aws-lambda-java-core:1.1.0'
-			dependencySet(group: 'org.slf4j', version: '1.7.21') {
-				entry 'slf4j-api'
-				entry 'slf4j-simple'
-			}
-			dependencySet(group: 'org.glassfish.jersey.media', version: '2.23.2') {
-				entry 'jersey-media-json-jackson'
-			}
-			dependencySet(group: 'com.google.guava', version: '18.0') {
-				entry 'guava-testlib'
-			}
-			
-			dependency 'junit:junit:4.12'
-			dependency 'org.mockito:mockito-core:2.2.0'
-		}
-	}
+	ext.libraries = [
+		jersey_containers_project: 'org.glassfish.jersey.containers:project:2.23.2',
+		jersey_media_json_jackson: 'org.glassfish.jersey.media:jersey-media-json-jackson:2.23.2',
+		findbugs_jsr305: 'com.google.code.findbugs:jsr305:3.0.1',
+		aws_lambda_core: 'com.amazonaws:aws-lambda-java-core:1.1.0',
+		slf4j_api: 'org.slf4j:slf4j-api:1.7.21',
+		slf4j_simple: 'org.slf4j:slf4j-simple:1.7.21',
+		junit: 'junit:junit:4.12',
+		mockito_core: 'org.mockito:mockito-core:2.2.0',
+		guava_testlib: 'com.google.guava:guava-testlib:18.0'
+	]
 
 	checkstyle {
 		configFile = checkstyleCfg

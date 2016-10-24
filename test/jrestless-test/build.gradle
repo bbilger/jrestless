@@ -3,11 +3,11 @@ version = "${globaleModuleVersion}"
 
 dependencies {
 	compile(
-		'com.google.guava:guava-testlib'
+		libraries.guava_testlib
 	)
 	testCompile(
-		'junit:junit',
-		'org.mockito:mockito-core'
+		libraries.junit,
+		libraries.mockito_core
 	)
 }
 
