@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.ext.RuntimeDelegate;
@@ -58,7 +57,7 @@ public final class HeaderUtils {
 				.filter(h -> !h.getValue().isEmpty())
 				.collect(Collectors.collectingAndThen(
 						Collectors.toMap(
-								h -> h.getKey(),
+								Map.Entry::getKey,
 								h -> asHeaderString(h.getValue())),
 						Collections::unmodifiableMap));
 	}
@@ -80,14 +79,17 @@ public final class HeaderUtils {
 	 * @return expanded headers (unmodifiable!)
 	 */
 	public static Map<String, List<String>> expandHeaders(Map<String, String> headers) {
-		Function<Map.Entry<String, String>, List<String>> toList = h -> Collections.singletonList(h.getValue());
 		return headers.entrySet().stream()
 				.filter(h -> h.getKey() != null)
 				.filter(h -> h.getValue() != null)
 				.collect(Collectors.collectingAndThen(
 						Collectors.toMap(
-								h -> h.getKey(),
-								toList),
+								Map.Entry::getKey,
+								HeaderUtils::expandHeaders),
 						Collections::unmodifiableMap));
+	}
+
+	private static List<String> expandHeaders(Map.Entry<String, String> entry) {
+		return Collections.singletonList(entry.getValue());
 	}
 }

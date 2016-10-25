@@ -153,7 +153,7 @@ public abstract class PreconditionsTester {
 
 	private void testArguments(List<Set<Argument>> argumentsLists, Class<? extends Exception> expectedException) {
 		for (List<Argument> arguments : InvokableArguments.getCartesianProduct(argumentsLists)) {
-			List<Object> argVals = arguments.stream().map(a -> a.getValue()).collect(Collectors.toList());
+			List<Object> argVals = arguments.stream().map(Argument::getValue).collect(Collectors.toList());
 			try {
 				invokable.invoke(argVals.toArray(new Object[argVals.size()]));
 				if (expectedException != null) {

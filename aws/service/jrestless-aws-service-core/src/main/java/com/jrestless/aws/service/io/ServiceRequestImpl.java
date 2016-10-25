@@ -101,7 +101,7 @@ public final class ServiceRequestImpl implements ServiceRequest {
 				.filter(e -> e.getValue() != null)
 				.collect(Collectors.collectingAndThen(
 						Collectors.toMap(
-								e -> e.getKey(),
+								Map.Entry::getKey,
 								ServiceRequestImpl::copyList),
 						Collections::unmodifiableMap));
 	}

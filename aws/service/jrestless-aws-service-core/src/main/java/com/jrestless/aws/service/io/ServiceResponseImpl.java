@@ -85,7 +85,7 @@ public final class ServiceResponseImpl implements ServiceResponse {
 			.filter(e -> e.getValue() != null)
 			.collect(Collectors.collectingAndThen(
 					Collectors.toMap(
-							e -> e.getKey(),
+							Map.Entry::getKey,
 							ServiceResponseImpl::copyList),
 					Collections::unmodifiableMap));
 	}

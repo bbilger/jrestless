@@ -62,7 +62,7 @@ public class CopyConstructorEqualsTester {
 			EqualsTester tester = new EqualsTester();
 			for (List<Argument> args : arguments.getCartesianProduct()) {
 				try {
-					Object[] invokeArgs = args.stream().map(a -> a.getValue()).toArray();
+					Object[] invokeArgs = args.stream().map(Argument::getValue).toArray();
 					Object o1 = constructor.newInstance(invokeArgs);
 					Object o2 = constructor.newInstance(invokeArgs);
 					tester.addEqualityGroup(o1, o2);

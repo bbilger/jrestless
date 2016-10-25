@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -50,16 +49,18 @@ public class JRestlessContainerRequestImpl implements JRestlessContainerRequest 
 		this.httpMethod = requireNonNull(httpMethod);
 		this.entityStream = requireNonNull(entityStream);
 		requireNonNull(headers);
-		Function<Map.Entry<String, List<String>>, List<String>> toImmutableCollection =
-				e -> Collections.unmodifiableList(new ArrayList<>(e.getValue()));
 		this.headers = headers.entrySet().stream()
 				.filter(e -> e.getKey() != null)
 				.filter(e -> e.getValue() != null)
 				.collect(Collectors.collectingAndThen(
 						Collectors.toMap(
-								e -> e.getKey(),
-								toImmutableCollection),
+								Map.Entry::getKey,
+								JRestlessContainerRequestImpl::toImmutableList),
 						Collections::unmodifiableMap));
+	}
+
+	private static List<String> toImmutableList(Map.Entry<String, List<String>> entry) {
+		return Collections.unmodifiableList(new ArrayList<>(entry.getValue()));
 	}
 
 	@Override
