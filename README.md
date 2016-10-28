@@ -13,10 +13,13 @@ JRestless allows you to create serverless (AWS Lambda) applications using JAX-RS
 
 * [Description](#description)
 * [Motivation](#motivation)
+* [Function Types](#function-types)
 * [Usage Example](#usage-example)
   * [AWS Usage Example](#aws-usage-example)
 * [Modules](#modules)
 * [Release History](#release-history)
+* [Alternative Projects](#alternative-projects)
+* Limitations
 * [Meta](#meta)
   * [License](#license)
   * [SonarQube Metrics](#sonarqube-metrics)
@@ -25,13 +28,23 @@ JRestless allows you to create serverless (AWS Lambda) applications using JAX-RS
 
 JRestless is a framework allowing you to build serverless JAX-RS applications or rather to run JAX-RS applications in FasS (Function as a Service) environments like AWS Lambda. This is achieved by providing a generic Jersey container that handles requests in the form of POJOs. For each FaaS environment there is a separate module acting as an integration layer between the actual environment and the generic Jersey container.
 
-Since this framework is just a wrapper around Jersey it is possible to use the features provided by JAX-RS. This includes   filters, for example, but also Jersey's custom extensions like **Spring integration** - not Spring MVC, though since this functionality is provided by JAX-RS itself.
+Since this framework is just a wrapper around or rather a container for Jersey, you can use almost all JAX-RS features plus Jersey's custom extensions like **Spring integration** - not Spring MVC, though since this functionality is provided by JAX-RS itself.
 
 AWS Lambda is the only FaaS environment that supports Java at the moment and so it is the only supported environment for now.
 
 ## Motivation
 
 The motivation for this project is to avoid a cloud vendor lock-in and to allow developers to run and test their code locally.
+
+## Function Types
+
+### AWS
+
+- _Gateway functions_ are AWS Lambda functions that get invoked by AWS API Gateway. [Read More...](aws/gateway/jrestless-aws-gateway-handler)
+- _Service functions_ are AWS Lambda functions that can either be invoked by other AWS Lambda functions or can be invoked directly through the AWS SDK. The point is that you don't use AWS API Gateway. You can abstract the fact that you invoke an AWS Lambda function away by using a special feign client ([jrestless-aws-service-feign-client](aws/service/jrestless-aws-service-feign-client)). [Read More...](aws/service/jrestless-aws-service-handler)
+- _SNS functions_ are planned for the next release.
+
+Note: the framework is split up into multiple modules, so you choose which functionality you actually want to use. See [Modules](#modules)
 
 ## Usage Example
 
@@ -217,6 +230,29 @@ All modules are available in jcenter.
 * **jrestless-test** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-test/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-test/_latestVersion)
   * Provides common test functionality.
   * [Read More...](test/jrestless-test)
+  
+## Alternative Projects
+
+### AWS
+
+* Java
+  * [lambadaframework](https://github.com/lambadaframework/lambadaframework) provides similar functionality like JRestless. It implements some features of the JAX-RS standard and includes deployment functionility within the framework itself.
+* JavaScript
+  * [aws-serverless-express](https://github.com/awslabs/aws-serverless-express) - run [express](https://github.com/expressjs/express) applications
+* Python
+  * [Zappa](https://github.com/Miserlou/Zappa) - run and deploy Python applications
+
+## Limitations
+
+### AWS
+
+* for all function types
+  * stateless only (you could utilize some cache like Redis, though)
+  * AWS Lambda functions have a maximum execution time of 5 minutes
+  * currently no support for binary data in requests/responses (binary data gets encoded to base64, however, in JSON responses)
+* _Gateway functions_
+  * AWS API Gateway has a timeout of 30 seconds
+  * Multiple headers with same name not supported
 
 ## Release History
 * 0.3.0
@@ -239,10 +275,10 @@ Distributed under Apache 2.0 license. See [License](https://github.com/bbilger/j
 
 ### SonarQube Metrics
 
-[![SonarQube Coverage](https://img.shields.io/sonar/http/sonarqube.com/jrestless/coverage.svg?maxAge=60&style=flat-square&label=SonarQube%20Coverage)](https://sonarqube.com/component_measures/domain/Coverage?id=jrestless)
-[![SonarQube Bugs](https://img.shields.io/sonar/http/sonarqube.com/jrestless/bugs.svg?maxAge=60&style=flat-square&label=SonarQube%20Bugs)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=BUG)
-[![SonarQube Vulnerabilities](https://img.shields.io/sonar/http/sonarqube.com/jrestless/vulnerabilities.svg?maxAge=60&style=flat-square&label=SonarQube%20Vulnerabilities)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=VULNERABILITY)
-[![SonarQube Tests](https://img.shields.io/sonar/http/sonarqube.com/jrestless/tests.svg?maxAge=60&style=flat-square&label=SonarQube%20Tests)](https://sonarqube.com/component_measures/metric/tests/list?id=jrestless)
-[![SonarQube Duplicated Blocks](https://img.shields.io/sonar/http/sonarqube.com/jrestless/duplicated_blocks.svg?maxAge=60&style=flat-square&label=SonarQube%20Duplicated%20Blocks)](https://sonarqube.com/component_measures/metric/duplicated_blocks/list?id=jrestless)
-[![SonarQube Technical Debt](https://img.shields.io/sonar/http/sonarqube.com/jrestless/tech_debt.svg?maxAge=60&style=flat-square&label=SonarQube Technical Debt)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|facetMode=effort|types=CODE_SMELL)
-[![SonarQube Code Smells](https://img.shields.io/sonar/http/sonarqube.com/jrestless/code_smells.svg?maxAge=60&style=flat-square&label=SonarQube%20Code%20Smells)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=CODE_SMELL)
+[![Coverage](https://img.shields.io/sonar/http/sonarqube.com/jrestless/coverage.svg?maxAge=60&style=flat-square&label=SonarQube%20Coverage)](https://sonarqube.com/component_measures/domain/Coverage?id=jrestless)
+[![Bugs](https://img.shields.io/sonar/http/sonarqube.com/jrestless/bugs.svg?maxAge=60&style=flat-square&label=SonarQube%20Bugs)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=BUG)
+[![Vulnerabilities](https://img.shields.io/sonar/http/sonarqube.com/jrestless/vulnerabilities.svg?maxAge=60&style=flat-square&label=SonarQube%20Vulnerabilities)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=VULNERABILITY)
+[![Tests](https://img.shields.io/sonar/http/sonarqube.com/jrestless/tests.svg?maxAge=60&style=flat-square&label=SonarQube%20Tests)](https://sonarqube.com/component_measures/metric/tests/list?id=jrestless)
+[![Duplicated Blocks](https://img.shields.io/sonar/http/sonarqube.com/jrestless/duplicated_blocks.svg?maxAge=60&style=flat-square&label=SonarQube%20Duplicated%20Blocks)](https://sonarqube.com/component_measures/metric/duplicated_blocks/list?id=jrestless)
+[![Technical Debt](https://img.shields.io/sonar/http/sonarqube.com/jrestless/tech_debt.svg?maxAge=60&style=flat-square&label=SonarQube Technical Debt)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|facetMode=effort|types=CODE_SMELL)
+[![Code Smells](https://img.shields.io/sonar/http/sonarqube.com/jrestless/code_smells.svg?maxAge=60&style=flat-square&label=SonarQube%20Code%20Smells)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=CODE_SMELL)
