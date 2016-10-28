@@ -252,7 +252,7 @@ All modules are available in jcenter.
   * currently no support for binary data in requests/responses (binary data gets encoded to base64, however, in JSON responses)
 * _Gateway functions_
   * AWS API Gateway has a timeout of 30 seconds
-  * Multiple headers with same name not supported
+  * Multiple headers with same name are not supported
 
 ## Release History
 * 0.3.0
