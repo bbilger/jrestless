@@ -48,7 +48,7 @@ Note: the framework is split up into multiple modules, so you choose which funct
 
 ## Usage Example
 
-All examples can be found in a separate repository: https://github.com/bbilger/jrestless-examples
+All examples, including the following one, can be found in a separate repository: https://github.com/bbilger/jrestless-examples
 
 ### AWS Usage Example
 
