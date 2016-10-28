@@ -19,7 +19,7 @@ JRestless allows you to create serverless (AWS Lambda) applications using JAX-RS
 * [Modules](#modules)
 * [Release History](#release-history)
 * [Alternative Projects](#alternative-projects)
-* Limitations
+* [Limitations](#limitations)
 * [Meta](#meta)
   * [License](#license)
   * [SonarQube Metrics](#sonarqube-metrics)
