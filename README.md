@@ -40,7 +40,7 @@ The motivation for this project is to avoid a cloud vendor lock-in and to allow 
 ## Features
 
 - Almost all JAX-RS features can be used (JSON/XML/text/... requests/responses, container request/response filters, etc.).
-- Jersey extensions can be use. For example integration for Spring (an example can be found here: https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-spring)
+- Jersey extensions can be used. For example integration for Spring (an example can be found here: https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-spring)
 - Injection of provider and/or function type specific values via `@javax.ws.rs.core.Context` into resources and endpoints:
   - All AWS functions can inject `com.amazonaws.services.lambda.runtime.Context`.
   - _AWS Gateway Functions_ can also inject the raw request [GatewayRequest](https://github.com/bbilger/jrestless/blob/master/aws/gateway/jrestless-aws-gateway-core/src/main/java/com/jrestless/aws/gateway/io/GatewayRequest.java) and the sub-request objects [GatewayRequestContext](https://github.com/bbilger/jrestless/blob/master/aws/gateway/jrestless-aws-gateway-core/src/main/java/com/jrestless/aws/gateway/io/GatewayRequestContext.java) and [GatewayIdentity](https://github.com/bbilger/jrestless/blob/master/aws/gateway/jrestless-aws-gateway-core/src/main/java/com/jrestless/aws/gateway/io/GatewayIdentity.java)
