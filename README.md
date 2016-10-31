@@ -13,6 +13,7 @@ JRestless allows you to create serverless (AWS Lambda) applications using JAX-RS
 
 * [Description](#description)
 * [Motivation](#motivation)
+* [Features](#features)
 * [Function Types](#function-types)
 * [Usage Example](#usage-example)
   * [AWS Usage Example](#aws-usage-example)
@@ -36,12 +37,22 @@ AWS Lambda is the only FaaS environment that supports Java at the moment and so 
 
 The motivation for this project is to avoid a cloud vendor lock-in and to allow developers to run and test their code locally.
 
+## Features
+
+- Almost all JAX-RS features can be used (JSON/XML/text/... requests/responses, container request/response filters, etc.).
+- Jersey extensions can be use. For example integration for Spring (an example can be found here: https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-spring)
+- Injection of provider and/or function type specific values via `@javax.ws.rs.core.Context` into resources and endpoints:
+  - All AWS functions can inject `com.amazonaws.services.lambda.runtime.Context`.
+  - _AWS Gateway Functions_ can also inject the raw request [GatewayRequest](https://github.com/bbilger/jrestless/blob/master/aws/gateway/jrestless-aws-gateway-core/src/main/java/com/jrestless/aws/gateway/io/GatewayRequest.java) and the sub-request objects [GatewayRequestContext](https://github.com/bbilger/jrestless/blob/master/aws/gateway/jrestless-aws-gateway-core/src/main/java/com/jrestless/aws/gateway/io/GatewayRequestContext.java) and [GatewayIdentity](https://github.com/bbilger/jrestless/blob/master/aws/gateway/jrestless-aws-gateway-core/src/main/java/com/jrestless/aws/gateway/io/GatewayIdentity.java)
+  - _AWS Service Functions_ can also inject the raw request [ServiceRequest](https://github.com/bbilger/jrestless/blob/master/aws/service/jrestless-aws-service-core/src/main/java/com/jrestless/aws/service/io/ServiceRequest.java)
+- It's worth mentioning that _AWS Gateway Functions_ is designed to be used with API Gateway's _proxy integration type_ for _Lambda Functions_. So there are no limitations on the status code, the headers and the body you return.
+
 ## Function Types
 
 ### AWS
 
-- _Gateway functions_ are AWS Lambda functions that get invoked by AWS API Gateway. [Read More...](aws/gateway/jrestless-aws-gateway-handler)
-- _Service functions_ are AWS Lambda functions that can either be invoked by other AWS Lambda functions or can be invoked directly through the AWS SDK. The point is that you don't use AWS API Gateway. You can abstract the fact that you invoke an AWS Lambda function away by using a special feign client ([jrestless-aws-service-feign-client](aws/service/jrestless-aws-service-feign-client)). [Read More...](aws/service/jrestless-aws-service-handler)
+- _Gateway Functions_ are AWS Lambda functions that get invoked by AWS API Gateway. [Read More...](aws/gateway/jrestless-aws-gateway-handler)
+- _Service Functions_ are AWS Lambda functions that can either be invoked by other AWS Lambda functions or can be invoked directly through the AWS SDK. The point is that you don't use AWS API Gateway. You can abstract the fact that you invoke an AWS Lambda function away by using a special feign client ([jrestless-aws-service-feign-client](aws/service/jrestless-aws-service-feign-client)). [Read More...](aws/service/jrestless-aws-service-handler)
 - _SNS functions_ are planned for the next release.
 
 Note: the framework is split up into multiple modules, so you choose which functionality you actually want to use. See [Modules](#modules)
@@ -54,7 +65,7 @@ All examples, including the following one, can be found in a separate repository
 
 JRestless does not depend on the [serverless framework](https://github.com/serverless/serverless) but it simplifies the necessary AWS configuration tremendously and will be used for this example.
 
-Install `serverless` as described in the docs https://serverless.com/framework/docs/guide/installing-serverless/
+Install `serverless` (>= 1.0.2) as described in the docs https://serverless.com/framework/docs/guide/installing-serverless/
 
 Setup your AWS account as described in the docs https://serverless.com/framework/docs/providers/aws/setup/
 
@@ -166,7 +177,9 @@ import com.jrestless.aws.gateway.handler.GatewayRequestObjectHandler;
 
 public class RequestHandler extends GatewayRequestObjectHandler {
   public RequestHandler() {
+    // initialize the container with your resource configuration
     init(new GatewayResourceConfig().packages("com.jrestless.aws.examples"));
+    // start the container
     start();
   }
 }
@@ -216,7 +229,7 @@ All modules are available in jcenter.
   * Contains interfaces used by [jrestless-aws-gateway-handler](aws/gateway/jrestless-aws-gateway-handler) and might be of interest for local development, as well.
   * [Read More...](aws/gateway/jrestless-aws-gateway-core)
 * **jrestless-aws-service-handler** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-handler/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-handler/_latestVersion)
-  * Provides an  AWS Lambda RequestHandler that delegates requests - in a HTTP format - to Jersey. This is intended but not limited to call one Lambda function from another.
+  * Provides an AWS Lambda RequestHandler that delegates requests - in an HTTP format - to Jersey. This is intended but not limited to call one Lambda function from another.
   * [Read More...](aws/service/jrestless-aws-service-handler)
 * **jrestless-aws-service-core** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-core/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-core/_latestVersion)
   * Contains interfaces and classes used by [jrestless-aws-service-handler](aws/service/jrestless-aws-service-handler), [jrestless-aws-service-feign-client](aws/service/jrestless-aws-service-feign-client) and might be of interest for local development, as well.
@@ -230,13 +243,13 @@ All modules are available in jcenter.
 * **jrestless-test** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-test/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-test/_latestVersion)
   * Provides common test functionality.
   * [Read More...](test/jrestless-test)
-  
+
 ## Alternative Projects
 
 ### AWS
 
 * Java
-  * [lambadaframework](https://github.com/lambadaframework/lambadaframework) provides similar functionality like JRestless. It implements some features of the JAX-RS standard and includes deployment functionility within the framework itself.
+  * [lambadaframework](https://github.com/lambadaframework/lambadaframework) provides similar functionality like JRestless. It implements some features of the JAX-RS standard and includes deployment functionality within the framework itself.
 * JavaScript
   * [aws-serverless-express](https://github.com/awslabs/aws-serverless-express) - run [express](https://github.com/expressjs/express) applications
 * Python
