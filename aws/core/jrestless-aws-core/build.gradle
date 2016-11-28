@@ -12,7 +12,3 @@ dependencies {
 		libraries.mockito_core
 	)
 }
-
-findbugs {
-	excludeFilter = file("$projectDir/config/findbugs/excludeFilter.xml")
-}

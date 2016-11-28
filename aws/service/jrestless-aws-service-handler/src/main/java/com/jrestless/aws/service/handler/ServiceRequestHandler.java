@@ -36,9 +36,9 @@ import org.glassfish.jersey.server.ContainerRequest;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.jrestless.aws.dpi.LambdaContextFactory;
 import com.jrestless.aws.service.dpi.ServiceRequestContextFactory;
+import com.jrestless.aws.service.io.DefaultServiceResponse;
 import com.jrestless.aws.service.io.ServiceRequest;
 import com.jrestless.aws.service.io.ServiceResponse;
-import com.jrestless.aws.service.io.ServiceResponseImpl;
 import com.jrestless.core.container.handler.SimpleRequestHandler;
 import com.jrestless.core.container.io.JRestlessContainerRequest;
 import com.jrestless.core.container.io.JRestlessContainerRequestImpl;
@@ -92,7 +92,7 @@ public abstract class ServiceRequestHandler
 
 	@Override
 	public ServiceResponse createInternalServerErrorResponse() {
-		return new ServiceResponseImpl(null, Collections.emptyMap(), Status.INTERNAL_SERVER_ERROR.getStatusCode(),
+		return new DefaultServiceResponse(null, Collections.emptyMap(), Status.INTERNAL_SERVER_ERROR.getStatusCode(),
 				Status.INTERNAL_SERVER_ERROR.getReasonPhrase());
 	}
 
@@ -112,7 +112,7 @@ public abstract class ServiceRequestHandler
 		public void writeResponse(StatusType statusType, Map<String, List<String>> headers,
 				OutputStream entityOutputStream) throws IOException {
 			String body = ((ByteArrayOutputStream) entityOutputStream).toString(StandardCharsets.UTF_8.name());
-			response = new ServiceResponseImpl(body, headers, statusType.getStatusCode(),
+			response = new DefaultServiceResponse(body, headers, statusType.getStatusCode(),
 					statusType.getReasonPhrase());
 		}
 

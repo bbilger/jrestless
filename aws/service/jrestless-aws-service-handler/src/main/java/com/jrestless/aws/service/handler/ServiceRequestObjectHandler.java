@@ -17,7 +17,7 @@ package com.jrestless.aws.service.handler;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.jrestless.aws.service.io.ServiceRequestImpl;
+import com.jrestless.aws.service.io.DefaultServiceRequest;
 import com.jrestless.aws.service.io.ServiceResponse;
 
 /**
@@ -31,10 +31,10 @@ import com.jrestless.aws.service.io.ServiceResponse;
  *
  */
 public abstract class ServiceRequestObjectHandler extends ServiceRequestHandler
-		implements RequestHandler<ServiceRequestImpl, ServiceResponse> {
+		implements RequestHandler<DefaultServiceRequest, ServiceResponse> {
 
 	@Override
-	public ServiceResponse handleRequest(ServiceRequestImpl request, Context lambdaContext) {
+	public ServiceResponse handleRequest(DefaultServiceRequest request, Context lambdaContext) {
 		return delegateRequest(new ServiceRequestAndLambdaContext(request, lambdaContext));
 	}
 }

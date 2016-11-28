@@ -16,8 +16,8 @@
 package com.jrestless.aws.service.client;
 
 import com.amazonaws.services.lambda.invoke.LambdaFunction;
+import com.jrestless.aws.service.io.DefaultServiceResponse;
 import com.jrestless.aws.service.io.ServiceRequest;
-import com.jrestless.aws.service.io.ServiceResponseImpl;
 
 /**
  * Lambda service interface required by
@@ -29,5 +29,5 @@ import com.jrestless.aws.service.io.ServiceResponseImpl;
  */
 interface LambdaInvokerService {
 	@LambdaFunction
-	ServiceResponseImpl execute(ServiceRequest request);
+	DefaultServiceResponse execute(ServiceRequest request);
 }

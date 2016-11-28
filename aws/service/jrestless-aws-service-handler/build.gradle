@@ -2,8 +2,8 @@ group = 'com.jrestless.aws'
 version = "${globaleModuleVersion}"
 
 dependencies {
-	compile project(':aws:service:jrestless-aws-service-core')
-	compile project(':aws:common:jrestless-aws-common-handler')
+	compile project(':aws:core:jrestless-aws-core')
+	compile project(':aws:core:jrestless-aws-core-handler')
 
 	testCompile project(':test:jrestless-test')
 	testCompile (

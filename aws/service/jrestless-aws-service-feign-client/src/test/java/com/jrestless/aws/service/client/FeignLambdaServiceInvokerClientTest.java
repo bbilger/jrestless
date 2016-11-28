@@ -17,11 +17,9 @@ import org.mockito.ArgumentMatcher;
 import com.amazonaws.services.lambda.AWSLambdaClient;
 import com.amazonaws.services.lambda.invoke.LambdaFunctionNameResolver;
 import com.amazonaws.services.lambda.invoke.LambdaInvokerFactory;
-import com.jrestless.aws.service.client.FeignLambdaServiceInvokerClient;
-import com.jrestless.aws.service.client.LambdaInvokerService;
+import com.jrestless.aws.service.io.DefaultServiceResponse;
 import com.jrestless.aws.service.io.ServiceRequest;
 import com.jrestless.aws.service.io.ServiceResponse;
-import com.jrestless.aws.service.io.ServiceResponseImpl;
 
 public class FeignLambdaServiceInvokerClientTest {
 
@@ -101,7 +99,7 @@ public class FeignLambdaServiceInvokerClientTest {
 	public void execute_RequestGiven_ShouldInvokeServiceReturnResponseAndNothingElse() {
 		FeignLambdaServiceInvokerClient invokerClient = init(lambdaClient, FUNCTION_NAME, null, null);
 		ServiceRequest request = mock(ServiceRequest.class);
-		ServiceResponseImpl expectedResponse = mock(ServiceResponseImpl.class);
+		DefaultServiceResponse expectedResponse = mock(DefaultServiceResponse.class);
 		feign.Request.Options requestOptions = mock(feign.Request.Options.class);
 		when(service.execute(request)).thenReturn(expectedResponse);
 		ServiceResponse actualResponse = invokerClient.execute(request, requestOptions);

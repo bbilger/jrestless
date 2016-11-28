@@ -1,12 +1,12 @@
 package com.jrestless.aws.service.io;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.Constructor;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,40 +17,40 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.testing.EqualsTester;
-import com.jrestless.aws.service.io.ServiceRequest;
-import com.jrestless.aws.service.io.ServiceRequestImpl;
+import com.jrestless.aws.service.io.ServiceResponse;
+import com.jrestless.aws.service.io.DefaultServiceResponse;
 import com.jrestless.test.ConstructorPreconditionsTester;
 import com.jrestless.test.CopyConstructorEqualsTester;
 
-public class ServiceRequestImplTest {
+public class DefaultServiceResponseTest {
 
 	@Test
 	public void testGetters() {
-		ServiceRequest req0 = new ServiceRequestImpl(null, ImmutableMap.of(), URI.create("/"), "GET");
-		assertEquals(null, req0.getBody());
-		assertEquals(ImmutableMap.of(), req0.getHeaders());
-		assertEquals(URI.create("/"), req0.getRequestUri());
-		assertEquals("GET", req0.getHttpMethod());
+		ServiceResponse resp0 = new DefaultServiceResponse(null, emptyMap(), 200, "a");
+		assertEquals(null, resp0.getBody());
+		assertEquals(ImmutableMap.of(), resp0.getHeaders());
+		assertEquals(200, resp0.getStatusCode());
+		assertEquals("a", resp0.getReasonPhrase());
 
-		Map<String, List<String>> headers = ImmutableMap.of("123", ImmutableList.of("1"));
-		ServiceRequest req1 = new ServiceRequestImpl("123", headers, URI.create("/1"), "POST");
-		assertEquals("123", req1.getBody());
-		assertEquals(headers, req1.getHeaders());
-		assertEquals(URI.create("/1"), req1.getRequestUri());
-		assertEquals("POST", req1.getHttpMethod());
+		Map<String, List<String>> headers = singletonMap("123", singletonList("1"));
+		ServiceResponse resp1 = new DefaultServiceResponse("123", headers, 500, "b");
+		assertEquals("123", resp1.getBody());
+		assertEquals(headers, resp1.getHeaders());
+		assertEquals(500, resp1.getStatusCode());
+		assertEquals("b", resp1.getReasonPhrase());
 
-		ServiceRequest req2 = new ServiceRequestImpl();
-		assertEquals(null, req2.getBody());
-		assertEquals(null, req2.getHeaders());
-		assertEquals(null, req2.getRequestUri());
-		assertEquals(null, req2.getHttpMethod());
+		ServiceResponse resp2 = new DefaultServiceResponse();
+		assertEquals(null, resp2.getBody());
+		assertEquals(null, resp2.getHeaders());
+		assertEquals(0, resp2.getStatusCode());
+		assertEquals(null, resp2.getReasonPhrase());
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void testHeaderMapImmutability() {
 		Map<String, List<String>> headers = new HashMap<>();
 		headers.put("0", emptyList());
-		ServiceRequest req = new ServiceRequestImpl(null, headers, URI.create("/"), "GET");
+		ServiceResponse req = new DefaultServiceResponse(null, headers, 0, null);
 		Map<String, List<String>> requestHeaders = req.getHeaders();
 		requestHeaders.put("0", emptyList());
 	}
@@ -60,7 +60,7 @@ public class ServiceRequestImplTest {
 		Map<String, List<String>> headers = new HashMap<>();
 		List<String> headerValues = new ArrayList<>();
 		headers.put("0", headerValues);
-		ServiceRequest req = new ServiceRequestImpl(null, headers, URI.create("/"), "GET");
+		ServiceResponse req = new DefaultServiceResponse(null, headers, 0, null);
 		Map<String, List<String>> requestHeaders = req.getHeaders();
 		requestHeaders.get("0").add("1");
 	}
@@ -69,7 +69,7 @@ public class ServiceRequestImplTest {
 	public void testHeaderMapCopied() {
 		Map<String, List<String>> headers = new HashMap<>();
 		headers.put("0", emptyList());
-		ServiceRequest req = new ServiceRequestImpl(null, headers, URI.create("/"), "GET");
+		ServiceResponse req = new DefaultServiceResponse(null, headers, 0, null);
 		headers.put("1", emptyList());
 		assertEquals(1, req.getHeaders().size());
 	}
@@ -80,7 +80,7 @@ public class ServiceRequestImplTest {
 		List<String> headerValues = new ArrayList<>();
 		headerValues.add("0");
 		headers.put("0", headerValues);
-		ServiceRequest req = new ServiceRequestImpl(null, headers, URI.create("/"), "GET");
+		ServiceResponse req = new DefaultServiceResponse(null, headers, 0, null);
 		headerValues.add("1");
 		assertEquals(1, req.getHeaders().get("0").size());
 	}
@@ -92,10 +92,10 @@ public class ServiceRequestImplTest {
 			.addArguments(0, null, "", "123")
 			// headers
 			.addArguments(1, ImmutableMap.of(), ImmutableMap.of("123", ImmutableList.of()), ImmutableMap.of("123", ImmutableList.of("1")))
-			// requestUri
-			.addArguments(2, URI.create("/"), URI.create("/a"))
-			// httpMethod
-			.addArguments(3, "GET", "POST")
+			// statusCode
+			.addArguments(2, 200, 400)
+			// reasonPhrase
+			.addArguments(3, null, "a", "b")
 			.testEquals();
 	}
 
@@ -119,18 +119,18 @@ public class ServiceRequestImplTest {
 		Map<String, List<String>> headers2 = new HashMap<>();
 		headers2.put("1", emptyList());
 
-		ServiceRequest req00 = new ServiceRequestImpl(null, invalidHeaders00, URI.create("/"), "GET");
-		ServiceRequest req01 = new ServiceRequestImpl(null, invalidHeaders01, URI.create("/"), "GET");
-		ServiceRequest req02 = new ServiceRequestImpl(null, headers0, URI.create("/"), "GET");
+		ServiceResponse resp00 = new DefaultServiceResponse(null, invalidHeaders00, 200, null);
+		ServiceResponse resp01 = new DefaultServiceResponse(null, invalidHeaders01, 200, null);
+		ServiceResponse resp02 = new DefaultServiceResponse(null, headers0, 200, null);
 
-		ServiceRequest req10 = new ServiceRequestImpl(null, headers1, URI.create("/"), "GET");
+		ServiceResponse resp10 = new DefaultServiceResponse(null, headers1, 200, null);
 
-		ServiceRequest req20 = new ServiceRequestImpl(null, headers2, URI.create("/"), "GET");
+		ServiceResponse resp20 = new DefaultServiceResponse(null, headers2, 200, null);
 
 		equalTester
-			.addEqualityGroup(req00, req01, req02)
-			.addEqualityGroup(req10)
-			.addEqualityGroup(req20)
+			.addEqualityGroup(resp00, resp01, resp02)
+			.addEqualityGroup(resp10)
+			.addEqualityGroup(resp20)
 			.testEquals();
 	}
 
@@ -147,18 +147,16 @@ public class ServiceRequestImplTest {
 			// headers
 			.addValidArgs(1, ImmutableMap.of(), nullHeader, nullHeaderValue, headers)
 			.addInvalidNpeArg(1)
-			// requestUri
-			.addValidArgs(2, URI.create("/"))
-			.addInvalidNpeArg(2)
-			// httpMethod
-			.addValidArgs(3, "GET")
-			.addInvalidNpeArg(3)
+			// statusCode
+			.addValidArgs(2, 500)
+			// reasonPhrase
+			.addValidArgs(3, null, "a")
 			.testPreconditionsAndValidCombinations();
 	}
 
-	private Constructor<ServiceRequestImpl> getConstructor() {
+	private Constructor<DefaultServiceResponse> getConstructor() {
 		try {
-			return ServiceRequestImpl.class.getConstructor(String.class, Map.class, URI.class, String.class);
+			return DefaultServiceResponse.class.getConstructor(String.class, Map.class, int.class, String.class);
 		} catch (NoSuchMethodException | SecurityException e) {
 			throw new RuntimeException(e);
 		}

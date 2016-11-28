@@ -1,2 +1,0 @@
-group = 'com.jrestless.aws'
-version = "${globaleModuleVersion}"

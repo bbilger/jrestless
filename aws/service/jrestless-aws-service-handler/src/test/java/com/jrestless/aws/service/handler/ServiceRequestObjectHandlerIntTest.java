@@ -38,10 +38,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.jrestless.aws.service.ServiceResourceConfig;
+import com.jrestless.aws.service.io.DefaultServiceRequest;
+import com.jrestless.aws.service.io.DefaultServiceResponse;
 import com.jrestless.aws.service.io.ServiceRequest;
-import com.jrestless.aws.service.io.ServiceRequestImpl;
 import com.jrestless.aws.service.io.ServiceResponse;
-import com.jrestless.aws.service.io.ServiceResponseImpl;
 import com.jrestless.core.container.dpi.InstanceBinder;
 
 public class ServiceRequestObjectHandlerIntTest {
@@ -64,7 +64,7 @@ public class ServiceRequestObjectHandlerIntTest {
 
 	@Test
 	public void testLambdaContextInjection() {
-		ServiceRequestImpl request = new ServiceRequestImpl(null, new HashMap<>(), URI.create("/"), "DELETE");
+		DefaultServiceRequest request = new DefaultServiceRequest(null, new HashMap<>(), URI.create("/"), "DELETE");
 		handler.handleRequest(request, context);
 		verify(testService).injectLambdaContext(context);
 	}
@@ -73,7 +73,7 @@ public class ServiceRequestObjectHandlerIntTest {
 	public void testLambdaContextMemberInjection() {
 		when(context.getAwsRequestId()).thenReturn("0", "1");
 		for (int i = 0; i <= 1; i++) {
-			ServiceRequestImpl request = new ServiceRequestImpl(null, new HashMap<>(), URI.create("/inject-lambda-context-member" + i), "GET");
+			DefaultServiceRequest request = new DefaultServiceRequest(null, new HashMap<>(), URI.create("/inject-lambda-context-member" + i), "GET");
 			handler.handleRequest(request, context);
 			verify(testService).injectedStringArg("" + i);
 		}
@@ -81,27 +81,27 @@ public class ServiceRequestObjectHandlerIntTest {
 
 	@Test
 	public void testServiceRequestInjection() {
-		ServiceRequestImpl request = new ServiceRequestImpl(null, new HashMap<>(), URI.create("/inject-service-request"), "PUT");
+		DefaultServiceRequest request = new DefaultServiceRequest(null, new HashMap<>(), URI.create("/inject-service-request"), "PUT");
 		handler.handleRequest(request, context);
 		verify(testService).injectServiceRequest(same(request));
 	}
 
 	@Test
 	public void testServiceRequestInjectionAsMember() {
-		ServiceRequestImpl request0 = new ServiceRequestImpl(null, new HashMap<>(), URI.create("/inject-service-request-member0"), "GET");
+		DefaultServiceRequest request0 = new DefaultServiceRequest(null, new HashMap<>(), URI.create("/inject-service-request-member0"), "GET");
 		handler.handleRequest(request0, context);
 		verify(testService).injectedStringArg("/inject-service-request-member0");
-		ServiceRequestImpl request1 = new ServiceRequestImpl(null, new HashMap<>(), URI.create("/inject-service-request-member1"), "GET");
+		DefaultServiceRequest request1 = new DefaultServiceRequest(null, new HashMap<>(), URI.create("/inject-service-request-member1"), "GET");
 		handler.handleRequest(request1, context);
 		verify(testService).injectedStringArg("/inject-service-request-member1");
 	}
 
 	@Test
 	public void testContainerFailureCreates500() {
-		ServiceRequestImpl request = new ServiceRequestImpl(null, new HashMap<>(), URI.create("/"), "DELETE");
+		DefaultServiceRequest request = new DefaultServiceRequest(null, new HashMap<>(), URI.create("/"), "DELETE");
 		doThrow(new RuntimeException()).when(handler).createContainerRequest(any());
 		ServiceResponse response = handler.handleRequest(request, context);
-		assertEquals(new ServiceResponseImpl(null, new HashMap<>(), 500, "Internal Server Error"), response);
+		assertEquals(new DefaultServiceResponse(null, new HashMap<>(), 500, "Internal Server Error"), response);
 	}
 
 	@Test
@@ -111,11 +111,11 @@ public class ServiceRequestObjectHandlerIntTest {
 		Map<String, List<String>> requestHeaders = ImmutableMap.of(HttpHeaders.ACCEPT, jsonMediaType,
 				HttpHeaders.CONTENT_TYPE, jsonMediaType);
 		String requestBody = mapper.writeValueAsString(new Entity("123"));
-		ServiceRequestImpl request = new ServiceRequestImpl(requestBody, requestHeaders, URI.create("/simple"), "POST");
+		DefaultServiceRequest request = new DefaultServiceRequest(requestBody, requestHeaders, URI.create("/simple"), "POST");
 		ServiceResponse response = handler.handleRequest(request, context);
 		Map<String, List<String>> responseHeaders = ImmutableMap.of(HttpHeaders.CONTENT_TYPE, jsonMediaType);
 		String responseBody = mapper.writeValueAsString(new Entity("123"));
-		assertEquals(new ServiceResponseImpl(responseBody, responseHeaders, 200, "OK"), response);
+		assertEquals(new DefaultServiceResponse(responseBody, responseHeaders, 200, "OK"), response);
 	}
 
 	@Path("/")

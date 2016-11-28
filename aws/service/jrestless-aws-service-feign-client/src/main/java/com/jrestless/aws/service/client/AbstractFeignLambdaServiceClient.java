@@ -23,8 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.jrestless.aws.service.io.DefaultServiceRequest;
 import com.jrestless.aws.service.io.ServiceRequest;
-import com.jrestless.aws.service.io.ServiceRequestImpl;
 import com.jrestless.aws.service.io.ServiceResponse;
 
 import feign.Client;
@@ -49,7 +49,7 @@ public abstract class AbstractFeignLambdaServiceClient implements Client {
 	}
 
 	private static ServiceRequest toServiceRequest(feign.Request feignRequest) {
-		return new ServiceRequestImpl(toServiceBody(feignRequest.body()), toServiceHeaders(feignRequest.headers()),
+		return new DefaultServiceRequest(toServiceBody(feignRequest.body()), toServiceHeaders(feignRequest.headers()),
 				URI.create(feignRequest.url()), feignRequest.method());
 	}
 

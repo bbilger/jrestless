@@ -29,9 +29,9 @@ import org.mockito.ArgumentCaptor;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.jrestless.aws.service.io.DefaultServiceRequest;
+import com.jrestless.aws.service.io.DefaultServiceResponse;
 import com.jrestless.aws.service.io.ServiceRequest;
-import com.jrestless.aws.service.io.ServiceRequestImpl;
-import com.jrestless.aws.service.io.ServiceResponseImpl;
 import com.jrestless.core.container.JRestlessHandlerContainer;
 import com.jrestless.core.container.handler.SimpleRequestHandler.SimpleResponseWriter;
 import com.jrestless.core.container.io.JRestlessContainerRequest;
@@ -55,10 +55,10 @@ public class ServiceRequestHandlerTest {
 	@Test
 	public void delegateRequest_ValidRequestGiven_ShouldRegisterContextsOnRequest() {
 		Context context = mock(Context.class);
-		ServiceRequestImpl request = new ServiceRequestImpl(null, new HashMap<>(), URI.create("/"), "GET");
+		DefaultServiceRequest request = new DefaultServiceRequest(null, new HashMap<>(), URI.create("/"), "GET");
 		ServiceRequestAndLambdaContext reqAndContext = new ServiceRequestAndLambdaContext(request, context);
-		ServiceResponseImpl response = new ServiceResponseImpl("testBody", new HashMap<>(), 200, "");
-		SimpleResponseWriter<ServiceResponseImpl> responseWriter = mock(SimpleResponseWriter.class);
+		DefaultServiceResponse response = new DefaultServiceResponse("testBody", new HashMap<>(), 200, "");
+		SimpleResponseWriter<DefaultServiceResponse> responseWriter = mock(SimpleResponseWriter.class);
 		when(responseWriter.getResponse()).thenReturn(response);
 		doReturn(responseWriter).when(gatewayHandler).createResponseWriter();
 		ArgumentCaptor<Consumer> containerEnhancerCapure = ArgumentCaptor.forClass(Consumer.class);
@@ -83,7 +83,7 @@ public class ServiceRequestHandlerTest {
 	@Test
 	public void createContainerRequest_BodyGiven_ShouldUseBody() {
 		ServiceRequestAndLambdaContext request = createMinimalRequest();
-		((ServiceRequestImpl) request.getServiceRequest()).setBody("abc");
+		((DefaultServiceRequest) request.getServiceRequest()).setBody("abc");
 		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
 		InputStream is = containerRequest.getEntityStream();
 		assertEquals(ByteArrayInputStream.class, is.getClass());
@@ -93,7 +93,7 @@ public class ServiceRequestHandlerTest {
 	@Test
 	public void createContainerRequest_HttpMethodGiven_ShouldUseHttpMethod() {
 		ServiceRequestAndLambdaContext request = createMinimalRequest();
-		((ServiceRequestImpl) request.getServiceRequest()).setHttpMethod("X");
+		((DefaultServiceRequest) request.getServiceRequest()).setHttpMethod("X");
 		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
 		assertEquals("X", containerRequest.getHttpMethod());
 	}
@@ -101,7 +101,7 @@ public class ServiceRequestHandlerTest {
 	@Test
 	public void createContainerRequest_PathGiven_ShouldUsePath() {
 		ServiceRequestAndLambdaContext request = createMinimalRequest();
-		((ServiceRequestImpl) request.getServiceRequest()).setRequestUri(URI.create("/a?b=c&d=e"));
+		((DefaultServiceRequest) request.getServiceRequest()).setRequestUri(URI.create("/a?b=c&d=e"));
 		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
 		assertEquals(URI.create("/a?b=c&d=e"), containerRequest.getRequestUri());
 	}
@@ -110,13 +110,13 @@ public class ServiceRequestHandlerTest {
 	public void createContainerRequest_HeadersGiven_ShouldUseHeaders() {
 		ServiceRequestAndLambdaContext request = createMinimalRequest();
 		Map<String, List<String>> headers = ImmutableMap.of("0", emptyList(), "1", singletonList("a"), "2", ImmutableList.of("b", "c"));
-		((ServiceRequestImpl) request.getServiceRequest()).setHeaders(headers);
+		((DefaultServiceRequest) request.getServiceRequest()).setHeaders(headers);
 		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
 		assertEquals(headers, containerRequest.getHeaders());
 	}
 
 	private ServiceRequestAndLambdaContext createMinimalRequest() {
-		ServiceRequest request = new ServiceRequestImpl(null, new HashMap<>(), URI.create("/"), "GET");
+		ServiceRequest request = new DefaultServiceRequest(null, new HashMap<>(), URI.create("/"), "GET");
 		return new ServiceRequestAndLambdaContext(request, null);
 	}
 

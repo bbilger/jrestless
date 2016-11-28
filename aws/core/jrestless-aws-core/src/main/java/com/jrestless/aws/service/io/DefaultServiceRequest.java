@@ -17,6 +17,7 @@ package com.jrestless.aws.service.io;
 
 import static java.util.Objects.requireNonNull;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,34 +29,41 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- *
- * Note: this object is mutable for de-serialization frameworks, only.
- *
- * @see ServiceResponse ServiceResponse
- *
- * @author Bjoern Bilger
- */
-public final class ServiceResponseImpl implements ServiceResponse {
+*
+* Note: this object is mutable for de-serialization frameworks, only.
+*
+* @see ServiceRequest ServiceRequest
+*
+* @author Bjoern Bilger
+*/
+public final class DefaultServiceRequest implements ServiceRequest {
 	private String body;
 	private Map<String, List<String>> headers;
-	private int statusCode;
-	private String reasonPhrase;
+	private URI requestUri;
+	private String httpMethod;
 
 	/**
 	 * For de-serialization frameworks, only.
 	 */
-	public ServiceResponseImpl() {
+	public DefaultServiceRequest() {
 		// for de-serialization
 	}
 
-	public ServiceResponseImpl(@Nullable String body, @Nonnull Map<String, List<String>> headers, int statusCode,
-			@Nullable String reasonPhrase) {
+	public DefaultServiceRequest(@Nullable String body, @Nonnull Map<String, List<String>> headers,
+			@Nonnull URI requestUri, @Nonnull String httpMethod) {
 		setBody(body);
 		setHeaders(headers);
-		setStatusCode(statusCode);
-		setReasonPhrase(reasonPhrase);
+		setRequestUri(requestUri);
+		setHttpMethod(httpMethod);
 	}
 
+	/**
+	 * Returns the body.
+	 * <p>
+	 * Note: null is a possible and valid value.
+	 *
+	 * @return the body
+	 */
 	@Override
 	public String getBody() {
 		// we don't copy the value for performance reasons
@@ -66,14 +74,22 @@ public final class ServiceResponseImpl implements ServiceResponse {
 	 * For de-serialization frameworks, only.
 	 */
 	public void setBody(@Nullable String body) {
-		// we don't copy the value for performance reasons
 		this.body = body;
 	}
 
+	/**
+	 * Returns the headers.
+	 * <p>
+	 * Note: it's possible that null is returned but this indicates an incorrect
+	 * initialization.
+	 *
+	 * @return the headers (immutable)
+	 */
 	@Override
 	public Map<String, List<String>> getHeaders() {
-		return headers;
+		return (headers == null) ? null : Collections.unmodifiableMap(headers);
 	}
+
 
 	/**
 	 * For de-serialization frameworks, only.
@@ -81,41 +97,59 @@ public final class ServiceResponseImpl implements ServiceResponse {
 	public void setHeaders(@Nonnull Map<String, List<String>> headers) {
 		requireNonNull(headers);
 		this.headers = headers.entrySet().stream()
-			.filter(e -> e.getKey() != null)
-			.filter(e -> e.getValue() != null)
-			.collect(Collectors.collectingAndThen(
-					Collectors.toMap(
-							Map.Entry::getKey,
-							ServiceResponseImpl::copyList),
-					Collections::unmodifiableMap));
+				.filter(e -> e.getKey() != null)
+				.filter(e -> e.getValue() != null)
+				.collect(Collectors.collectingAndThen(
+						Collectors.toMap(
+								Map.Entry::getKey,
+								DefaultServiceRequest::copyList),
+						Collections::unmodifiableMap));
 	}
 
 	private static List<String> copyList(Map.Entry<String, List<String>> header) {
 		return Collections.unmodifiableList(new ArrayList<>(header.getValue()));
 	}
 
+	/**
+	 * Returns the request URI.
+	 * <p>
+	 * Note: it's possible that null is returned but this indicates an incorrect
+	 * initialization.
+	 *
+	 * @return the request URI
+	 */
 	@Override
-	public int getStatusCode() {
-		return statusCode;
+	public URI getRequestUri() {
+		return requestUri;
 	}
 
 	/**
 	 * For de-serialization frameworks, only.
 	 */
-	public void setStatusCode(int statusCode) {
-		this.statusCode = statusCode;
+	public void setRequestUri(@Nonnull URI requestUri) {
+		requireNonNull(requestUri);
+		this.requestUri = requestUri;
 	}
 
+	/**
+	 * Returns the HTTP method.
+	 * <p>
+	 * Note: it's possible that null is returned but this indicates an incorrect
+	 * initialization.
+	 *
+	 * @return the HTTP method
+	 */
 	@Override
-	public String getReasonPhrase() {
-		return reasonPhrase;
+	public String getHttpMethod() {
+		return httpMethod;
 	}
 
 	/**
 	 * For de-serialization frameworks, only.
 	 */
-	public void setReasonPhrase(@Nullable String reasonPhrase) {
-		this.reasonPhrase = reasonPhrase;
+	public void setHttpMethod(@Nonnull String httpMethod) {
+		requireNonNull(httpMethod);
+		this.httpMethod = httpMethod;
 	}
 
 	@Override
@@ -129,20 +163,19 @@ public final class ServiceResponseImpl implements ServiceResponse {
 		if (!getClass().equals(other.getClass())) {
 			return false;
 		}
-		ServiceResponseImpl castOther = (ServiceResponseImpl) other;
+		DefaultServiceRequest castOther = (DefaultServiceRequest) other;
 		return Objects.equals(body, castOther.body) && Objects.equals(headers, castOther.headers)
-				&& Objects.equals(statusCode, castOther.statusCode)
-				&& Objects.equals(reasonPhrase, castOther.reasonPhrase);
+				&& Objects.equals(requestUri, castOther.requestUri) && Objects.equals(httpMethod, castOther.httpMethod);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(body, headers, statusCode, reasonPhrase);
+		return Objects.hash(body, headers, requestUri, httpMethod);
 	}
 
 	@Override
 	public String toString() {
-		return "ServiceResponseImpl [body=" + body + ", headers=" + headers + ", statusCode="
-				+ statusCode + ", reasonPhrase=" + reasonPhrase + "]";
+		return "ServiceRequestImpl [body=" + body + ", headers=" + headers + ", requestUri=" + requestUri
+				+ ", httpMethod=" + httpMethod + "]";
 	}
 }
