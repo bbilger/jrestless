@@ -53,7 +53,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.jrestless.aws.gateway.GatewayResourceConfig;
 import com.jrestless.aws.gateway.io.GatewayIdentity;
-import com.jrestless.aws.gateway.io.GatewayIdentityImpl;
 import com.jrestless.aws.gateway.io.GatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayRequestContext;
 import com.jrestless.aws.gateway.io.GatewayRequestContextImpl;
@@ -122,30 +121,6 @@ public class GatewayRequestObjectHandlerIntTest {
 		String path1 = "/inject-gateway-request-member1";
 		request1.setPath(path1);
 		testProxy(request0, request1, path0, path1);
-	}
-
-	@Test
-	public void testGatewayRequestContextInjection() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
-		GatewayRequestContextImpl requestContext = new GatewayRequestContextImpl();
-		request.setRequestContext(requestContext);
-		request.setHttpMethod("PUT");
-		request.setPath("/inject-gateway-request-context");
-		handler.handleRequest(request, context);
-		verify(testService).injectGatewayRequestContext(same(requestContext));
-	}
-
-	@Test
-	public void testGatewayRequestIdentityInjection() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
-		GatewayRequestContextImpl requestContext = new GatewayRequestContextImpl();
-		GatewayIdentityImpl identity = new GatewayIdentityImpl();
-		requestContext.setIdentity(identity);
-		request.setRequestContext(requestContext);
-		request.setHttpMethod("PUT");
-		request.setPath("/inject-gateway-identity");
-		handler.handleRequest(request, context);
-		verify(testService).injectGatewayIdentity(same(identity));
 	}
 
 	@Test
@@ -236,20 +211,6 @@ public class GatewayRequestObjectHandlerIntTest {
 		@GET
 		public Response injectGatewayRequestAsMember1() {
 			service.injectedStringArg(gatewayRequestMember.getPath());
-			return Response.ok().build();
-		}
-
-		@Path("/inject-gateway-request-context")
-		@PUT
-		public Response injectGatewayRequestContext(@javax.ws.rs.core.Context GatewayRequestContext requestContext) {
-			service.injectGatewayRequestContext(requestContext);
-			return Response.ok().build();
-		}
-
-		@Path("/inject-gateway-identity")
-		@PUT
-		public Response injectGatewayRequestContext(@javax.ws.rs.core.Context GatewayIdentity identity) {
-			service.injectGatewayIdentity(identity);
 			return Response.ok().build();
 		}
 

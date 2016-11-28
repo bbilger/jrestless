@@ -6,12 +6,8 @@ import javax.ws.rs.core.FeatureContext;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 
-import com.jrestless.aws.gateway.dpi.GatewayIdentityContextFactory;
-import com.jrestless.aws.gateway.dpi.GatewayRequestContextContextFactory;
 import com.jrestless.aws.gateway.dpi.GatewayRequestContextFactory;
-import com.jrestless.aws.gateway.io.GatewayIdentity;
 import com.jrestless.aws.gateway.io.GatewayRequest;
-import com.jrestless.aws.gateway.io.GatewayRequestContext;
 
 /**
  * Binds Gateway specific values.
@@ -31,23 +27,7 @@ import com.jrestless.aws.gateway.io.GatewayRequestContext;
  * <td>{@link GatewayRequestContextFactory}
  * </tr>
  *
- * <tr>
- * <td>{@link GatewayRequestContext}
- * <td>false
- * <td>request
- * <td>{@link GatewayRequestContextContextFactory}
- * </tr>
- *
- * <tr>
- * <td>{@link GatewayIdentity}
- * <td>false
- * <td>request
- * <td>{@link GatewayIdentityContextFactory}
- * </tr>
  * </table>
- *
- * Note: GatewayRequestContext and GatewayIdentity are not proxiable since they are
- * not necessarily available for each request.
  *
  * @author Bjoern Bilger
  *
@@ -62,14 +42,6 @@ public class GatewayFeature implements Feature {
 					.to(GatewayRequest.class)
 					.proxy(true)
 					.proxyForSameScope(false)
-					.in(RequestScoped.class);
-				bindFactory(GatewayRequestContextContextFactory.class)
-					.to(GatewayRequestContext.class)
-					.proxy(false)
-					.in(RequestScoped.class);
-				bindFactory(GatewayIdentityContextFactory.class)
-					.to(GatewayIdentity.class)
-					.proxy(false)
 					.in(RequestScoped.class);
 			}
 		});
