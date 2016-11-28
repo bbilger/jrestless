@@ -15,20 +15,17 @@
  */
 package com.jrestless.aws.service;
 
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
-import com.amazonaws.services.lambda.runtime.Context;
-import com.jrestless.aws.service.dpi.LambdaContextFactory;
-import com.jrestless.aws.service.dpi.ServiceRequestContextFactory;
-import com.jrestless.aws.service.io.ServiceRequest;
+import com.jrestless.aws.AwsFeature;
 
 /**
  * Jersey application configuration with jrestless AWS service specifics.
  * <ol>
- * <li>{@link LambdaContextFactory}
- * <li>{@link ServiceRequestContextFactory}
+ * <li>{@link AwsFeature}
+ * <li>{@link ServiceFeature}
+ * <li>{@link RolesAllowedDynamicFeature}
  * </ol>
  *
  * @author Bjoern Bilger
@@ -37,21 +34,8 @@ import com.jrestless.aws.service.io.ServiceRequest;
 public class ServiceResourceConfig extends ResourceConfig {
 
 	public ServiceResourceConfig() {
-		register(new AbstractBinder() {
-			@Override
-			protected void configure() {
-				bindFactory(LambdaContextFactory.class)
-					.to(Context.class)
-					.in(RequestScoped.class);
-			}
-		});
-		register(new AbstractBinder() {
-			@Override
-			protected void configure() {
-				bindFactory(ServiceRequestContextFactory.class)
-					.to(ServiceRequest.class)
-					.in(RequestScoped.class);
-			}
-		});
+		register(AwsFeature.class);
+		register(ServiceFeature.class);
+		register(RolesAllowedDynamicFeature.class);
 	}
 }

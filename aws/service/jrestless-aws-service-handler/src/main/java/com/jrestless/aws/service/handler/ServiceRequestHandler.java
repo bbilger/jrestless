@@ -34,7 +34,7 @@ import javax.ws.rs.core.Response.StatusType;
 import org.glassfish.jersey.server.ContainerRequest;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.jrestless.aws.service.dpi.LambdaContextFactory;
+import com.jrestless.aws.dpi.LambdaContextFactory;
 import com.jrestless.aws.service.dpi.ServiceRequestContextFactory;
 import com.jrestless.aws.service.io.ServiceRequest;
 import com.jrestless.aws.service.io.ServiceResponse;

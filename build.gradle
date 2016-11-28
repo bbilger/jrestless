@@ -48,8 +48,10 @@ subprojects {
 	}
 	
 	ext.libraries = [
-		jersey_containers_project: 'org.glassfish.jersey.containers:project:2.23.2',
-		jersey_media_json_jackson: 'org.glassfish.jersey.media:jersey-media-json-jackson:2.23.2',
+		jersey_containers_project: 'org.glassfish.jersey.containers:project:2.24.1',
+		jersey_media_json_jackson: 'org.glassfish.jersey.media:jersey-media-json-jackson:2.24.1',
+		jersey_test_grizzly: 'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:2.24.1',
+		jersey_test_core: 'org.glassfish.jersey.test-framework:jersey-test-framework-core:2.24.1',
 		findbugs_jsr305: 'com.google.code.findbugs:jsr305:3.0.1',
 		aws_lambda_core: 'com.amazonaws:aws-lambda-java-core:1.1.0',
 		slf4j_api: 'org.slf4j:slf4j-api:1.7.21',
@@ -158,6 +160,7 @@ subprojects {
 
 dependencies {
 	compile project(":core:jrestless-core-container")
+	compile project(":aws:common:jrestless-aws-common-handler")
 	compile project(":aws:gateway:jrestless-aws-gateway-core")
 	compile project(":aws:gateway:jrestless-aws-gateway-handler")
 	compile project(":aws:service:jrestless-aws-service-core")

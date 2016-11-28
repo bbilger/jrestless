@@ -3,10 +3,7 @@ version = "${globaleModuleVersion}"
 
 dependencies {
 	compile project(':aws:service:jrestless-aws-service-core')
-	compile project(':core:jrestless-core-container')
-	compile(
-		libraries.aws_lambda_core
-	)
+	compile project(':aws:common:jrestless-aws-common-handler')
 
 	testCompile project(':test:jrestless-test')
 	testCompile (

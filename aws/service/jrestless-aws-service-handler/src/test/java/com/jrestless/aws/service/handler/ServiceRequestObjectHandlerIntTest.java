@@ -7,6 +7,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.net.URI;
 import java.util.Collections;
@@ -17,6 +18,7 @@ import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -68,10 +70,30 @@ public class ServiceRequestObjectHandlerIntTest {
 	}
 
 	@Test
+	public void testLambdaContextMemberInjection() {
+		when(context.getAwsRequestId()).thenReturn("0", "1");
+		for (int i = 0; i <= 1; i++) {
+			ServiceRequestImpl request = new ServiceRequestImpl(null, new HashMap<>(), URI.create("/inject-lambda-context-member" + i), "GET");
+			handler.handleRequest(request, context);
+			verify(testService).injectedStringArg("" + i);
+		}
+	}
+
+	@Test
 	public void testServiceRequestInjection() {
 		ServiceRequestImpl request = new ServiceRequestImpl(null, new HashMap<>(), URI.create("/inject-service-request"), "PUT");
 		handler.handleRequest(request, context);
 		verify(testService).injectServiceRequest(same(request));
+	}
+
+	@Test
+	public void testServiceRequestInjectionAsMember() {
+		ServiceRequestImpl request0 = new ServiceRequestImpl(null, new HashMap<>(), URI.create("/inject-service-request-member0"), "GET");
+		handler.handleRequest(request0, context);
+		verify(testService).injectedStringArg("/inject-service-request-member0");
+		ServiceRequestImpl request1 = new ServiceRequestImpl(null, new HashMap<>(), URI.create("/inject-service-request-member1"), "GET");
+		handler.handleRequest(request1, context);
+		verify(testService).injectedStringArg("/inject-service-request-member1");
 	}
 
 	@Test
@@ -99,6 +121,12 @@ public class ServiceRequestObjectHandlerIntTest {
 	@Path("/")
 	public static class TestResource {
 
+		@javax.ws.rs.core.Context
+		private Context lambdaContextMember;
+
+		@javax.ws.rs.core.Context
+		private ServiceRequest serviceRequestMember;
+
 		private TestService service;
 
 		@Inject
@@ -112,10 +140,38 @@ public class ServiceRequestObjectHandlerIntTest {
 			return Response.ok().build();
 		}
 
+		@Path("/inject-lambda-context-member0")
+		@GET
+		public Response injectLambdaContextAsMember0() {
+			service.injectedStringArg(lambdaContextMember.getAwsRequestId());
+			return Response.ok().build();
+		}
+
+		@Path("/inject-lambda-context-member1")
+		@GET
+		public Response injectLambdaContextAsMember1() {
+			service.injectedStringArg(lambdaContextMember.getAwsRequestId());
+			return Response.ok().build();
+		}
+
 		@Path("/inject-service-request")
 		@PUT
 		public Response injectServiceRequest(@javax.ws.rs.core.Context ServiceRequest request) {
 			service.injectServiceRequest(request);
+			return Response.ok().build();
+		}
+
+		@Path("/inject-service-request-member0")
+		@GET
+		public Response injectServiceRequestAsMember0() {
+			service.injectedStringArg(serviceRequestMember.getRequestUri().toString());
+			return Response.ok().build();
+		}
+
+		@Path("/inject-service-request-member1")
+		@GET
+		public Response injectServiceRequestAsMember1() {
+			service.injectedStringArg(serviceRequestMember.getRequestUri().toString());
 			return Response.ok().build();
 		}
 
@@ -129,6 +185,7 @@ public class ServiceRequestObjectHandlerIntTest {
 	public static interface TestService {
 		void injectLambdaContext(Context context);
 		void injectServiceRequest(ServiceRequest request);
+		void injectedStringArg(String arg);
 	}
 
 	public static class Entity {

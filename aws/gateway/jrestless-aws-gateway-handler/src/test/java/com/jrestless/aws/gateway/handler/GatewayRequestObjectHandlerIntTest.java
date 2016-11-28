@@ -22,13 +22,16 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -88,12 +91,37 @@ public class GatewayRequestObjectHandlerIntTest {
 	}
 
 	@Test
+	public void testLambdaContextMemberInjection() {
+		when(context.getAwsRequestId()).thenReturn("0", "1");
+		for (int i = 0; i <= 1; i++) {
+			GatewayRequestImpl request = new GatewayRequestImpl();
+			request.setHttpMethod("GET");
+			request.setPath("/inject-lambda-context-member" + i);
+			handler.handleRequest(request, context);
+			verify(testService).injectedStringArg("" + i);
+		}
+	}
+
+	@Test
 	public void testGatewayRequestInjection() {
 		GatewayRequestImpl request = new GatewayRequestImpl();
 		request.setHttpMethod("PUT");
 		request.setPath("/inject-gateway-request");
 		handler.handleRequest(request, context);
 		verify(testService).injectGatewayRequest(same(request));
+	}
+
+	@Test
+	public void testGatewayRequestMemberInjection() {
+		GatewayRequestImpl request0 = new GatewayRequestImpl();
+		request0.setHttpMethod("GET");
+		String path0 = "/inject-gateway-request-member0";
+		request0.setPath(path0);
+		GatewayRequestImpl request1 = new GatewayRequestImpl();
+		request1.setHttpMethod("GET");
+		String path1 = "/inject-gateway-request-member1";
+		request1.setPath(path1);
+		testProxy(request0, request1, path0, path1);
 	}
 
 	@Test
@@ -145,8 +173,23 @@ public class GatewayRequestObjectHandlerIntTest {
 		assertEquals(new GatewayResponse(responseBody, responseHeaders, Status.OK), response);
 	}
 
+	private void testProxy(GatewayRequestImpl request0, GatewayRequestImpl request1,
+			String expectedArg0, String expectedArg1) {
+		handler.handleRequest(request0, context);
+		verify(testService).injectedStringArg(expectedArg0);
+		handler.handleRequest(request1, context);
+		verify(testService).injectedStringArg(expectedArg1);
+	}
+
 	@Path("/")
+	@Singleton // singleton in order to test proxies
 	public static class TestResource {
+
+		@javax.ws.rs.core.Context
+		private Context lambdaContextMember;
+
+		@javax.ws.rs.core.Context
+		private GatewayRequest gatewayRequestMember;
 
 		private TestService service;
 
@@ -161,10 +204,38 @@ public class GatewayRequestObjectHandlerIntTest {
 			return Response.ok().build();
 		}
 
+		@Path("/inject-lambda-context-member0")
+		@GET
+		public Response injectLambdaContextAsMember0() {
+			service.injectedStringArg(lambdaContextMember.getAwsRequestId());
+			return Response.ok().build();
+		}
+
+		@Path("/inject-lambda-context-member1")
+		@GET
+		public Response injectLambdaContextAsMember1() {
+			service.injectedStringArg(lambdaContextMember.getAwsRequestId());
+			return Response.ok().build();
+		}
+
 		@Path("/inject-gateway-request")
 		@PUT
 		public Response injectGatewayRequest(@javax.ws.rs.core.Context GatewayRequest request) {
 			service.injectGatewayRequest(request);
+			return Response.ok().build();
+		}
+
+		@Path("/inject-gateway-request-member0")
+		@GET
+		public Response injectGatewayRequestAsMember0() {
+			service.injectedStringArg(gatewayRequestMember.getPath());
+			return Response.ok().build();
+		}
+
+		@Path("/inject-gateway-request-member1")
+		@GET
+		public Response injectGatewayRequestAsMember1() {
+			service.injectedStringArg(gatewayRequestMember.getPath());
 			return Response.ok().build();
 		}
 
@@ -192,6 +263,7 @@ public class GatewayRequestObjectHandlerIntTest {
 	public static interface TestService {
 		void injectLambdaContext(Context context);
 		void injectGatewayRequest(GatewayRequest request);
+		void injectedStringArg(String arg);
 		void injectGatewayRequestContext(GatewayRequestContext requestContext);
 		void injectGatewayIdentity(GatewayIdentity identity);
 	}

@@ -15,27 +15,16 @@
  */
 package com.jrestless.aws.gateway;
 
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
-import com.amazonaws.services.lambda.runtime.Context;
-import com.jrestless.aws.gateway.dpi.GatewayIdentityContextFactory;
-import com.jrestless.aws.gateway.dpi.GatewayRequestContextContextFactory;
-import com.jrestless.aws.gateway.dpi.GatewayRequestContextFactory;
-import com.jrestless.aws.gateway.dpi.LambdaContextFactory;
-import com.jrestless.aws.gateway.io.GatewayIdentity;
-import com.jrestless.aws.gateway.io.GatewayRequest;
-import com.jrestless.aws.gateway.io.GatewayRequestContext;
+import com.jrestless.aws.AwsFeature;
 
 /**
- * Jersey application configuration with AWS specifics.
+ * Jersey application configuration with AWS Gateway specifics.
  * <ol>
- * <li>{@link LambdaContextFactory}
- * <li>{@link GatewayRequestContextFactory}
- * <li>{@link GatewayRequestContextContextFactory}
- * <li>{@link GatewayIdentityContextFactory}
+ * <li>{@link AwsFeature}
+ * <li>{@link GatewayFeature}
  * <li>{@link RolesAllowedDynamicFeature}
  * </ol>
  *
@@ -45,38 +34,8 @@ import com.jrestless.aws.gateway.io.GatewayRequestContext;
 public class GatewayResourceConfig extends ResourceConfig {
 
 	public GatewayResourceConfig() {
-		register(new AbstractBinder() {
-			@Override
-			protected void configure() {
-				bindFactory(LambdaContextFactory.class)
-					.to(Context.class)
-					.in(RequestScoped.class);
-			}
-		});
-		register(new AbstractBinder() {
-			@Override
-			protected void configure() {
-				bindFactory(GatewayRequestContextFactory.class)
-					.to(GatewayRequest.class)
-					.in(RequestScoped.class);
-			}
-		});
-		register(new AbstractBinder() {
-			@Override
-			protected void configure() {
-				bindFactory(GatewayRequestContextContextFactory.class)
-					.to(GatewayRequestContext.class)
-					.in(RequestScoped.class);
-			}
-		});
-		register(new AbstractBinder() {
-			@Override
-			protected void configure() {
-				bindFactory(GatewayIdentityContextFactory.class)
-					.to(GatewayIdentity.class)
-					.in(RequestScoped.class);
-			}
-		});
+		register(AwsFeature.class);
+		register(GatewayFeature.class);
 		register(RolesAllowedDynamicFeature.class);
 	}
 }

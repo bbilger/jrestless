@@ -36,10 +36,10 @@ import javax.ws.rs.core.Response.StatusType;
 import org.glassfish.jersey.server.ContainerRequest;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.jrestless.aws.dpi.LambdaContextFactory;
 import com.jrestless.aws.gateway.dpi.GatewayIdentityContextFactory;
 import com.jrestless.aws.gateway.dpi.GatewayRequestContextContextFactory;
 import com.jrestless.aws.gateway.dpi.GatewayRequestContextFactory;
-import com.jrestless.aws.gateway.dpi.LambdaContextFactory;
 import com.jrestless.aws.gateway.io.GatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayRequestContext;
 import com.jrestless.aws.gateway.io.GatewayResponse;
