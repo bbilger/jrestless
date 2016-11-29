@@ -250,6 +250,8 @@ All modules are available in jcenter.
 
 * Java
   * [lambadaframework](https://github.com/lambadaframework/lambadaframework) provides similar functionality like JRestless. It implements some features of the JAX-RS standard and includes deployment functionality within the framework itself.
+  * [ingenieux/lambada](https://github.com/ingenieux/lambada) Non-JAX-RS Java framework
+  * [aws-lambda-servlet](https://github.com/ingenieux/lambada) run JAX-RS applications - uses Jersey and pretends to run in a servlet container
 * JavaScript
   * [aws-serverless-express](https://github.com/awslabs/aws-serverless-express) - run [express](https://github.com/expressjs/express) applications
 * Python
