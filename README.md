@@ -254,6 +254,7 @@ All modules are available in jcenter.
   * [aws-serverless-express](https://github.com/awslabs/aws-serverless-express) - run [express](https://github.com/expressjs/express) applications
 * Python
   * [Zappa](https://github.com/Miserlou/Zappa) - run and deploy Python applications
+  * [Chalice](https://github.com/awslabs/chalice) - run and deploy Python applications
 
 ## Limitations
 
