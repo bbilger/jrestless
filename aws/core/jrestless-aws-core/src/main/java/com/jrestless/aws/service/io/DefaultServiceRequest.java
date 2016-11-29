@@ -38,7 +38,7 @@ import javax.annotation.Nullable;
 */
 public final class DefaultServiceRequest implements ServiceRequest {
 	private String body;
-	private Map<String, List<String>> headers;
+	private Map<String, List<String>> headers = Collections.emptyMap();
 	private URI requestUri;
 	private String httpMethod;
 
@@ -66,7 +66,6 @@ public final class DefaultServiceRequest implements ServiceRequest {
 	 */
 	@Override
 	public String getBody() {
-		// we don't copy the value for performance reasons
 		return body;
 	}
 
@@ -87,7 +86,7 @@ public final class DefaultServiceRequest implements ServiceRequest {
 	 */
 	@Override
 	public Map<String, List<String>> getHeaders() {
-		return (headers == null) ? null : Collections.unmodifiableMap(headers);
+		return headers;
 	}
 
 

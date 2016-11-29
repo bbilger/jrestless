@@ -63,7 +63,7 @@ public final class GatewayResponse {
 
 	@Override
 	public String toString() {
-		return "GatewayDefaultResponse [body=" + body + ", headers=" + headers + ", statusCode=" + statusCode + "]";
+		return "GatewayResponse [body=" + body + ", headers=" + headers + ", statusCode=" + statusCode + "]";
 	}
 
 	@Override

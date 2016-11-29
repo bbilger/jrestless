@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +18,6 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.testing.EqualsTester;
-import com.jrestless.aws.service.io.ServiceRequest;
-import com.jrestless.aws.service.io.DefaultServiceRequest;
 import com.jrestless.test.ConstructorPreconditionsTester;
 import com.jrestless.test.CopyConstructorEqualsTester;
 
@@ -41,7 +40,7 @@ public class DefaultServiceRequestTest {
 
 		ServiceRequest req2 = new DefaultServiceRequest();
 		assertEquals(null, req2.getBody());
-		assertEquals(null, req2.getHeaders());
+		assertEquals(Collections.emptyMap(), req2.getHeaders());
 		assertEquals(null, req2.getRequestUri());
 		assertEquals(null, req2.getHttpMethod());
 	}

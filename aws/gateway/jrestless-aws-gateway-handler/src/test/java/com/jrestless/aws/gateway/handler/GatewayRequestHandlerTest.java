@@ -41,9 +41,9 @@ import org.mockito.ArgumentCaptor;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.collect.ImmutableMap;
-import com.jrestless.aws.gateway.io.GatewayIdentityImpl;
-import com.jrestless.aws.gateway.io.GatewayRequestContextImpl;
-import com.jrestless.aws.gateway.io.GatewayRequestImpl;
+import com.jrestless.aws.gateway.io.DefaultGatewayIdentity;
+import com.jrestless.aws.gateway.io.DefaultGatewayRequestContext;
+import com.jrestless.aws.gateway.io.DefaultGatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayResponse;
 import com.jrestless.core.container.JRestlessHandlerContainer;
 import com.jrestless.core.container.handler.SimpleRequestHandler.SimpleResponseWriter;
@@ -67,10 +67,10 @@ public class GatewayRequestHandlerTest {
 	@Test
 	public void delegateRequest_ValidRequestGiven_ShouldRegisterContextsOnRequest() {
 		Context context = mock(Context.class);
-		GatewayIdentityImpl identity = new GatewayIdentityImpl();
-		GatewayRequestContextImpl reqContext = new GatewayRequestContextImpl();
+		DefaultGatewayIdentity identity = new DefaultGatewayIdentity();
+		DefaultGatewayRequestContext reqContext = new DefaultGatewayRequestContext();
 		reqContext.setIdentity(identity);
-		GatewayRequestImpl request = new GatewayRequestImpl();
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
 		request.setPath("/");
 		request.setHttpMethod("GET");
 		request.setRequestContext(reqContext);
@@ -94,14 +94,14 @@ public class GatewayRequestHandlerTest {
 	@Test(expected = NullPointerException.class)
 	public void createContainerRequest_NoPathGiven_ShouldThrowNpe() {
 		GatewayRequestAndLambdaContext request = createMinimalRequest();
-		((GatewayRequestImpl) request.getGatewayRequest()).setPath(null);
+		((DefaultGatewayRequest) request.getGatewayRequest()).setPath(null);
 		gatewayHandler.createContainerRequest(request);
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void createContainerRequest_NoHttpMethodGiven_ShouldThrowNpe() {
 		GatewayRequestAndLambdaContext request = createMinimalRequest();
-		((GatewayRequestImpl) request.getGatewayRequest()).setHttpMethod(null);
+		((DefaultGatewayRequest) request.getGatewayRequest()).setHttpMethod(null);
 		gatewayHandler.createContainerRequest(request);
 	}
 
@@ -117,7 +117,7 @@ public class GatewayRequestHandlerTest {
 	@Test
 	public void createContainerRequest_BodyGiven_ShouldUseBody() {
 		GatewayRequestAndLambdaContext request = createMinimalRequest();
-		((GatewayRequestImpl) request.getGatewayRequest()).setBody("abc");
+		((DefaultGatewayRequest) request.getGatewayRequest()).setBody("abc");
 		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
 		InputStream is = containerRequest.getEntityStream();
 		assertEquals(ByteArrayInputStream.class, is.getClass());
@@ -127,7 +127,7 @@ public class GatewayRequestHandlerTest {
 	@Test
 	public void createContainerRequest_HttpMethodGiven_ShouldUseHttpMethod() {
 		GatewayRequestAndLambdaContext request = createMinimalRequest();
-		((GatewayRequestImpl) request.getGatewayRequest()).setHttpMethod("POST");
+		((DefaultGatewayRequest) request.getGatewayRequest()).setHttpMethod("POST");
 		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
 		assertEquals("POST", containerRequest.getHttpMethod());
 	}
@@ -135,7 +135,7 @@ public class GatewayRequestHandlerTest {
 	@Test
 	public void createContainerRequest_PathWithNoQueryParamsGiven_ShouldUsePathAsRequestUri() {
 		GatewayRequestAndLambdaContext request = createMinimalRequest();
-		((GatewayRequestImpl) request.getGatewayRequest()).setPath("/abc");
+		((DefaultGatewayRequest) request.getGatewayRequest()).setPath("/abc");
 		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
 		assertEquals(URI.create("/abc"), containerRequest.getRequestUri());
 	}
@@ -143,8 +143,8 @@ public class GatewayRequestHandlerTest {
 	@Test
 	public void createContainerRequest_PathWithOneQueryParamsGiven_ShouldUseQueryParamsInRequestUri() {
 		GatewayRequestAndLambdaContext request = createMinimalRequest();
-		((GatewayRequestImpl) request.getGatewayRequest()).setPath("/abc");
-		((GatewayRequestImpl) request.getGatewayRequest()).setQueryStringParameters(ImmutableMap.of("a_k", "a_v"));
+		((DefaultGatewayRequest) request.getGatewayRequest()).setPath("/abc");
+		((DefaultGatewayRequest) request.getGatewayRequest()).setQueryStringParameters(ImmutableMap.of("a_k", "a_v"));
 		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
 		assertEquals(URI.create("/abc?a_k=a_v"), containerRequest.getRequestUri());
 	}
@@ -152,8 +152,8 @@ public class GatewayRequestHandlerTest {
 	@Test
 	public void createContainerRequest_PathWithMultipleQueryParamsGiven_ShouldUseQueryParamsInRequestUri() {
 		GatewayRequestAndLambdaContext request = createMinimalRequest();
-		((GatewayRequestImpl) request.getGatewayRequest()).setPath("/abc");
-		((GatewayRequestImpl) request.getGatewayRequest()).setQueryStringParameters(ImmutableMap.of("a_k", "a_v", "b_k", "b_v"));
+		((DefaultGatewayRequest) request.getGatewayRequest()).setPath("/abc");
+		((DefaultGatewayRequest) request.getGatewayRequest()).setQueryStringParameters(ImmutableMap.of("a_k", "a_v", "b_k", "b_v"));
 		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
 		assertEquals(URI.create("/abc?a_k=a_v&b_k=b_v"), containerRequest.getRequestUri());
 	}
@@ -161,7 +161,7 @@ public class GatewayRequestHandlerTest {
 	@Test
 	public void createContainerRequest_HeadersGiven_ShouldUseHeaders() {
 		GatewayRequestAndLambdaContext request = createMinimalRequest();
-		((GatewayRequestImpl) request.getGatewayRequest()).setHeaders(ImmutableMap.of("a_k", "a_v", "b_k", "b_v"));
+		((DefaultGatewayRequest) request.getGatewayRequest()).setHeaders(ImmutableMap.of("a_k", "a_v", "b_k", "b_v"));
 		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
 		assertEquals(ImmutableMap.of("a_k", singletonList("a_v"), "b_k", singletonList("b_v")), containerRequest.getHeaders());
 	}
@@ -172,7 +172,7 @@ public class GatewayRequestHandlerTest {
 		Map<String, String> headers = new HashMap<>();
 		headers.put(null, "a_v");
 		headers.put("b_k", "b_v");
-		((GatewayRequestImpl) request.getGatewayRequest()).setHeaders(headers);
+		((DefaultGatewayRequest) request.getGatewayRequest()).setHeaders(headers);
 		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
 		assertEquals(ImmutableMap.of("b_k", singletonList("b_v")), containerRequest.getHeaders());
 	}
@@ -183,7 +183,7 @@ public class GatewayRequestHandlerTest {
 		Map<String, String> headers = new HashMap<>();
 		headers.put("a_k", null);
 		headers.put("b_k", "b_v");
-		((GatewayRequestImpl) request.getGatewayRequest()).setHeaders(headers);
+		((DefaultGatewayRequest) request.getGatewayRequest()).setHeaders(headers);
 		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
 		assertEquals(ImmutableMap.of("b_k", singletonList("b_v")), containerRequest.getHeaders());
 	}
@@ -193,13 +193,13 @@ public class GatewayRequestHandlerTest {
 		GatewayRequestAndLambdaContext request = createMinimalRequest();
 		Map<String, String> headers = new HashMap<>();
 		headers.put("a_k", "a_v0,a_v1");
-		((GatewayRequestImpl) request.getGatewayRequest()).setHeaders(headers);
+		((DefaultGatewayRequest) request.getGatewayRequest()).setHeaders(headers);
 		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
 		assertEquals(ImmutableMap.of("a_k", singletonList("a_v0,a_v1")), containerRequest.getHeaders());
 	}
 
 	private GatewayRequestAndLambdaContext createMinimalRequest() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
 		request.setPath("/");
 		request.setHttpMethod("GET");
 		return new GatewayRequestAndLambdaContext(request, null);

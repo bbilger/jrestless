@@ -41,7 +41,7 @@ import com.jrestless.aws.service.io.ServiceRequest;
 import com.jrestless.aws.service.io.ServiceResponse;
 import com.jrestless.core.container.handler.SimpleRequestHandler;
 import com.jrestless.core.container.io.JRestlessContainerRequest;
-import com.jrestless.core.container.io.JRestlessContainerRequestImpl;
+import com.jrestless.core.container.io.DefaultJRestlessContainerRequest;
 
 /**
  * Base request handler.
@@ -72,7 +72,7 @@ public abstract class ServiceRequestHandler
 		} else {
 			entityStream = new ByteArrayInputStream(new byte[0]);
 		}
-		return new JRestlessContainerRequestImpl(ROOT_URI, requestUri, request.getHttpMethod(), entityStream,
+		return new DefaultJRestlessContainerRequest(ROOT_URI, requestUri, request.getHttpMethod(), entityStream,
 				request.getHeaders());
 	}
 

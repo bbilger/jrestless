@@ -6,10 +6,10 @@ import java.lang.reflect.Constructor;
 
 import org.junit.Test;
 
-import com.jrestless.aws.gateway.io.GatewayIdentityImpl;
+import com.jrestless.aws.gateway.io.DefaultGatewayIdentity;
 import com.jrestless.test.CopyConstructorEqualsTester;
 
-public class GatewayIdentityImplTest {
+public class DefaultGatewayIdentityTest {
 
 	@Test
 	public void testEquals() {
@@ -30,7 +30,7 @@ public class GatewayIdentityImplTest {
 
 	@Test
 	public void testGetters() {
-		GatewayIdentityImpl identity = new GatewayIdentityImpl("cognitoIdentityPoolId", "accountId", "cognitoIdentityId",
+		DefaultGatewayIdentity identity = new DefaultGatewayIdentity("cognitoIdentityPoolId", "accountId", "cognitoIdentityId",
 				"caller", "apiKey", "sourceIp", "cognitoAuthenticationType", "cognitoAuthenticationProvider", "userArn",
 				"userAgent", "user");
 
@@ -47,9 +47,9 @@ public class GatewayIdentityImplTest {
 		assertEquals("user", identity.getUser());
 	}
 
-	private Constructor<GatewayIdentityImpl> getConstructor() {
+	private Constructor<DefaultGatewayIdentity> getConstructor() {
 		try {
-			return GatewayIdentityImpl.class.getDeclaredConstructor(String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class);
+			return DefaultGatewayIdentity.class.getDeclaredConstructor(String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class);
 		} catch (NoSuchMethodException | SecurityException e) {
 			throw new RuntimeException(e);
 		}

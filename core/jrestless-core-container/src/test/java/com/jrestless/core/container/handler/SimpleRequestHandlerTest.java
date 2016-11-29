@@ -30,7 +30,7 @@ import com.google.common.collect.ImmutableMap;
 import com.jrestless.core.container.JRestlessHandlerContainer;
 import com.jrestless.core.container.handler.SimpleRequestHandler.SimpleResponseWriter;
 import com.jrestless.core.container.io.JRestlessContainerRequest;
-import com.jrestless.core.container.io.JRestlessContainerRequestImpl;
+import com.jrestless.core.container.io.DefaultJRestlessContainerRequest;
 
 public class SimpleRequestHandlerTest {
 
@@ -183,7 +183,7 @@ public class SimpleRequestHandlerTest {
 	}
 
 	private JRestlessContainerRequest createMinimalRequest() {
-		JRestlessContainerRequest request = new JRestlessContainerRequestImpl(URI.create("/"), URI.create("/"), "GET",
+		JRestlessContainerRequest request = new DefaultJRestlessContainerRequest(URI.create("/"), URI.create("/"), "GET",
 				new ByteArrayInputStream(new byte[0]), new HashMap<>());
 		return request;
 	}

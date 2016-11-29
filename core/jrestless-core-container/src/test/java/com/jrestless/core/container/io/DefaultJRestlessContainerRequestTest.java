@@ -24,11 +24,11 @@ import com.google.common.io.CharStreams;
 import com.jrestless.test.ConstructorPreconditionsTester;
 import com.jrestless.test.CopyConstructorEqualsTester;
 
-public class JRestlessContainerRequestImplTest {
+public class DefaultJRestlessContainerRequestTest {
 
 	@Test
 	public void testGetters() throws IOException {
-		JRestlessContainerRequest request = new JRestlessContainerRequestImpl(URI.create("/123"), URI.create("/456"), "DELETE",
+		JRestlessContainerRequest request = new DefaultJRestlessContainerRequest(URI.create("/123"), URI.create("/456"), "DELETE",
 				new ByteArrayInputStream("123".getBytes()), ImmutableMap.of("a", ImmutableList.of("a0", "a1")));
 		assertEquals(URI.create("/123"), request.getBaseUri());
 		assertEquals(URI.create("/456"), request.getRequestUri());
@@ -39,7 +39,7 @@ public class JRestlessContainerRequestImplTest {
 	@Test
 	public void testHeadersNotSame() throws IOException {
 		Map<String, List<String>> headers = ImmutableMap.of("a", ImmutableList.of("a0", "a1"));
-		JRestlessContainerRequest request = new JRestlessContainerRequestImpl(URI.create("/123"), URI.create("/456"), "DELETE",
+		JRestlessContainerRequest request = new DefaultJRestlessContainerRequest(URI.create("/123"), URI.create("/456"), "DELETE",
 				new ByteArrayInputStream("123".getBytes()), headers);
 		assertNotSame(headers, request.getHeaders());
 	}
@@ -47,7 +47,7 @@ public class JRestlessContainerRequestImplTest {
 	@Test
 	public void testHeadersCopied() throws IOException {
 		Map<String, List<String>> headers = new HashMap<>();
-		JRestlessContainerRequest request = new JRestlessContainerRequestImpl(URI.create("/123"), URI.create("/456"), "DELETE",
+		JRestlessContainerRequest request = new DefaultJRestlessContainerRequest(URI.create("/123"), URI.create("/456"), "DELETE",
 				new ByteArrayInputStream("123".getBytes()), headers);
 		headers.put("0", ImmutableList.of("0"));
 		assertTrue(request.getHeaders().isEmpty());
@@ -55,14 +55,14 @@ public class JRestlessContainerRequestImplTest {
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void testHeadersImmutable() throws IOException {
-		JRestlessContainerRequest request = new JRestlessContainerRequestImpl(URI.create("/123"), URI.create("/456"), "DELETE",
+		JRestlessContainerRequest request = new DefaultJRestlessContainerRequest(URI.create("/123"), URI.create("/456"), "DELETE",
 				new ByteArrayInputStream("123".getBytes()), new HashMap<>());
 		request.getHeaders().put("0", ImmutableList.of());
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void testHeaderValuesImmutable() throws IOException {
-		JRestlessContainerRequest request = new JRestlessContainerRequestImpl(URI.create("/123"), URI.create("/456"), "DELETE",
+		JRestlessContainerRequest request = new DefaultJRestlessContainerRequest(URI.create("/123"), URI.create("/456"), "DELETE",
 				new ByteArrayInputStream("123".getBytes()), ImmutableMap.of("a", ImmutableList.of("a0", "a1")));
 		request.getHeaders().get("a").add("123");
 	}
@@ -75,7 +75,7 @@ public class JRestlessContainerRequestImplTest {
 		bVal.add("b_0");
 		headers.put("a", null);
 		headers.put("b", bVal);
-		JRestlessContainerRequest request = new JRestlessContainerRequestImpl(URI.create("/123"), URI.create("/456"), "DELETE",
+		JRestlessContainerRequest request = new DefaultJRestlessContainerRequest(URI.create("/123"), URI.create("/456"), "DELETE",
 				new ByteArrayInputStream("123".getBytes()), headers);
 		assertNull(request.getHeaders().get("a"));
 		assertNull(request.getHeaders().get("b").get(0));
@@ -124,9 +124,9 @@ public class JRestlessContainerRequestImplTest {
 			.testPreconditionsAndValidCombinations();
 	}
 
-	private Constructor<JRestlessContainerRequestImpl> getConstructor() {
+	private Constructor<DefaultJRestlessContainerRequest> getConstructor() {
 		try {
-			return JRestlessContainerRequestImpl.class.getConstructor(URI.class, URI.class, String.class, InputStream.class, Map.class);
+			return DefaultJRestlessContainerRequest.class.getConstructor(URI.class, URI.class, String.class, InputStream.class, Map.class);
 		} catch (NoSuchMethodException | SecurityException e) {
 			throw new RuntimeException(e);
 		}

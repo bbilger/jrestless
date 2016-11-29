@@ -10,124 +10,87 @@ import java.util.function.Supplier;
 
 import org.junit.Test;
 
-import com.jrestless.aws.gateway.io.GatewayRequestContextImpl;
-import com.jrestless.aws.gateway.io.GatewayRequestImpl;
+import com.google.common.collect.ImmutableMap;
 import com.jrestless.test.CopyConstructorEqualsTester;
 
-import jersey.repackaged.com.google.common.collect.ImmutableMap;
-
-public class GatewayRequestImplTest {
+public class DefaultGatewayRequestTest {
 
 	@Test(expected = UnsupportedOperationException.class)
-	public void testHeadersReturnsImmutableMap() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
-		testReturnsImmutableMap(request::setHeaders, request::getHeaders);
-	}
-
-	@Test
-	public void testHeadersCopiesValues() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
-		testMapCopiesValues(request::setHeaders, request::getHeaders);
+	public void testHeadersReturnsUnmodifiableMap() {
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
+		testReturnsUnmodifiableMap(request::setHeaders, request::getHeaders);
 	}
 
 	@Test
 	public void testHeadersClearsValues() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
 		testMapClearsValues(request::setHeaders, request::getHeaders);
 	}
 
 	@Test
 	public void testHeadersClearsValuesOnNull() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
 		testMapClearsValuesOnNull(request::setHeaders, request::getHeaders);
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
-	public void testQueryStringParametersReturnsImmutableMap() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
-		testReturnsImmutableMap(request::setQueryStringParameters, request::getQueryStringParameters);
-	}
-
-	@Test
-	public void testQueryStringParametersCopiesValues() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
-		testMapCopiesValues(request::setQueryStringParameters, request::getQueryStringParameters);
+	public void testQueryStringParametersReturnsUnmodifiableMap() {
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
+		testReturnsUnmodifiableMap(request::setQueryStringParameters, request::getQueryStringParameters);
 	}
 
 	@Test
 	public void testQueryStringParametersClearsValues() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
 		testMapClearsValues(request::setQueryStringParameters, request::getQueryStringParameters);
 	}
 
 	@Test
 	public void testQueryStringParametersClearsValuesOnNull() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
 		testMapClearsValuesOnNull(request::setQueryStringParameters, request::getQueryStringParameters);
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
-	public void testPathParameterReturnsImmutableMap() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
-		testReturnsImmutableMap(request::setPathParameters, request::getPathParameters);
-	}
-
-	@Test
-	public void testPathParameterCopiesValues() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
-		testMapCopiesValues(request::setPathParameters, request::getPathParameters);
+	public void testPathParameterReturnsUnmodifiableMap() {
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
+		testReturnsUnmodifiableMap(request::setPathParameters, request::getPathParameters);
 	}
 
 	@Test
 	public void testPathParameterClearsValues() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
 		testMapClearsValues(request::setPathParameters, request::getPathParameters);
 	}
 
 	@Test
 	public void testPathParameterClearsValuesOnNull() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
 		testMapClearsValuesOnNull(request::setPathParameters, request::getPathParameters);
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
-	public void testStageVariablesReturnsImmutableMap() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
-		testReturnsImmutableMap(request::setStageVariables, request::getStageVariables);
-	}
-
-	@Test
-	public void testStageVariablesCopiesValues() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
-		testMapCopiesValues(request::setStageVariables, request::getStageVariables);
+	public void testStageVariablesReturnsUnmodifiableMap() {
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
+		testReturnsUnmodifiableMap(request::setStageVariables, request::getStageVariables);
 	}
 
 	@Test
 	public void testStageVariablesClearsValues() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
 		testMapClearsValues(request::setStageVariables, request::getStageVariables);
 	}
 
 	@Test
 	public void testStageVariablesClearsValuesOnNull() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
 		testMapClearsValuesOnNull(request::setStageVariables, request::getStageVariables);
 	}
 
-	private void testReturnsImmutableMap(Consumer<Map<String, String>> setter, Supplier<Map<String, String>> getter) {
+	private void testReturnsUnmodifiableMap(Consumer<Map<String, String>> setter, Supplier<Map<String, String>> getter) {
 		setter.accept(new HashMap<>());
 		getter.get().put("1", "1");
 	}
-
-	private void testMapCopiesValues(Consumer<Map<String, String>> setter, Supplier<Map<String, String>> getter) {
-		Map<String, String> stageVariables = new HashMap<>();
-		stageVariables.put("1", "1");
-		stageVariables.put("2", "2");
-		setter.accept(stageVariables);
-		stageVariables.remove("1");
-		assertEquals(2, getter.get().size());
-	}
-
 
 	private void testMapClearsValues(Consumer<Map<String, String>> setter, Supplier<Map<String, String>> getter) {
 		setter.accept(ImmutableMap.of("1", "1"));
@@ -144,7 +107,7 @@ public class GatewayRequestImplTest {
 
 	@Test
 	public void testEquals() {
-		GatewayRequestContextImpl requestContext = new GatewayRequestContextImpl();
+		DefaultGatewayRequestContext requestContext = new DefaultGatewayRequestContext();
 		new CopyConstructorEqualsTester(getConstructor())
 			.addArguments(0, null, "resource")
 			.addArguments(1, null, "path")
@@ -160,8 +123,8 @@ public class GatewayRequestImplTest {
 
 	@Test
 	public void testGetters() {
-		GatewayRequestContextImpl requestContext = new GatewayRequestContextImpl();
-		GatewayRequestImpl request = new GatewayRequestImpl("resource", "path", "httpMethod",
+		DefaultGatewayRequestContext requestContext = new DefaultGatewayRequestContext();
+		DefaultGatewayRequest request = new DefaultGatewayRequest("resource", "path", "httpMethod",
 				ImmutableMap.of("headers", "headers"),
 				ImmutableMap.of("queryStringParameters", "queryStringParameters"),
 				ImmutableMap.of("pathParameters", "pathParameters"),
@@ -178,10 +141,10 @@ public class GatewayRequestImplTest {
 		assertEquals("body", request.getBody());
 	}
 
-	private Constructor<GatewayRequestImpl> getConstructor() {
+	private Constructor<DefaultGatewayRequest> getConstructor() {
 		try {
-			return GatewayRequestImpl.class.getDeclaredConstructor(String.class, String.class, String.class, Map.class,
-					Map.class, Map.class, Map.class, GatewayRequestContextImpl.class, String.class);
+			return DefaultGatewayRequest.class.getDeclaredConstructor(String.class, String.class, String.class, Map.class,
+					Map.class, Map.class, Map.class, DefaultGatewayRequestContext.class, String.class);
 		} catch (NoSuchMethodException | SecurityException e) {
 			throw new RuntimeException(e);
 		}

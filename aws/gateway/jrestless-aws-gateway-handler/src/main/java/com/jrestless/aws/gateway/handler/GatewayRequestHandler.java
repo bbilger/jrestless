@@ -45,7 +45,7 @@ import com.jrestless.aws.gateway.io.GatewayRequestContext;
 import com.jrestless.aws.gateway.io.GatewayResponse;
 import com.jrestless.core.container.handler.SimpleRequestHandler;
 import com.jrestless.core.container.io.JRestlessContainerRequest;
-import com.jrestless.core.container.io.JRestlessContainerRequestImpl;
+import com.jrestless.core.container.io.DefaultJRestlessContainerRequest;
 import com.jrestless.core.util.HeaderUtils;
 
 /**
@@ -79,7 +79,7 @@ public abstract class GatewayRequestHandler
 			entityStream = new ByteArrayInputStream(new byte[0]);
 		}
 		URI requestUri = URI.create(appendQueryParams(request.getPath(), request.getQueryStringParameters()));
-		return new JRestlessContainerRequestImpl(ROOT_URI, requestUri, request.getHttpMethod(), entityStream,
+		return new DefaultJRestlessContainerRequest(ROOT_URI, requestUri, request.getHttpMethod(), entityStream,
 				HeaderUtils.expandHeaders(request.getHeaders()));
 	}
 

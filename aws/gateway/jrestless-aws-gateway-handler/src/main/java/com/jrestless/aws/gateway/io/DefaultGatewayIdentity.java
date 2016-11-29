@@ -26,7 +26,7 @@ import java.util.Objects;
  * @author Bjoern Bilger
  *
  */
-public final class GatewayIdentityImpl implements GatewayIdentity {
+public final class DefaultGatewayIdentity implements GatewayIdentity {
 
 	private String cognitoIdentityPoolId;
 	private String accountId;
@@ -40,13 +40,13 @@ public final class GatewayIdentityImpl implements GatewayIdentity {
 	private String userAgent;
 	private String user;
 
-	public GatewayIdentityImpl() {
+	public DefaultGatewayIdentity() {
 		// for de-serialization
 	}
 
 	// for unit testing, only
 	// CHECKSTYLE:OFF
-	GatewayIdentityImpl(String cognitoIdentityPoolId, String accountId, String cognitoIdentityId, String caller,
+	DefaultGatewayIdentity(String cognitoIdentityPoolId, String accountId, String cognitoIdentityId, String caller,
 			String apiKey, String sourceIp, String cognitoAuthenticationType, String cognitoAuthenticationProvider,
 			String userArn, String userAgent, String user) {
 		setCognitoIdentityPoolId(cognitoIdentityPoolId);
@@ -174,7 +174,7 @@ public final class GatewayIdentityImpl implements GatewayIdentity {
 		if (!getClass().equals(other.getClass())) {
 			return false;
 		}
-		GatewayIdentityImpl castOther = (GatewayIdentityImpl) other;
+		DefaultGatewayIdentity castOther = (DefaultGatewayIdentity) other;
 		return Objects.equals(cognitoIdentityPoolId, castOther.cognitoIdentityPoolId)
 				&& Objects.equals(accountId, castOther.accountId)
 				&& Objects.equals(cognitoIdentityId, castOther.cognitoIdentityId)
@@ -194,7 +194,7 @@ public final class GatewayIdentityImpl implements GatewayIdentity {
 
 	@Override
 	public String toString() {
-		return "GatewayIdentityImpl [cognitoIdentityPoolId=" + cognitoIdentityPoolId + ", accountId=" + accountId
+		return "DefaultGatewayIdentity [cognitoIdentityPoolId=" + cognitoIdentityPoolId + ", accountId=" + accountId
 				+ ", cognitoIdentityId=" + cognitoIdentityId + ", caller=" + caller + ", apiKey=" + apiKey
 				+ ", sourceIp=" + sourceIp + ", cognitoAuthenticationType=" + cognitoAuthenticationType
 				+ ", cognitoAuthenticationProvider=" + cognitoAuthenticationProvider + ", userArn=" + userArn

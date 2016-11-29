@@ -16,7 +16,6 @@
 package com.jrestless.aws.gateway.io;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -29,27 +28,27 @@ import java.util.Objects;
  * @author Bjoern Bilger
  *
  */
-public final class GatewayRequestImpl implements GatewayRequest {
+public final class DefaultGatewayRequest implements GatewayRequest {
 
 	private String resource;
 	private String path;
 	private String httpMethod;
-	private Map<String, String> headers = new HashMap<>();
-	private Map<String, String> queryStringParameters = new HashMap<>();
-	private Map<String, String> pathParameters = new HashMap<>();
-	private Map<String, String> stageVariables = new HashMap<>();
+	private Map<String, String> headers = Collections.emptyMap();
+	private Map<String, String> queryStringParameters = Collections.emptyMap();
+	private Map<String, String> pathParameters = Collections.emptyMap();
+	private Map<String, String> stageVariables = Collections.emptyMap();
 	private GatewayRequestContext requestContext;
 	private String body;
 
-	public GatewayRequestImpl() {
+	public DefaultGatewayRequest() {
 		// for de-serialization
 	}
 
 	// for unit testing, only
 	// CHECKSTYLE:OFF
-	GatewayRequestImpl(String resource, String path, String httpMethod, Map<String, String> headers,
+	DefaultGatewayRequest(String resource, String path, String httpMethod, Map<String, String> headers,
 			Map<String, String> queryStringParameters, Map<String, String> pathParameters,
-			Map<String, String> stageVariables, GatewayRequestContextImpl requestContext, String body) {
+			Map<String, String> stageVariables, DefaultGatewayRequestContext requestContext, String body) {
 		setResource(resource);
 		setPath(path);
 		setHttpMethod(httpMethod);
@@ -91,50 +90,38 @@ public final class GatewayRequestImpl implements GatewayRequest {
 
 	@Override
 	public Map<String, String> getHeaders() {
-		return Collections.unmodifiableMap(headers);
+		return headers;
 	}
 
 	public void setHeaders(Map<String, String> headers) {
-		this.headers.clear();
-		if (headers != null) {
-			this.headers.putAll(headers);
-		}
+		this.headers = toUnmodifiableMap(headers);
 	}
 
 	@Override
 	public Map<String, String> getQueryStringParameters() {
-		return Collections.unmodifiableMap(queryStringParameters);
+		return queryStringParameters;
 	}
 
 	public void setQueryStringParameters(Map<String, String> queryStringParameters) {
-		this.queryStringParameters.clear();
-		if (queryStringParameters != null) {
-			this.queryStringParameters.putAll(queryStringParameters);
-		}
+		this.queryStringParameters = toUnmodifiableMap(queryStringParameters);
 	}
 
 	@Override
 	public Map<String, String> getPathParameters() {
-		return Collections.unmodifiableMap(pathParameters);
+		return pathParameters;
 	}
 
 	public void setPathParameters(Map<String, String> pathParameters) {
-		this.pathParameters.clear();
-		if (pathParameters != null) {
-			this.pathParameters.putAll(pathParameters);
-		}
+		this.pathParameters = toUnmodifiableMap(pathParameters);
 	}
 
 	@Override
 	public Map<String, String> getStageVariables() {
-		return Collections.unmodifiableMap(stageVariables);
+		return stageVariables;
 	}
 
 	public void setStageVariables(Map<String, String> stageVariables) {
-		this.stageVariables.clear();
-		if (stageVariables != null) {
-			this.stageVariables.putAll(stageVariables);
-		}
+		this.stageVariables = toUnmodifiableMap(stageVariables);
 	}
 
 	@Override
@@ -142,7 +129,7 @@ public final class GatewayRequestImpl implements GatewayRequest {
 		return requestContext;
 	}
 
-	public void setRequestContext(GatewayRequestContextImpl requestContext) {
+	public void setRequestContext(DefaultGatewayRequestContext requestContext) {
 		this.requestContext = requestContext;
 	}
 
@@ -153,6 +140,13 @@ public final class GatewayRequestImpl implements GatewayRequest {
 
 	public void setBody(String body) {
 		this.body = body;
+	}
+
+	private Map<String, String> toUnmodifiableMap(Map<String, String> map) {
+		if (map == null) {
+			return Collections.emptyMap();
+		}
+		return Collections.unmodifiableMap(map);
 	}
 
 	@Override
@@ -166,7 +160,7 @@ public final class GatewayRequestImpl implements GatewayRequest {
 		if (!getClass().equals(other.getClass())) {
 			return false;
 		}
-		GatewayRequestImpl castOther = (GatewayRequestImpl) other;
+		DefaultGatewayRequest castOther = (DefaultGatewayRequest) other;
 		return Objects.equals(resource, castOther.resource) && Objects.equals(path, castOther.path)
 				&& Objects.equals(httpMethod, castOther.httpMethod) && Objects.equals(headers, castOther.headers)
 				&& Objects.equals(queryStringParameters, castOther.queryStringParameters)
@@ -183,7 +177,7 @@ public final class GatewayRequestImpl implements GatewayRequest {
 
 	@Override
 	public String toString() {
-		return "GatewayRequestImpl [resource=" + resource + ", path=" + path + ", httpMethod=" + httpMethod
+		return "DefaultGatewayRequest [resource=" + resource + ", path=" + path + ", httpMethod=" + httpMethod
 				+ ", headers=" + headers + ", queryStringParameters=" + queryStringParameters + ", pathParameters="
 				+ pathParameters + ", stageVariables=" + stageVariables + ", requestContext=" + requestContext
 				+ ", body=" + body + "]";

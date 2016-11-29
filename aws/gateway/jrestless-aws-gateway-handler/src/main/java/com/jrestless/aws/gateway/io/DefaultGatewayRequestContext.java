@@ -15,6 +15,9 @@
  */
 package com.jrestless.aws.gateway.io;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 
 /**
@@ -26,7 +29,7 @@ import java.util.Objects;
  * @author Bjoern Bilger
  *
  */
-public final class GatewayRequestContextImpl implements GatewayRequestContext {
+public final class DefaultGatewayRequestContext implements GatewayRequestContext {
 
 	private String accountId;
 	private String resourceId;
@@ -36,15 +39,16 @@ public final class GatewayRequestContextImpl implements GatewayRequestContext {
 	private String resourcePath;
 	private String httpMethod;
 	private String apiId;
+	private Map<String, Object> authorizer = Collections.emptyMap();
 
-	public GatewayRequestContextImpl() {
+	public DefaultGatewayRequestContext() {
 		// for de-serialization
 	}
 
 	// for unit testing, only
 	// CHECKSTYLE:OFF
-	GatewayRequestContextImpl(String accountId, String resourceId, String stage, String requestId,
-			GatewayIdentityImpl identity, String resourcePath, String httpMethod, String apiId) {
+	DefaultGatewayRequestContext(String accountId, String resourceId, String stage, String requestId,
+			DefaultGatewayIdentity identity, String resourcePath, String httpMethod, String apiId, Map<String, Object> authorizer) {
 		setAccountId(accountId);
 		setResourceId(resourceId);
 		setStage(stage);
@@ -53,6 +57,7 @@ public final class GatewayRequestContextImpl implements GatewayRequestContext {
 		setResourcePath(resourcePath);
 		setHttpMethod(httpMethod);
 		setApiId(apiId);
+		setAuthorizer(authorizer);
 	}
 	// CHECKSTYLE:ON
 
@@ -97,7 +102,7 @@ public final class GatewayRequestContextImpl implements GatewayRequestContext {
 		return identity;
 	}
 
-	public void setIdentity(GatewayIdentityImpl identity) {
+	public void setIdentity(DefaultGatewayIdentity identity) {
 		this.identity = identity;
 	}
 
@@ -129,6 +134,31 @@ public final class GatewayRequestContextImpl implements GatewayRequestContext {
 	}
 
 	@Override
+	public Map<String, Object> getAuthorizer() {
+		return authorizer;
+	}
+
+	public void setAuthorizer(Map<String, Object> authorizer) {
+		if (authorizer == null || authorizer.isEmpty()) {
+			this.authorizer = Collections.emptyMap();
+		} else {
+			this.authorizer = toUnmodifiableMap(authorizer);
+		}
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private static <T> Map<T, Object> toUnmodifiableMap(Map<T, Object> map) {
+		for (Entry<T, Object> entry : map.entrySet()) {
+			T key = entry.getKey();
+			Object value = entry.getValue();
+			if (value instanceof Map) {
+				map.replace(key, toUnmodifiableMap((Map) value));
+			}
+		}
+		return Collections.unmodifiableMap(map);
+	}
+
+	@Override
 	public boolean equals(final Object other) {
 		if (this == other) {
 			return true;
@@ -139,22 +169,24 @@ public final class GatewayRequestContextImpl implements GatewayRequestContext {
 		if (!getClass().equals(other.getClass())) {
 			return false;
 		}
-		GatewayRequestContextImpl castOther = (GatewayRequestContextImpl) other;
+		DefaultGatewayRequestContext castOther = (DefaultGatewayRequestContext) other;
 		return Objects.equals(accountId, castOther.accountId) && Objects.equals(resourceId, castOther.resourceId)
 				&& Objects.equals(stage, castOther.stage) && Objects.equals(requestId, castOther.requestId)
 				&& Objects.equals(identity, castOther.identity) && Objects.equals(resourcePath, castOther.resourcePath)
-				&& Objects.equals(httpMethod, castOther.httpMethod) && Objects.equals(apiId, castOther.apiId);
+				&& Objects.equals(httpMethod, castOther.httpMethod) && Objects.equals(apiId, castOther.apiId)
+				&& Objects.equals(authorizer, castOther.authorizer);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(accountId, resourceId, stage, requestId, identity, resourcePath, httpMethod, apiId);
+		return Objects.hash(accountId, resourceId, stage, requestId, identity, resourcePath, httpMethod, apiId,
+				authorizer);
 	}
 
 	@Override
 	public String toString() {
-		return "GatewayRequestContextImpl [accountId=" + accountId + ", resourceId=" + resourceId + ", stage=" + stage
-				+ ", requestId=" + requestId + ", identity=" + identity + ", resourcePath=" + resourcePath
-				+ ", httpMethod=" + httpMethod + ", apiId=" + apiId + "]";
+		return "DefaultGatewayRequestContext [accountId=" + accountId + ", resourceId=" + resourceId + ", stage="
+				+ stage + ", requestId=" + requestId + ", identity=" + identity + ", resourcePath=" + resourcePath
+				+ ", httpMethod=" + httpMethod + ", apiId=" + apiId + ", authorizer=" + authorizer + "]";
 	}
 }

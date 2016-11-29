@@ -55,8 +55,8 @@ import com.jrestless.aws.gateway.GatewayResourceConfig;
 import com.jrestless.aws.gateway.io.GatewayIdentity;
 import com.jrestless.aws.gateway.io.GatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayRequestContext;
-import com.jrestless.aws.gateway.io.GatewayRequestContextImpl;
-import com.jrestless.aws.gateway.io.GatewayRequestImpl;
+import com.jrestless.aws.gateway.io.DefaultGatewayRequestContext;
+import com.jrestless.aws.gateway.io.DefaultGatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayResponse;
 import com.jrestless.core.container.dpi.InstanceBinder;
 
@@ -80,8 +80,8 @@ public class GatewayRequestObjectHandlerIntTest {
 
 	@Test
 	public void testLambdaContextInjection() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
-		GatewayRequestContextImpl requestContext = new GatewayRequestContextImpl();
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
+		DefaultGatewayRequestContext requestContext = new DefaultGatewayRequestContext();
 		request.setRequestContext(requestContext);
 		request.setHttpMethod("DELETE");
 		request.setPath("/");
@@ -93,7 +93,7 @@ public class GatewayRequestObjectHandlerIntTest {
 	public void testLambdaContextMemberInjection() {
 		when(context.getAwsRequestId()).thenReturn("0", "1");
 		for (int i = 0; i <= 1; i++) {
-			GatewayRequestImpl request = new GatewayRequestImpl();
+			DefaultGatewayRequest request = new DefaultGatewayRequest();
 			request.setHttpMethod("GET");
 			request.setPath("/inject-lambda-context-member" + i);
 			handler.handleRequest(request, context);
@@ -103,7 +103,7 @@ public class GatewayRequestObjectHandlerIntTest {
 
 	@Test
 	public void testGatewayRequestInjection() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
 		request.setHttpMethod("PUT");
 		request.setPath("/inject-gateway-request");
 		handler.handleRequest(request, context);
@@ -112,11 +112,11 @@ public class GatewayRequestObjectHandlerIntTest {
 
 	@Test
 	public void testGatewayRequestMemberInjection() {
-		GatewayRequestImpl request0 = new GatewayRequestImpl();
+		DefaultGatewayRequest request0 = new DefaultGatewayRequest();
 		request0.setHttpMethod("GET");
 		String path0 = "/inject-gateway-request-member0";
 		request0.setPath(path0);
-		GatewayRequestImpl request1 = new GatewayRequestImpl();
+		DefaultGatewayRequest request1 = new DefaultGatewayRequest();
 		request1.setHttpMethod("GET");
 		String path1 = "/inject-gateway-request-member1";
 		request1.setPath(path1);
@@ -125,7 +125,7 @@ public class GatewayRequestObjectHandlerIntTest {
 
 	@Test
 	public void testContainerFailureCreates500() {
-		GatewayRequestImpl request = new GatewayRequestImpl();
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
 		doThrow(new RuntimeException()).when(handler).createContainerRequest(any());
 		GatewayResponse response = handler.handleRequest(request, context);
 		assertEquals(new GatewayResponse(null, new HashMap<>(), Status.INTERNAL_SERVER_ERROR), response);
@@ -137,7 +137,7 @@ public class GatewayRequestObjectHandlerIntTest {
 		Map<String, String> requestHeaders = ImmutableMap.of(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON,
 				HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
 		String requestBody = mapper.writeValueAsString(new Entity("123"));
-		GatewayRequestImpl request = new GatewayRequestImpl();
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
 		request.setHttpMethod("POST");
 		request.setBody(requestBody);
 		request.setPath("/round-trip");
@@ -148,7 +148,7 @@ public class GatewayRequestObjectHandlerIntTest {
 		assertEquals(new GatewayResponse(responseBody, responseHeaders, Status.OK), response);
 	}
 
-	private void testProxy(GatewayRequestImpl request0, GatewayRequestImpl request1,
+	private void testProxy(DefaultGatewayRequest request0, DefaultGatewayRequest request1,
 			String expectedArg0, String expectedArg1) {
 		handler.handleRequest(request0, context);
 		verify(testService).injectedStringArg(expectedArg0);

@@ -61,7 +61,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.jrestless.core.container.dpi.InstanceBinder;
 import com.jrestless.core.container.io.JRestlessContainerRequest;
-import com.jrestless.core.container.io.JRestlessContainerRequestImpl;
+import com.jrestless.core.container.io.DefaultJRestlessContainerRequest;
 
 public class SimpleRequestHandlerIntTest {
 
@@ -92,7 +92,7 @@ public class SimpleRequestHandlerIntTest {
 		if (headers == null) {
 			headers = new HashMap<>();
 		}
-		return new JRestlessContainerRequestImpl(BASE_URI, URI.create(requestUri), httpMethod, is, headers);
+		return new DefaultJRestlessContainerRequest(BASE_URI, URI.create(requestUri), httpMethod, is, headers);
 	}
 
 	private JRestlessContainerRequest createJsonRequest(String requestUri, String httpMethod, String body) {

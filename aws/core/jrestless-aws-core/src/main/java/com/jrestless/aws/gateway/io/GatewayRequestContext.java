@@ -15,6 +15,8 @@
  */
 package com.jrestless.aws.gateway.io;
 
+import java.util.Map;
+
 /**
  * The request context passed through from AWS API Gateway to the Lambda
  * function.
@@ -67,4 +69,17 @@ public interface GatewayRequestContext {
 	 * The identifier API Gateway assigns to your API.
 	 */
 	String getApiId();
+
+	/**
+	 * The authorizer data.
+	 * <ul>
+	 * <li>If a custom authorizer is used, then the key "principalId" and all
+	 * property keys passed through the "context" map will be available.
+	 * <li>If a cognito user pool authorizer is used, then the "claims" key will
+	 * be available. The "claims" value will be a Map of strings.
+	 * <li>If no authorizer is used an empty map will be returned.
+	 * </ul>
+	 */
+	// this data is highly customizable so we use a map, here
+	Map<String, Object> getAuthorizer();
 }

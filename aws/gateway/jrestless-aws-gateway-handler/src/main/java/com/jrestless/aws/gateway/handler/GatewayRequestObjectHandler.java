@@ -17,7 +17,7 @@ package com.jrestless.aws.gateway.handler;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.jrestless.aws.gateway.io.GatewayRequestImpl;
+import com.jrestless.aws.gateway.io.DefaultGatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayResponse;
 
 /**
@@ -31,10 +31,10 @@ import com.jrestless.aws.gateway.io.GatewayResponse;
  *
  */
 public abstract class GatewayRequestObjectHandler extends GatewayRequestHandler
-		implements RequestHandler<GatewayRequestImpl, GatewayResponse> {
+		implements RequestHandler<DefaultGatewayRequest, GatewayResponse> {
 
 	@Override
-	public GatewayResponse handleRequest(GatewayRequestImpl request, Context lambdaContext) {
+	public GatewayResponse handleRequest(DefaultGatewayRequest request, Context lambdaContext) {
 		return delegateRequest(new GatewayRequestAndLambdaContext(request, lambdaContext));
 	}
 }

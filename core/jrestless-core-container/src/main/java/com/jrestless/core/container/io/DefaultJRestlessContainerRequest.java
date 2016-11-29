@@ -29,12 +29,12 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 /**
- * Default implementation of {@link JRestlessContainerRequestImpl}.
+ * Default implementation of {@link DefaultJRestlessContainerRequest}.
  *
  * @author Bjoern Bilger
  *
  */
-public class JRestlessContainerRequestImpl implements JRestlessContainerRequest {
+public class DefaultJRestlessContainerRequest implements JRestlessContainerRequest {
 
 	private URI baseUri;
 	private URI requestUri;
@@ -42,7 +42,7 @@ public class JRestlessContainerRequestImpl implements JRestlessContainerRequest 
 	private InputStream entityStream;
 	private Map<String, List<String>> headers;
 
-	public JRestlessContainerRequestImpl(@Nonnull URI baseUri, @Nonnull URI requestUri, @Nonnull String httpMethod,
+	public DefaultJRestlessContainerRequest(@Nonnull URI baseUri, @Nonnull URI requestUri, @Nonnull String httpMethod,
 			@Nonnull InputStream entityStream, @Nonnull Map<String, List<String>> headers) {
 		this.baseUri = requireNonNull(baseUri);
 		this.requestUri = requireNonNull(requestUri);
@@ -55,7 +55,7 @@ public class JRestlessContainerRequestImpl implements JRestlessContainerRequest 
 				.collect(Collectors.collectingAndThen(
 						Collectors.toMap(
 								Map.Entry::getKey,
-								JRestlessContainerRequestImpl::toImmutableList),
+								DefaultJRestlessContainerRequest::toImmutableList),
 						Collections::unmodifiableMap));
 	}
 
@@ -99,7 +99,7 @@ public class JRestlessContainerRequestImpl implements JRestlessContainerRequest 
 		if (!getClass().equals(other.getClass())) {
 			return false;
 		}
-		JRestlessContainerRequestImpl castOther = (JRestlessContainerRequestImpl) other;
+		DefaultJRestlessContainerRequest castOther = (DefaultJRestlessContainerRequest) other;
 		return Objects.equals(baseUri, castOther.baseUri) && Objects.equals(requestUri, castOther.requestUri)
 				&& Objects.equals(httpMethod, castOther.httpMethod)
 				&& Objects.equals(entityStream, castOther.entityStream) && Objects.equals(headers, castOther.headers);
