@@ -39,14 +39,16 @@ public final class GatewayResponse {
 	private final String body;
 	private final Map<String, String> headers;
 	private final int statusCode;
+	private final boolean base64Encoded;
 
 	public GatewayResponse(@Nullable String body, @Nonnull Map<String, String> headers,
-			@Nonnull StatusType statusType) {
+			@Nonnull StatusType statusType, boolean base64Encoded) {
 		requireNonNull(headers);
 		requireNonNull(statusType);
 		this.statusCode = statusType.getStatusCode();
 		this.body = body;
 		this.headers = Collections.unmodifiableMap(new HashMap<>(headers));
+		this.base64Encoded = base64Encoded;
 	}
 
 	public String getBody() {
@@ -60,10 +62,9 @@ public final class GatewayResponse {
 	public int getStatusCode() {
 		return statusCode;
 	}
-
-	@Override
-	public String toString() {
-		return "GatewayResponse [body=" + body + ", headers=" + headers + ", statusCode=" + statusCode + "]";
+	// APIGW expects the property to be called "isBase64Encoded"
+	public boolean isIsBase64Encoded() {
+		return base64Encoded;
 	}
 
 	@Override
@@ -78,12 +79,20 @@ public final class GatewayResponse {
 			return false;
 		}
 		GatewayResponse castOther = (GatewayResponse) other;
-		return Objects.equals(body, castOther.body) && Objects.equals(headers, castOther.headers)
-				&& Objects.equals(statusCode, castOther.statusCode);
+		return Objects.equals(body, castOther.body)
+				&& Objects.equals(headers, castOther.headers)
+				&& Objects.equals(statusCode, castOther.statusCode)
+				&& Objects.equals(base64Encoded, castOther.base64Encoded);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(body, headers, statusCode);
+		return Objects.hash(body, headers, statusCode, base64Encoded);
+	}
+
+	@Override
+	public String toString() {
+		return "GatewayResponse [body=" + body + ", headers=" + headers + ", statusCode=" + statusCode
+				+ ", base64Encoded=" + base64Encoded + "]";
 	}
 }

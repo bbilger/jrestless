@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.ext.RuntimeDelegate;
@@ -37,24 +38,35 @@ public final class HeaderUtils {
 	}
 
 	/**
+	 * See {@link #flattenHeaders(Map, Predicate)} with no headerNameFilter.
+	 */
+	public static Map<String, String> flattenHeaders(Map<String, List<String>> headers) {
+		return flattenHeaders(headers, headerName -> true);
+	}
+
+	/**
 	 * Flattens headers.
 	 * <ol>
 	 * <li>headers having a null key are filtered out
 	 * <li>headers having a null value instead of a list object are filtered out
 	 * <li>headers having an empty list value are filtered out
+	 * <li>headers no passing the headerNameFilter
 	 * <li>null header values (within the list) are filtered out
 	 * <li>lists of values are merged into a single string (in most cases
 	 * separated by a comma)
 	 * </ol>
 	 *
 	 * @param headers
+	 * @param headerNameFilter
 	 * @return flattened headers (unmodifiable!)
 	 */
-	public static Map<String, String> flattenHeaders(Map<String, List<String>> headers) {
+	public static Map<String, String> flattenHeaders(Map<String, List<String>> headers,
+			Predicate<String> headerNameFilter) {
 		return headers.entrySet().stream()
 				.filter(h -> h.getKey() != null)
 				.filter(h -> h.getValue() != null)
 				.filter(h -> !h.getValue().isEmpty())
+				.filter(h -> headerNameFilter.test(h.getKey()))
 				.collect(Collectors.collectingAndThen(
 						Collectors.toMap(
 								Map.Entry::getKey,

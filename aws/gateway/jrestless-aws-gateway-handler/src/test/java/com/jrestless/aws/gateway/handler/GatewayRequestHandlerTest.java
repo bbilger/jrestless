@@ -17,6 +17,8 @@ package com.jrestless.aws.gateway.handler;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -26,9 +28,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -40,10 +46,12 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.jrestless.aws.gateway.GatewayBinaryResponseCheckFilter;
 import com.jrestless.aws.gateway.io.DefaultGatewayIdentity;
-import com.jrestless.aws.gateway.io.DefaultGatewayRequestContext;
 import com.jrestless.aws.gateway.io.DefaultGatewayRequest;
+import com.jrestless.aws.gateway.io.DefaultGatewayRequestContext;
 import com.jrestless.aws.gateway.io.GatewayResponse;
 import com.jrestless.core.container.JRestlessHandlerContainer;
 import com.jrestless.core.container.handler.SimpleRequestHandler.SimpleResponseWriter;
@@ -75,7 +83,7 @@ public class GatewayRequestHandlerTest {
 		request.setHttpMethod("GET");
 		request.setRequestContext(reqContext);
 		GatewayRequestAndLambdaContext reqAndContext = new GatewayRequestAndLambdaContext(request, context);
-		GatewayResponse response = new GatewayResponse("testBody", new HashMap<>(), Status.OK);
+		GatewayResponse response = new GatewayResponse("testBody", new HashMap<>(), Status.OK, false);
 		SimpleResponseWriter<GatewayResponse> responseWriter = mock(SimpleResponseWriter.class);
 		when(responseWriter.getResponse()).thenReturn(response);
 		doReturn(responseWriter).when(gatewayHandler).createResponseWriter();
@@ -87,8 +95,6 @@ public class GatewayRequestHandlerTest {
 		containerEnhancerCapure.getValue().accept(containerRequest);
 		verify(containerRequest).setProperty("awsLambdaContext", context);
 		verify(containerRequest).setProperty("awsApiGatewayRequest", request);
-		verify(containerRequest).setProperty("awsApiGatewayRequestContext", reqContext);
-		verify(containerRequest).setProperty("awsApiGatewayIdentity", identity);
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -196,6 +202,52 @@ public class GatewayRequestHandlerTest {
 		((DefaultGatewayRequest) request.getGatewayRequest()).setHeaders(headers);
 		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
 		assertEquals(ImmutableMap.of("a_k", singletonList("a_v0,a_v1")), containerRequest.getHeaders());
+	}
+
+	@Test
+	public void testResponseWriterFiltersInternalBinaryHeader() throws IOException {
+		Map<String, List<String>> headers = new HashMap<>();
+		headers.put("a_k", Collections.singletonList("a_v"));
+		headers.put(GatewayBinaryResponseCheckFilter.HEADER_BINARY_RESPONSE, Collections.singletonList("true"));
+		headers.put("b_k", Collections.singletonList("b_v"));
+		SimpleResponseWriter<GatewayResponse> responseWriter = gatewayHandler.createResponseWriter();
+		responseWriter.writeResponse(Status.OK, headers, new ByteArrayOutputStream());
+		assertEquals(ImmutableMap.of("a_k", "a_v", "b_k", "b_v"), responseWriter.getResponse().getHeaders());
+	}
+
+	@Test
+	public void testResponseWriterSetsBase64EncodedFlagIfExactlyOneBinaryHeaderSetToTrue() throws IOException {
+		Map<String, List<String>> headers = new HashMap<>();
+		headers.put(GatewayBinaryResponseCheckFilter.HEADER_BINARY_RESPONSE, Collections.singletonList("true"));
+		SimpleResponseWriter<GatewayResponse> responseWriter = gatewayHandler.createResponseWriter();
+		responseWriter.writeResponse(Status.OK, headers, new ByteArrayOutputStream());
+		assertTrue(responseWriter.getResponse().isIsBase64Encoded());
+	}
+
+	@Test
+	public void testResponseWriterDoesntSetBase64EncodedFlagIfMultipleBinaryHeadersSet() throws IOException {
+		Map<String, List<String>> headers = new HashMap<>();
+		headers.put(GatewayBinaryResponseCheckFilter.HEADER_BINARY_RESPONSE, ImmutableList.of("true", "true"));
+		SimpleResponseWriter<GatewayResponse> responseWriter = gatewayHandler.createResponseWriter();
+		responseWriter.writeResponse(Status.OK, headers, new ByteArrayOutputStream());
+		assertFalse(responseWriter.getResponse().isIsBase64Encoded());
+	}
+
+	@Test
+	public void testResponseWriterDoesntSetBase64EncodedFlagIfNoBinaryHeadersSet() throws IOException {
+		Map<String, List<String>> headers = new HashMap<>();
+		SimpleResponseWriter<GatewayResponse> responseWriter = gatewayHandler.createResponseWriter();
+		responseWriter.writeResponse(Status.OK, headers, new ByteArrayOutputStream());
+		assertFalse(responseWriter.getResponse().isIsBase64Encoded());
+	}
+
+	@Test
+	public void testResponseWriterDoesntSetBase64EncodedFlagIfBinaryHeaderSetToFalse() throws IOException {
+		Map<String, List<String>> headers = new HashMap<>();
+		headers.put(GatewayBinaryResponseCheckFilter.HEADER_BINARY_RESPONSE, Collections.singletonList("false"));
+		SimpleResponseWriter<GatewayResponse> responseWriter = gatewayHandler.createResponseWriter();
+		responseWriter.writeResponse(Status.OK, headers, new ByteArrayOutputStream());
+		assertFalse(responseWriter.getResponse().isIsBase64Encoded());
 	}
 
 	private GatewayRequestAndLambdaContext createMinimalRequest() {

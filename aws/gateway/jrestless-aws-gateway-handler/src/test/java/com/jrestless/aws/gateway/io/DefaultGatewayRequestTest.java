@@ -1,6 +1,7 @@
 package com.jrestless.aws.gateway.io;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
@@ -118,33 +119,45 @@ public class DefaultGatewayRequestTest {
 			.addArguments(6, null, ImmutableMap.of("stageVariables", "stageVariables"))
 			.addArguments(7, null, requestContext)
 			.addArguments(8, null, "body")
+			.addArguments(9, true, false)
 			.testEquals();
 	}
 
 	@Test
 	public void testGetters() {
 		DefaultGatewayRequestContext requestContext = new DefaultGatewayRequestContext();
-		DefaultGatewayRequest request = new DefaultGatewayRequest("resource", "path", "httpMethod",
-				ImmutableMap.of("headers", "headers"),
-				ImmutableMap.of("queryStringParameters", "queryStringParameters"),
-				ImmutableMap.of("pathParameters", "pathParameters"),
-				ImmutableMap.of("stageVariables", "stageVariables"), requestContext, "body");
+		Map<String, String> headers = ImmutableMap.of("headers", "headers");
+		Map<String, String> queryStringParameters = ImmutableMap.of("queryStringParameters", "queryStringParameters");
+		Map<String, String> pathParameters = ImmutableMap.of("pathParameters", "pathParameters");
+		Map<String, String> stageVariables = ImmutableMap.of("stageVariables", "stageVariables");
+		DefaultGatewayRequest request = new DefaultGatewayRequest(
+				"resource",
+				"path",
+				"httpMethod",
+				headers,
+				queryStringParameters,
+				pathParameters,
+				stageVariables,
+				requestContext,
+				"body",
+				true);
 
 		assertEquals("resource", request.getResource());
 		assertEquals("path", request.getPath());
 		assertEquals("httpMethod", request.getHttpMethod());
-		assertEquals(ImmutableMap.of("headers", "headers"), request.getHeaders());
-		assertEquals(ImmutableMap.of("queryStringParameters", "queryStringParameters"), request.getQueryStringParameters());
-		assertEquals(ImmutableMap.of("pathParameters", "pathParameters"), request.getPathParameters());
-		assertEquals(ImmutableMap.of("stageVariables", "stageVariables"), request.getStageVariables());
+		assertEquals(headers, request.getHeaders());
+		assertEquals(queryStringParameters, request.getQueryStringParameters());
+		assertEquals(pathParameters, request.getPathParameters());
+		assertEquals(stageVariables, request.getStageVariables());
 		assertEquals(requestContext, request.getRequestContext());
 		assertEquals("body", request.getBody());
+		assertTrue(request.isBase64Encoded());
 	}
 
 	private Constructor<DefaultGatewayRequest> getConstructor() {
 		try {
 			return DefaultGatewayRequest.class.getDeclaredConstructor(String.class, String.class, String.class, Map.class,
-					Map.class, Map.class, Map.class, DefaultGatewayRequestContext.class, String.class);
+					Map.class, Map.class, Map.class, DefaultGatewayRequestContext.class, String.class, boolean.class);
 		} catch (NoSuchMethodException | SecurityException e) {
 			throw new RuntimeException(e);
 		}

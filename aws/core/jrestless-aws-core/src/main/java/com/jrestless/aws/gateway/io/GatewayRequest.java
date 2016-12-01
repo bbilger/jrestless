@@ -76,4 +76,6 @@ public interface GatewayRequest {
 	 * The request body.
 	 */
 	String getBody();
+
+	boolean isBase64Encoded();
 }

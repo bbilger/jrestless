@@ -16,6 +16,8 @@
 package com.jrestless.aws.gateway.handler;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doThrow;
@@ -24,10 +26,22 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Logger;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
+import javax.activation.DataSource;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.DELETE;
@@ -35,13 +49,18 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.StreamingOutput;
 
 import org.glassfish.hk2.utilities.Binder;
+import org.glassfish.jersey.logging.LoggingFeature;
+import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -51,16 +70,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import com.jrestless.aws.gateway.GatewayBinaryResponseCheckFilter;
 import com.jrestless.aws.gateway.GatewayResourceConfig;
+import com.jrestless.aws.gateway.io.DefaultGatewayRequest;
+import com.jrestless.aws.gateway.io.DefaultGatewayRequestContext;
 import com.jrestless.aws.gateway.io.GatewayIdentity;
 import com.jrestless.aws.gateway.io.GatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayRequestContext;
-import com.jrestless.aws.gateway.io.DefaultGatewayRequestContext;
-import com.jrestless.aws.gateway.io.DefaultGatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayResponse;
 import com.jrestless.core.container.dpi.InstanceBinder;
 
 public class GatewayRequestObjectHandlerIntTest {
+
+	private static final Logger LOGGER = Logger.getLogger(GatewayRequestObjectHandlerIntTest.class.getName());
 
 	private GatewayRequestObjectHandler handler;
 	private TestService testService;
@@ -73,6 +95,9 @@ public class GatewayRequestObjectHandlerIntTest {
 		Binder binder = new InstanceBinder.Builder().addInstance(testService, TestService.class).build();
 		config.register(binder);
 		config.register(TestResource.class);
+		config.register(EncodingFilter.class);
+		config.register(GZipEncoder.class);
+		config.register(new LoggingFeature(LOGGER, LoggingFeature.Verbosity.PAYLOAD_ANY));
 		handler = spy(new GatewayRequestObjectHandlerImpl());
 		handler.init(config);
 		handler.start();
@@ -128,7 +153,7 @@ public class GatewayRequestObjectHandlerIntTest {
 		DefaultGatewayRequest request = new DefaultGatewayRequest();
 		doThrow(new RuntimeException()).when(handler).createContainerRequest(any());
 		GatewayResponse response = handler.handleRequest(request, context);
-		assertEquals(new GatewayResponse(null, new HashMap<>(), Status.INTERNAL_SERVER_ERROR), response);
+		assertEquals(new GatewayResponse(null, new HashMap<>(), Status.INTERNAL_SERVER_ERROR, false), response);
 	}
 
 	@Test
@@ -143,9 +168,14 @@ public class GatewayRequestObjectHandlerIntTest {
 		request.setPath("/round-trip");
 		request.setHeaders(requestHeaders);
 		GatewayResponse response = handler.handleRequest(request, context);
-		Map<String, String> responseHeaders = ImmutableMap.of(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+		/*
+		 * check for the vary header is only necessary because we registered
+		 * org.glassfish.jersey.server.filter.EncodingFilter
+		 */
+		Map<String, String> responseHeaders = ImmutableMap.of(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON,
+				HttpHeaders.VARY, HttpHeaders.ACCEPT_ENCODING);
 		String responseBody = mapper.writeValueAsString(new Entity("123"));
-		assertEquals(new GatewayResponse(responseBody, responseHeaders, Status.OK), response);
+		assertEquals(new GatewayResponse(responseBody, responseHeaders, Status.OK, false), response);
 	}
 
 	private void testProxy(DefaultGatewayRequest request0, DefaultGatewayRequest request1,
@@ -154,6 +184,87 @@ public class GatewayRequestObjectHandlerIntTest {
 		verify(testService).injectedStringArg(expectedArg0);
 		handler.handleRequest(request1, context);
 		verify(testService).injectedStringArg(expectedArg1);
+	}
+
+	@Test
+	public void testBase64EncodingOfStreamingOutput() {
+		testBase64Encoding("/streaming-output");
+	}
+
+	@Test
+	public void testBase64EncodingOfInputStream() {
+		testBase64Encoding("/input-stream");
+	}
+
+	@Test
+	public void testBase64EncodingOfByteArray() {
+		testBase64Encoding("/byte-array");
+	}
+
+	@Test
+	public void testBase64EncodingOfDataSource() {
+		testBase64Encoding("/data-source");
+	}
+
+	@Test
+	public void testBase64EncodingWithContentEncoding() throws IOException {
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
+		request.setHttpMethod("GET");
+		request.setPath("/test-string");
+		request.setHeaders(ImmutableMap.of(HttpHeaders.ACCEPT_ENCODING, "gzip"));
+		GatewayResponse response = handler.handleRequest(request, context);
+		assertTrue(response.isIsBase64Encoded());
+		byte[] bytes = Base64.getDecoder().decode(response.getBody());
+		InputStream unzipStream = new GZIPInputStream(new ByteArrayInputStream(bytes));
+		assertEquals("test", new String(toBytes(unzipStream)));
+	}
+
+	private byte[] toBytes(InputStream is) throws IOException {
+	    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+	    int nRead;
+	    byte[] data = new byte[1024];
+	    while ((nRead = is.read(data, 0, data.length)) != -1) {
+	        buffer.write(data, 0, nRead);
+	    }
+	    buffer.flush();
+	    return buffer.toByteArray();
+	}
+
+	private void testBase64Encoding(String path) {
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
+		request.setHttpMethod("GET");
+		request.setPath(path);
+		GatewayResponse response = handler.handleRequest(request, context);
+		assertTrue(response.isIsBase64Encoded());
+		assertEquals(Base64.getEncoder().encodeToString("test".getBytes()), response.getBody());
+		assertFalse(response.getHeaders().containsKey(GatewayBinaryResponseCheckFilter.HEADER_BINARY_RESPONSE));
+	}
+
+	@Test
+	public void testBase64Decoding() {
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
+		request.setHttpMethod("PUT");
+		request.setPath("/binary-data");
+		request.setIsBase64Encoded(true);
+		request.setBody(new String(Base64.getEncoder().encode("test".getBytes()), StandardCharsets.UTF_8));
+		handler.handleRequest(request, context);
+		verify(testService).binaryData("test".getBytes());
+	}
+
+	@Test
+	public void testEncodedBase64Decoding() throws IOException {
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
+		request.setHttpMethod("PUT");
+		request.setPath("/binary-data");
+		request.setIsBase64Encoded(true);
+		request.setHeaders(Collections.singletonMap(HttpHeaders.CONTENT_ENCODING, "gzip"));
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try (GZIPOutputStream zipOut = new GZIPOutputStream(baos, true)) {
+			zipOut.write("test".getBytes());
+		} // finish + flush
+		request.setBody(Base64.getEncoder().encodeToString(baos.toByteArray()));
+		handler.handleRequest(request, context);
+		verify(testService).binaryData("test".getBytes());
 	}
 
 	@Path("/")
@@ -219,6 +330,64 @@ public class GatewayRequestObjectHandlerIntTest {
 		public Response putSomething(Entity entity) {
 			return Response.ok(entity).build();
 		}
+
+		@Path("/streaming-output")
+		@GET
+		public StreamingOutput getStreamingOutput() {
+			return new StreamingOutput() {
+				@Override
+				public void write(OutputStream output) throws IOException, WebApplicationException {
+					output.write("test".getBytes());
+				}
+			};
+		}
+
+		@Path("/input-stream")
+		@GET
+		public InputStream getInputStream() {
+			return new ByteArrayInputStream("test".getBytes());
+		}
+
+		@Path("/byte-array")
+		@GET
+		public byte[] getByteArray() {
+			return "test".getBytes();
+		}
+
+		@Path("/data-source")
+		@GET
+		public DataSource getDataSrouce() {
+			return new DataSource() {
+				@Override
+				public OutputStream getOutputStream() throws IOException {
+					return null;
+				}
+				@Override
+				public String getName() {
+					return null;
+				}
+				@Override
+				public InputStream getInputStream() throws IOException {
+					return new ByteArrayInputStream("test".getBytes());
+				}
+				@Override
+				public String getContentType() {
+					return null;
+				}
+			};
+		}
+
+		@Path("/binary-data")
+		@PUT
+		public void putBinary(byte[] in) {
+			service.binaryData(in);
+		}
+
+		@Path("/test-string")
+		@GET
+		public String getTestString() {
+			return "test";
+		}
 	}
 
 	public static interface TestService {
@@ -227,6 +396,7 @@ public class GatewayRequestObjectHandlerIntTest {
 		void injectedStringArg(String arg);
 		void injectGatewayRequestContext(GatewayRequestContext requestContext);
 		void injectGatewayIdentity(GatewayIdentity identity);
+		void binaryData(byte[] data);
 	}
 
 	public static class Entity {

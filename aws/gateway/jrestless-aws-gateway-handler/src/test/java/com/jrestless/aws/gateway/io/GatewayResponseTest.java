@@ -26,7 +26,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
-import com.jrestless.aws.gateway.io.GatewayResponse;
 import com.jrestless.test.ConstructorPreconditionsTester;
 import com.jrestless.test.CopyConstructorEqualsTester;
 
@@ -34,7 +33,7 @@ public class GatewayResponseTest {
 
 	@Test
 	public void getStatusCode_StatusTypeGiven_ShouldReturnStatusCodeFromType() {
-		GatewayResponse resp = new GatewayResponse(null, ImmutableMap.of(), Status.CONFLICT);
+		GatewayResponse resp = new GatewayResponse(null, ImmutableMap.of(), Status.CONFLICT, false);
 		Assert.assertEquals(409, resp.getStatusCode());
 	}
 
@@ -49,6 +48,7 @@ public class GatewayResponseTest {
 			.addArguments(1, ImmutableMap.of(), ImmutableMap.of("headerName", "headerValue"), nullHeader)
 			// statusType
 			.addArguments(2, Status.OK, Status.BAD_GATEWAY)
+			.addArguments(3, true, false)
 			.testEquals();
 	}
 
@@ -65,12 +65,13 @@ public class GatewayResponseTest {
 			// statusType
 			.addValidArgs(2, Status.OK)
 			.addInvalidNpeArg(2)
+			.addValidArgs(3, true, false)
 			.testPreconditionsAndValidCombinations();
 	}
 
 	private Constructor<GatewayResponse> getConstructor() {
 		try {
-			return GatewayResponse.class.getConstructor(String.class, Map.class, StatusType.class);
+			return GatewayResponse.class.getConstructor(String.class, Map.class, StatusType.class, boolean.class);
 		} catch (NoSuchMethodException | SecurityException e) {
 			throw new RuntimeException(e);
 		}

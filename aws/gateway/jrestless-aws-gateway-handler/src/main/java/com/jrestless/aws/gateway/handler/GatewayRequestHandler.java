@@ -15,6 +15,7 @@
  */
 package com.jrestless.aws.gateway.handler;
 
+import static com.jrestless.aws.gateway.GatewayBinaryResponseCheckFilter.HEADER_BINARY_RESPONSE;
 import static java.util.Objects.requireNonNull;
 
 import java.io.ByteArrayInputStream;
@@ -37,15 +38,13 @@ import org.glassfish.jersey.server.ContainerRequest;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.jrestless.aws.dpi.LambdaContextFactory;
-import com.jrestless.aws.gateway.dpi.GatewayIdentityContextFactory;
-import com.jrestless.aws.gateway.dpi.GatewayRequestContextContextFactory;
+import com.jrestless.aws.gateway.GatewayBinaryReadInterceptor;
 import com.jrestless.aws.gateway.dpi.GatewayRequestContextFactory;
 import com.jrestless.aws.gateway.io.GatewayRequest;
-import com.jrestless.aws.gateway.io.GatewayRequestContext;
 import com.jrestless.aws.gateway.io.GatewayResponse;
 import com.jrestless.core.container.handler.SimpleRequestHandler;
-import com.jrestless.core.container.io.JRestlessContainerRequest;
 import com.jrestless.core.container.io.DefaultJRestlessContainerRequest;
+import com.jrestless.core.container.io.JRestlessContainerRequest;
 import com.jrestless.core.util.HeaderUtils;
 
 /**
@@ -118,12 +117,8 @@ public abstract class GatewayRequestHandler
 		Context lambdaContext = requestAndLambdaContext.getLambdaContext();
 		actualContainerRequest.setProperty(LambdaContextFactory.PROPERTY_NAME, lambdaContext);
 		actualContainerRequest.setProperty(GatewayRequestContextFactory.PROPERTY_NAME, request);
-		GatewayRequestContext requestContext = request.getRequestContext();
-		actualContainerRequest.setProperty(GatewayRequestContextContextFactory.PROPERTY_NAME, requestContext);
-		if (requestContext != null) {
-			actualContainerRequest.setProperty(GatewayIdentityContextFactory.PROPERTY_NAME,
-					requestContext.getIdentity());
-		}
+		actualContainerRequest.setProperty(GatewayBinaryReadInterceptor.PROPERTY_BASE_64_ENCODED_REQUEST,
+				request.isBase64Encoded());
 	}
 
 	@Override
@@ -133,7 +128,7 @@ public abstract class GatewayRequestHandler
 
 	@Override
 	public GatewayResponse createInternalServerErrorResponse() {
-		return new GatewayResponse(null, Collections.emptyMap(), Status.INTERNAL_SERVER_ERROR);
+		return new GatewayResponse(null, Collections.emptyMap(), Status.INTERNAL_SERVER_ERROR, false);
 	}
 
 	public static class QueryParameterEncodingException extends RuntimeException {
@@ -160,9 +155,14 @@ public abstract class GatewayRequestHandler
 		@Override
 		public void writeResponse(StatusType statusType, Map<String, List<String>> headers,
 				OutputStream entityOutputStream) throws IOException {
-			Map<String, String> flattenedHeaders = HeaderUtils.flattenHeaders(headers);
+			List<String> binaryResponseHeader = headers.get(HEADER_BINARY_RESPONSE);
+			boolean binaryResponse = binaryResponseHeader != null
+					&& binaryResponseHeader.size() == 1
+					&& "true".equals(binaryResponseHeader.get(0));
+			Map<String, String> flattenedHeaders = HeaderUtils.flattenHeaders(headers,
+					headerName -> !HEADER_BINARY_RESPONSE.equals(headerName));
 			String body = ((ByteArrayOutputStream) entityOutputStream).toString(StandardCharsets.UTF_8.name());
-			response = new GatewayResponse(body, flattenedHeaders, statusType);
+			response = new GatewayResponse(body, flattenedHeaders, statusType, binaryResponse);
 		}
 
 		@Override

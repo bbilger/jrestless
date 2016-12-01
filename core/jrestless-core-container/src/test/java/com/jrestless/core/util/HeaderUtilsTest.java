@@ -55,6 +55,17 @@ public class HeaderUtilsTest {
 		assertEquals(ImmutableMap.of("a_k", "a_v", "c_k", "c_v"), flattenedHeaders);
 	}
 
+	@Test
+	public void flattenHeader_headerNameFilterGiven_ShouldFilterOutHeaders() {
+		Map<String, List<String>> listHeaders = new HashMap<>();
+		listHeaders.put("a_k", singletonList("a_v"));
+		listHeaders.put("b_k", singletonList("b_v"));
+		listHeaders.put("c_k", singletonList("c_v"));
+		listHeaders.put("d_k", singletonList("d_v"));
+		Map<String, String> flattenedHeaders = flattenHeaders(listHeaders, headerName -> !"b_k".equals(headerName) && !"c_k".equals(headerName));
+		assertEquals(ImmutableMap.of("a_k", "a_v", "d_k", "d_v"), flattenedHeaders);
+	}
+
 	@Test(expected = UnsupportedOperationException.class)
 	public void flattenHeaders_AnyGiven_ShouldReturnImmutableMap() {
 		flattenHeaders(new HashMap<>()).put("k", "v");

@@ -39,6 +39,7 @@ public final class DefaultGatewayRequest implements GatewayRequest {
 	private Map<String, String> stageVariables = Collections.emptyMap();
 	private GatewayRequestContext requestContext;
 	private String body;
+	private boolean base64Encoded;
 
 	public DefaultGatewayRequest() {
 		// for de-serialization
@@ -48,7 +49,8 @@ public final class DefaultGatewayRequest implements GatewayRequest {
 	// CHECKSTYLE:OFF
 	DefaultGatewayRequest(String resource, String path, String httpMethod, Map<String, String> headers,
 			Map<String, String> queryStringParameters, Map<String, String> pathParameters,
-			Map<String, String> stageVariables, DefaultGatewayRequestContext requestContext, String body) {
+			Map<String, String> stageVariables, DefaultGatewayRequestContext requestContext, String body,
+			boolean base64Encoded) {
 		setResource(resource);
 		setPath(path);
 		setHttpMethod(httpMethod);
@@ -58,6 +60,7 @@ public final class DefaultGatewayRequest implements GatewayRequest {
 		setStageVariables(stageVariables);
 		setRequestContext(requestContext);
 		setBody(body);
+		setIsBase64Encoded(base64Encoded);
 	}
 	// CHECKSTYLE:ON
 
@@ -150,6 +153,15 @@ public final class DefaultGatewayRequest implements GatewayRequest {
 	}
 
 	@Override
+	public boolean isBase64Encoded() {
+		return base64Encoded;
+	}
+	// the property is called "isBase64Encoded"
+	public void setIsBase64Encoded(boolean base64Encoded) {
+		this.base64Encoded = base64Encoded;
+	}
+
+	@Override
 	public boolean equals(final Object other) {
 		if (this == other) {
 			return true;
@@ -161,18 +173,22 @@ public final class DefaultGatewayRequest implements GatewayRequest {
 			return false;
 		}
 		DefaultGatewayRequest castOther = (DefaultGatewayRequest) other;
-		return Objects.equals(resource, castOther.resource) && Objects.equals(path, castOther.path)
-				&& Objects.equals(httpMethod, castOther.httpMethod) && Objects.equals(headers, castOther.headers)
+		return Objects.equals(resource, castOther.resource)
+				&& Objects.equals(path, castOther.path)
+				&& Objects.equals(httpMethod, castOther.httpMethod)
+				&& Objects.equals(headers, castOther.headers)
 				&& Objects.equals(queryStringParameters, castOther.queryStringParameters)
 				&& Objects.equals(pathParameters, castOther.pathParameters)
 				&& Objects.equals(stageVariables, castOther.stageVariables)
-				&& Objects.equals(requestContext, castOther.requestContext) && Objects.equals(body, castOther.body);
+				&& Objects.equals(requestContext, castOther.requestContext)
+				&& Objects.equals(body, castOther.body)
+				&& Objects.equals(base64Encoded, castOther.base64Encoded);
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(resource, path, httpMethod, headers, queryStringParameters, pathParameters, stageVariables,
-				requestContext, body);
+				requestContext, body, base64Encoded);
 	}
 
 	@Override
@@ -180,6 +196,6 @@ public final class DefaultGatewayRequest implements GatewayRequest {
 		return "DefaultGatewayRequest [resource=" + resource + ", path=" + path + ", httpMethod=" + httpMethod
 				+ ", headers=" + headers + ", queryStringParameters=" + queryStringParameters + ", pathParameters="
 				+ pathParameters + ", stageVariables=" + stageVariables + ", requestContext=" + requestContext
-				+ ", body=" + body + "]";
+				+ ", body=" + body + ", base64Encoded=" + base64Encoded + "]";
 	}
 }
