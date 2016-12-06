@@ -1,8 +1,8 @@
 package com.jrestless.security;
 
-interface OpenIdSubClaim extends Claims {
+import static com.jrestless.security.OpenIdClaimFieldNames.CLAIM_SUB;
 
-	String OPEN_ID_CLAIM_SUB = "sub";
+interface OpenIdSubClaim extends Claims {
 
 	/**
 	 * <dl>
@@ -17,6 +17,6 @@ interface OpenIdSubClaim extends Claims {
 	 * </dl>
 	 */
 	default String getSub() {
-		return (String) getClaim(OPEN_ID_CLAIM_SUB);
+		return (String) getClaim(CLAIM_SUB);
 	}
 }

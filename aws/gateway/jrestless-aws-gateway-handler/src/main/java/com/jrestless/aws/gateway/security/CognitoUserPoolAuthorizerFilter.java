@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.jrestless.aws.security.CognitoUserPoolAuthorizerClaims;
 import com.jrestless.aws.security.CognitoUserPoolAuthorizerPrincipal;
 import com.jrestless.security.OpenIdAddressClaims;
-import com.jrestless.security.OpenIdStandardClaims;
+import com.jrestless.security.OpenIdClaimFieldNames;
 
 /**
  * Filter to set a security context with a
@@ -70,14 +70,14 @@ public class CognitoUserPoolAuthorizerFilter extends AuthorizerFilter {
 	final SecurityContext createSecurityContext(Map<String, Object> authorizerData) {
 		Map<String, Object> claims = (Map<String, Object>) authorizerData.get("claims");
 		if (claims != null) {
-			Object subClaimObj = claims.get(OpenIdStandardClaims.OPEN_ID_CLAIM_STANDARD_SUB);
+			Object subClaimObj = claims.get(OpenIdClaimFieldNames.STANDARD_CLAIM_SUB);
 			if (subClaimObj == null) {
 				LOG.warn("sub claim is not set");
 			} else if (subClaimObj instanceof String) {
 				String subClaim = (String) subClaimObj;
 				if (!subClaim.trim().isEmpty()) {
 					OpenIdAddressClaims openIdAddressClaims = createAddressClaims(
-							(Map<String, Object>) claims.get(OpenIdStandardClaims.OPEN_ID_CLAIM_STANDARD_ADDRESS));
+							(Map<String, Object>) claims.get(OpenIdClaimFieldNames.STANDARD_CLAIM_ADDRESS));
 
 					CognitoUserPoolAuthorizerPrincipal principal = new CognitoUserPoolAuthorizerPrincipal() {
 						@Override

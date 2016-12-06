@@ -15,6 +15,25 @@
  */
 package com.jrestless.security;
 
+import static com.jrestless.security.OpenIdClaimFieldNames.STANDARD_CLAIM_BIRTHDATE;
+import static com.jrestless.security.OpenIdClaimFieldNames.STANDARD_CLAIM_EMAIL;
+import static com.jrestless.security.OpenIdClaimFieldNames.STANDARD_CLAIM_EMAIL_VERIFIED;
+import static com.jrestless.security.OpenIdClaimFieldNames.STANDARD_CLAIM_FAMILY_NAME;
+import static com.jrestless.security.OpenIdClaimFieldNames.STANDARD_CLAIM_GENDER;
+import static com.jrestless.security.OpenIdClaimFieldNames.STANDARD_CLAIM_GIVEN_NAME;
+import static com.jrestless.security.OpenIdClaimFieldNames.STANDARD_CLAIM_LOCALE;
+import static com.jrestless.security.OpenIdClaimFieldNames.STANDARD_CLAIM_MIDDLE_NAME;
+import static com.jrestless.security.OpenIdClaimFieldNames.STANDARD_CLAIM_NAME;
+import static com.jrestless.security.OpenIdClaimFieldNames.STANDARD_CLAIM_NICKNAME;
+import static com.jrestless.security.OpenIdClaimFieldNames.STANDARD_CLAIM_PHONE_NUMBER;
+import static com.jrestless.security.OpenIdClaimFieldNames.STANDARD_CLAIM_PHONE_NUMBER_VERIFIED;
+import static com.jrestless.security.OpenIdClaimFieldNames.STANDARD_CLAIM_PICTURE;
+import static com.jrestless.security.OpenIdClaimFieldNames.STANDARD_CLAIM_PREFERRED_USERNAME;
+import static com.jrestless.security.OpenIdClaimFieldNames.STANDARD_CLAIM_PROFILE;
+import static com.jrestless.security.OpenIdClaimFieldNames.STANDARD_CLAIM_UPDATED_AT;
+import static com.jrestless.security.OpenIdClaimFieldNames.STANDARD_CLAIM_WEBSITE;
+import static com.jrestless.security.OpenIdClaimFieldNames.STANDARD_CLAIM_ZONEINFO;
+
 /**
  * OpenID standard claims.
  * <p>
@@ -27,34 +46,13 @@ package com.jrestless.security;
  */
 public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 
-	String OPEN_ID_CLAIM_STANDARD_SUB = OPEN_ID_CLAIM_SUB;
-	String OPEN_ID_CLAIM_STANDARD_NAME = "name";
-	String OPEN_ID_CLAIM_STANDARD_GIVEN_NAME = "given_name";
-	String OPEN_ID_CLAIM_STANDARD_FAMILY_NAME = "family_name";
-	String OPEN_ID_CLAIM_STANDARD_MIDDLE_NAME = "middle_name";
-	String OPEN_ID_CLAIM_STANDARD_NICKNAME = "nickname";
-	String OPEN_ID_CLAIM_STANDARD_PREFERRED_USERNAME = "preferred_username";
-	String OPEN_ID_CLAIM_STANDARD_PROFILE = "profile";
-	String OPEN_ID_CLAIM_STANDARD_PICTURE = "picture";
-	String OPEN_ID_CLAIM_STANDARD_WEBSITE = "website";
-	String OPEN_ID_CLAIM_STANDARD_EMAIL = "email";
-	String OPEN_ID_CLAIM_STANDARD_EMAIL_VERIFIED = "email_verified";
-	String OPEN_ID_CLAIM_STANDARD_GENDER = "gender";
-	String OPEN_ID_CLAIM_STANDARD_BIRTHDATE = "birthdate";
-	String OPEN_ID_CLAIM_STANDARD_ZONEINFO = "zoneinfo";
-	String OPEN_ID_CLAIM_STANDARD_LOCALE = "locale";
-	String OPEN_ID_CLAIM_STANDARD_PHONE_NUMBER = "phone_number";
-	String OPEN_ID_CLAIM_STANDARD_PHONE_NUMBER_VERIFIED = "phone_number_verified";
-	String OPEN_ID_CLAIM_STANDARD_ADDRESS = "address";
-	String OPEN_ID_CLAIM_STANDARD_UPDATED_AT = "updated_at";
-
 	/**
 	 * End-User's full name in displayable form including all name parts,
 	 * possibly including titles and suffixes, ordered according to the
 	 * End-User's locale and preferences.
 	 */
 	default String getName() {
-		return (String) getClaim(OPEN_ID_CLAIM_STANDARD_NAME);
+		return (String) getClaim(STANDARD_CLAIM_NAME);
 	}
 
 	/**
@@ -63,7 +61,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	 * the names being separated by space characters.
 	 */
 	default String getGivenName() {
-		return (String) getClaim(OPEN_ID_CLAIM_STANDARD_GIVEN_NAME);
+		return (String) getClaim(STANDARD_CLAIM_GIVEN_NAME);
 	}
 
 	/**
@@ -72,7 +70,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	 * present, with the names being separated by space characters.
 	 */
 	default String getFamilyName() {
-		return (String) getClaim(OPEN_ID_CLAIM_STANDARD_FAMILY_NAME);
+		return (String) getClaim(STANDARD_CLAIM_FAMILY_NAME);
 	}
 
 	/**
@@ -82,7 +80,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	 * names are not used.
 	 */
 	default String getMiddleName() {
-		return (String) getClaim(OPEN_ID_CLAIM_STANDARD_MIDDLE_NAME);
+		return (String) getClaim(STANDARD_CLAIM_MIDDLE_NAME);
 	}
 
 	/**
@@ -91,7 +89,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	 * alongside a given_name value of Michael.
 	 */
 	default String getNickname() {
-		return (String) getClaim(OPEN_ID_CLAIM_STANDARD_NICKNAME);
+		return (String) getClaim(STANDARD_CLAIM_NICKNAME);
 	}
 
 	/**
@@ -103,7 +101,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	 * 5.7</a>.
 	 */
 	default String getPreferredUsername() {
-		return (String) getClaim(OPEN_ID_CLAIM_STANDARD_PREFERRED_USERNAME);
+		return (String) getClaim(STANDARD_CLAIM_PREFERRED_USERNAME);
 	}
 
 	/**
@@ -111,7 +109,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	 * be about the End-User.
 	 */
 	default String getProfile() {
-		return (String) getClaim(OPEN_ID_CLAIM_STANDARD_PROFILE);
+		return (String) getClaim(STANDARD_CLAIM_PROFILE);
 	}
 
 	/**
@@ -123,7 +121,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	 * End-User.
 	 */
 	default String getPicture() {
-		return (String) getClaim(OPEN_ID_CLAIM_STANDARD_PICTURE);
+		return (String) getClaim(STANDARD_CLAIM_PICTURE);
 	}
 
 	/**
@@ -132,7 +130,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	 * End-User is affiliated with.
 	 */
 	default String getWebsite() {
-		return (String) getClaim(OPEN_ID_CLAIM_STANDARD_WEBSITE);
+		return (String) getClaim(STANDARD_CLAIM_WEBSITE);
 	}
 
 	/**
@@ -144,7 +142,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	 * "http://openid.net/specs/openid-connect-core-1_0.html#ClaimStability">5.7</a>.
 	 */
 	default String getEmail() {
-		return (String) getClaim(OPEN_ID_CLAIM_STANDARD_EMAIL);
+		return (String) getClaim(STANDARD_CLAIM_EMAIL);
 	}
 
 	/**
@@ -159,7 +157,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	 * operating.
 	 */
 	default Boolean getEmailVerified() {
-		return (Boolean) getClaim(OPEN_ID_CLAIM_STANDARD_EMAIL_VERIFIED);
+		return (Boolean) getClaim(STANDARD_CLAIM_EMAIL_VERIFIED);
 	}
 
 	/**
@@ -168,7 +166,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	 * applicable.
 	 */
 	default String getGender() {
-		return (String) getClaim(OPEN_ID_CLAIM_STANDARD_GENDER);
+		return (String) getClaim(STANDARD_CLAIM_GENDER);
 	}
 
 	/**
@@ -182,7 +180,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	 * the dates.
 	 */
 	default String getBirthdate() {
-		return (String) getClaim(OPEN_ID_CLAIM_STANDARD_BIRTHDATE);
+		return (String) getClaim(STANDARD_CLAIM_BIRTHDATE);
 	}
 
 	/**
@@ -192,7 +190,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	 * Europe/Paris or America/Los_Angeles.
 	 */
 	default String getZoneinfo() {
-		return (String) getClaim(OPEN_ID_CLAIM_STANDARD_ZONEINFO);
+		return (String) getClaim(STANDARD_CLAIM_ZONEINFO);
 	}
 
 	/**
@@ -209,7 +207,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	 * locale syntax as well.
 	 */
 	default String getLocale() {
-		return (String) getClaim(OPEN_ID_CLAIM_STANDARD_LOCALE);
+		return (String) getClaim(STANDARD_CLAIM_LOCALE);
 	}
 
 	/**
@@ -223,7 +221,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	 * 555-1234;ext=5678.
 	 */
 	default String getPhoneNumber() {
-		return (String) getClaim(OPEN_ID_CLAIM_STANDARD_PHONE_NUMBER);
+		return (String) getClaim(STANDARD_CLAIM_PHONE_NUMBER);
 	}
 
 	/**
@@ -239,7 +237,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	 * any extensions MUST be represented in RFC 3966 format.
 	 */
 	default Boolean getPhoneNumberVerified() {
-		return (Boolean) getClaim(OPEN_ID_CLAIM_STANDARD_PHONE_NUMBER_VERIFIED);
+		return (Boolean) getClaim(STANDARD_CLAIM_PHONE_NUMBER_VERIFIED);
 	}
 
 	/**
@@ -258,6 +256,6 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	 * measured in UTC until the date/time.
 	 */
 	default Long getUpdatedAt() {
-		return (Long) getClaim(OPEN_ID_CLAIM_STANDARD_UPDATED_AT);
+		return (Long) getClaim(STANDARD_CLAIM_UPDATED_AT);
 	}
 }

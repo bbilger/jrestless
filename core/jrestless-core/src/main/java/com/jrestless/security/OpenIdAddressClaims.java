@@ -15,6 +15,13 @@
  */
 package com.jrestless.security;
 
+import static com.jrestless.security.OpenIdClaimFieldNames.ADDRESS_CLAIM_COUNTRY;
+import static com.jrestless.security.OpenIdClaimFieldNames.ADDRESS_CLAIM_FORMATTED;
+import static com.jrestless.security.OpenIdClaimFieldNames.ADDRESS_CLAIM_LOCALITY;
+import static com.jrestless.security.OpenIdClaimFieldNames.ADDRESS_CLAIM_POSTAL_CODE;
+import static com.jrestless.security.OpenIdClaimFieldNames.ADDRESS_CLAIM_REGION;
+import static com.jrestless.security.OpenIdClaimFieldNames.ADDRESS_CLAIM_STREET_ADDRESS;
+
 /**
  * OpenID Address claims.
  * <p>
@@ -27,13 +34,6 @@ package com.jrestless.security;
  */
 public interface OpenIdAddressClaims extends Claims {
 
-	String OPEN_ID_CLAIM_ADDRESS_FORMATTED = "formatted";
-	String OPEN_ID_CLAIM_ADDRESS_STREET_ADDRESS = "street_address";
-	String OPEN_ID_CLAIM_ADDRESS_LOCALITY = "locality";
-	String OPEN_ID_CLAIM_ADDRESS_REGION = "region";
-	String OPEN_ID_CLAIM_ADDRESS_POSTAL_CODE = "postal_code";
-	String OPEN_ID_CLAIM_ADDRESS_COUNTRY = "country";
-
 	/**
 	 * Full mailing address, formatted for display or use on a mailing label.
 	 * This field MAY contain multiple lines, separated by newlines. Newlines
@@ -41,7 +41,7 @@ public interface OpenIdAddressClaims extends Claims {
 	 * as a single line feed character ("\n").
 	 */
 	default String getFormatted() {
-		return (String) getClaim(OPEN_ID_CLAIM_ADDRESS_FORMATTED);
+		return (String) getClaim(ADDRESS_CLAIM_FORMATTED);
 	}
 
 	/**
@@ -52,35 +52,35 @@ public interface OpenIdAddressClaims extends Claims {
 	 * feed pair ("\r\n") or as a single line feed character ("\n").
 	 */
 	default String getStreetAddress() {
-		return (String) getClaim(OPEN_ID_CLAIM_ADDRESS_STREET_ADDRESS);
+		return (String) getClaim(ADDRESS_CLAIM_STREET_ADDRESS);
 	}
 
 	/**
 	 * City or locality component.
 	 */
 	default String getLocality() {
-		return (String) getClaim(OPEN_ID_CLAIM_ADDRESS_LOCALITY);
+		return (String) getClaim(ADDRESS_CLAIM_LOCALITY);
 	}
 
 	/**
 	 * State, province, prefecture, or region component.
 	 */
 	default String getRegion() {
-		return (String) getClaim(OPEN_ID_CLAIM_ADDRESS_REGION);
+		return (String) getClaim(ADDRESS_CLAIM_REGION);
 	}
 
 	/**
 	 * Zip code or postal code component.
 	 */
 	default String getPostalCode() {
-		return (String) getClaim(OPEN_ID_CLAIM_ADDRESS_POSTAL_CODE);
+		return (String) getClaim(ADDRESS_CLAIM_POSTAL_CODE);
 	}
 
 	/**
 	 * Country name component.
 	 */
 	default String getCountry() {
-		return (String) getClaim(OPEN_ID_CLAIM_ADDRESS_COUNTRY);
+		return (String) getClaim(ADDRESS_CLAIM_COUNTRY);
 	}
 
 }
