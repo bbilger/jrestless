@@ -17,6 +17,8 @@ package com.jrestless.aws.gateway.handler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
@@ -32,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,6 +57,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.glassfish.hk2.utilities.Binder;
@@ -63,6 +67,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -70,14 +75,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
-import com.jrestless.aws.gateway.GatewayBinaryResponseCheckFilter;
 import com.jrestless.aws.gateway.GatewayResourceConfig;
 import com.jrestless.aws.gateway.io.DefaultGatewayRequest;
 import com.jrestless.aws.gateway.io.DefaultGatewayRequestContext;
+import com.jrestless.aws.gateway.io.GatewayBinaryResponseCheckFilter;
 import com.jrestless.aws.gateway.io.GatewayIdentity;
 import com.jrestless.aws.gateway.io.GatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayRequestContext;
 import com.jrestless.aws.gateway.io.GatewayResponse;
+import com.jrestless.aws.security.CustomAuthorizerPrincipal;
+import com.jrestless.aws.security.CognitoUserPoolAuthorizerPrincipal;
 import com.jrestless.core.container.dpi.InstanceBinder;
 
 public class GatewayRequestObjectHandlerIntTest {
@@ -267,6 +274,58 @@ public class GatewayRequestObjectHandlerIntTest {
 		verify(testService).binaryData("test".getBytes());
 	}
 
+	@Test
+	public void testNoPrincipalWithNullAuthorizer() {
+		assertNull(testPrincipal(null));
+	}
+
+	@Test
+	public void testNoPrincipalWithEmptyAuthorizer() {
+		assertNull(testPrincipal(Collections.emptyMap()));
+	}
+
+	@Test
+	public void testCognitoCustomAuthorizerPrincipal() {
+		Map<String, Object> authorizerDate = new HashMap<>();
+		authorizerDate.put("principalId", "123");
+		authorizerDate.put("custom:value", "blub");
+		Principal principal = testPrincipal(authorizerDate);
+		assertTrue(principal instanceof CustomAuthorizerPrincipal);
+		CustomAuthorizerPrincipal cognitoCustomPrincipal = (CustomAuthorizerPrincipal) principal;
+		assertEquals("123", cognitoCustomPrincipal.getName());
+		assertEquals("123", cognitoCustomPrincipal.getClaims().getPrincipalId());
+		assertEquals("blub", cognitoCustomPrincipal.getClaims().getClaim("custom:value"));
+	}
+
+	@Test
+	public void testCognitoUserPoolAuthorizerPrincipal() {
+		Map<String, Object> claims = new HashMap<>();
+		claims.put("sub", "123");
+		Map<String, Object> authorizerData = new HashMap<>();
+		authorizerData.put("claims", claims);
+		Principal principal = testPrincipal(authorizerData);
+		assertTrue(principal instanceof CognitoUserPoolAuthorizerPrincipal);
+		CognitoUserPoolAuthorizerPrincipal cognitoUserPoolPrincipal = (CognitoUserPoolAuthorizerPrincipal) principal;
+		assertEquals("123", cognitoUserPoolPrincipal.getName());
+		assertNotNull(cognitoUserPoolPrincipal.getClaims());
+		assertEquals("123", cognitoUserPoolPrincipal.getClaims().getSub());
+		assertEquals("123", cognitoUserPoolPrincipal.getClaims().getClaim("sub"));
+	}
+
+	private Principal testPrincipal(Map<String, Object> authorizerData) {
+		DefaultGatewayRequestContext requestContext = new DefaultGatewayRequestContext();
+		requestContext.setAuthorizer(authorizerData);
+		DefaultGatewayRequest request = new DefaultGatewayRequest();
+		request.setHttpMethod("GET");
+		request.setPath("/security-context");
+		request.setRequestContext(requestContext);
+		ArgumentCaptor<SecurityContext> securityContextCapture = ArgumentCaptor.forClass(SecurityContext.class);
+		handler.handleRequest(request, context);
+		verify(testService).injectSecurityContext(securityContextCapture.capture());
+		SecurityContext sc = securityContextCapture.getValue();
+		return sc.getUserPrincipal();
+	}
+
 	@Path("/")
 	@Singleton // singleton in order to test proxies
 	public static class TestResource {
@@ -388,6 +447,12 @@ public class GatewayRequestObjectHandlerIntTest {
 		public String getTestString() {
 			return "test";
 		}
+
+		@Path("/security-context")
+		@GET
+		public void getSc(@javax.ws.rs.core.Context SecurityContext securityContext) {
+			service.injectSecurityContext(securityContext);
+		}
 	}
 
 	public static interface TestService {
@@ -397,6 +462,7 @@ public class GatewayRequestObjectHandlerIntTest {
 		void injectGatewayRequestContext(GatewayRequestContext requestContext);
 		void injectGatewayIdentity(GatewayIdentity identity);
 		void binaryData(byte[] data);
+		void injectSecurityContext(SecurityContext sc);
 	}
 
 	public static class Entity {

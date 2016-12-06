@@ -159,6 +159,7 @@ subprojects {
 }
 
 dependencies {
+	compile project(":core:jrestless-core")
 	compile project(":core:jrestless-core-container")
 	compile project(":aws:core:jrestless-aws-core-handler")
 	compile project(":aws:core:jrestless-aws-core")

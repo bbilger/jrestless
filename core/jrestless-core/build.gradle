@@ -1,0 +1,8 @@
+group = 'com.jrestless.core'
+version = "${globaleModuleVersion}"
+
+dependencies {
+	testCompile(
+		libraries.junit
+	)
+}

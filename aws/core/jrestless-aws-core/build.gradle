@@ -2,6 +2,7 @@ group = 'com.jrestless.aws'
 version = "${globaleModuleVersion}"
 
 dependencies {
+	compile project(':core:jrestless-core')
 	compile(
 		libraries.findbugs_jsr305
 	)

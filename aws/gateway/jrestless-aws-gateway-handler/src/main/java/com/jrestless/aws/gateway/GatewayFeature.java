@@ -22,7 +22,12 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 
 import com.jrestless.aws.gateway.dpi.GatewayRequestContextFactory;
+import com.jrestless.aws.gateway.io.GatewayBinaryReadInterceptor;
+import com.jrestless.aws.gateway.io.GatewayBinaryResponseCheckFilter;
+import com.jrestless.aws.gateway.io.GatewayBinaryWriteInterceptor;
 import com.jrestless.aws.gateway.io.GatewayRequest;
+import com.jrestless.aws.gateway.security.CustomAuthorizerFilter;
+import com.jrestless.aws.gateway.security.CognitoUserPoolAuthorizerFilter;
 
 /**
  * Binds Gateway specific values.
@@ -63,6 +68,8 @@ public class GatewayFeature implements Feature {
 		context.register(GatewayBinaryReadInterceptor.class);
 		context.register(GatewayBinaryResponseCheckFilter.class);
 		context.register(GatewayBinaryWriteInterceptor.class);
+		context.register(CustomAuthorizerFilter.class);
+		context.register(CognitoUserPoolAuthorizerFilter.class);
 		return true;
 	}
 }

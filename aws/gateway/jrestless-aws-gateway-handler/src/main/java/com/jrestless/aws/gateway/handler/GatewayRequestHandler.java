@@ -15,7 +15,7 @@
  */
 package com.jrestless.aws.gateway.handler;
 
-import static com.jrestless.aws.gateway.GatewayBinaryResponseCheckFilter.HEADER_BINARY_RESPONSE;
+import static com.jrestless.aws.gateway.io.GatewayBinaryResponseCheckFilter.HEADER_BINARY_RESPONSE;
 import static java.util.Objects.requireNonNull;
 
 import java.io.ByteArrayInputStream;
@@ -38,8 +38,8 @@ import org.glassfish.jersey.server.ContainerRequest;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.jrestless.aws.dpi.LambdaContextFactory;
-import com.jrestless.aws.gateway.GatewayBinaryReadInterceptor;
 import com.jrestless.aws.gateway.dpi.GatewayRequestContextFactory;
+import com.jrestless.aws.gateway.io.GatewayBinaryReadInterceptor;
 import com.jrestless.aws.gateway.io.GatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayResponse;
 import com.jrestless.core.container.handler.SimpleRequestHandler;
