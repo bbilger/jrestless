@@ -3,7 +3,7 @@ version = "${globaleModuleVersion}"
 
 dependencies {
 	compile(
-		libraries.jersey_containers_project,
+		libraries.jersey_server,
 		libraries.slf4j_api,
 		libraries.findbugs_jsr305
 	)
