@@ -23,9 +23,6 @@ package com.jrestless.security;
  */
 public final class OpenIdClaimFieldNames {
 
-	private OpenIdClaimFieldNames() {
-	}
-
 	static final String CLAIM_SUB = "sub";
 
 	public static final String ID_TOKEN_CLAIM_ISS = "iss";
@@ -66,4 +63,7 @@ public final class OpenIdClaimFieldNames {
 	public static final String ADDRESS_CLAIM_REGION = "region";
 	public static final String ADDRESS_CLAIM_POSTAL_CODE = "postal_code";
 	public static final String ADDRESS_CLAIM_COUNTRY = "country";
+
+	private OpenIdClaimFieldNames() {
+	}
 }

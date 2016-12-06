@@ -35,9 +35,7 @@ import com.jrestless.security.OpenIdStandardClaims;
  *
  */
 public interface CognitoUserPoolAuthorizerClaims extends OpenIdIdTokenClaims, OpenIdStandardClaims {
-	String OPEN_ID_CLAIM_CUSTOM_COGNITO_USER_NAME = "cognito:username";
-
 	default String getCognitoUserName() {
-		return (String) getClaim(OPEN_ID_CLAIM_CUSTOM_COGNITO_USER_NAME);
+		return (String) getClaim("cognito:username");
 	}
 }

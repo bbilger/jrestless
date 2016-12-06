@@ -16,6 +16,7 @@ public class OpenIdStandardClaimsTest extends ClaimsTest<OpenIdStandardClaims> {
         return Arrays.asList(new Object[][] {
                  { "getSub", "sub", "someSubValue" },
                  { "getName", "name", "someNameValue" },
+                 { "getGivenName", "given_name", "someGivenNameValue" },
                  { "getFamilyName", "family_name", "someFamilyNameValue" },
                  { "getMiddleName", "middle_name", "someMiddleNameValue" },
                  { "getNickname", "nickname", "someNicknameValue" },
@@ -28,6 +29,7 @@ public class OpenIdStandardClaimsTest extends ClaimsTest<OpenIdStandardClaims> {
                  { "getGender", "gender", "someGenderValue" },
                  { "getBirthdate", "birthdate", "someBirthdateValue" },
                  { "getZoneinfo", "zoneinfo", "someZoneinfoValue" },
+                 { "getLocale", "locale", "someLocaleValue" },
                  { "getPhoneNumber", "phone_number", "somePhoneNumberValue" },
                  { "getPhoneNumberVerified", "phone_number_verified", true },
                  { "getUpdatedAt", "updated_at", 123L }

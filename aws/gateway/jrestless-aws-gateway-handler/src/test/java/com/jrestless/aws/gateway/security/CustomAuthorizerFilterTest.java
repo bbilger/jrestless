@@ -1,6 +1,7 @@
 package com.jrestless.aws.gateway.security;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -55,6 +56,27 @@ public class CustomAuthorizerFilterTest extends AuthorizerFilterTest {
 	public void principalIdGiven_ShouldSetSecurityContext() {
 		SecurityContext sc = filterAndReturnSetSecurityContext(Collections.singletonMap("principalId", "123"));
 		assertNotNull(sc);
+	}
+
+	@Test
+	public void validRequestGiven_ShouldSetSecurityContextThatIsSecure() {
+		SecurityContext sc = filterAndReturnSetSecurityContext(Collections.singletonMap("principalId", "123"));
+		assertTrue(sc.isSecure());
+	}
+
+	@Test
+	public void validRequestGiven_ShouldSetSecurityContextWithUserCognitoPoolAuthorizerAuthenticationScheme() {
+		SecurityContext sc = filterAndReturnSetSecurityContext(Collections.singletonMap("principalId", "123"));
+		assertEquals("custom_authorizer", sc.getAuthenticationScheme());
+	}
+
+	@Test
+	public void validRequestGiven_ShouldSetSecurityContextWithUserNeverInAnyRole() {
+		SecurityContext sc = filterAndReturnSetSecurityContext(Collections.singletonMap("principalId", "123"));
+		assertFalse(sc.isUserInRole(null));
+		assertFalse(sc.isUserInRole(""));
+		assertFalse(sc.isUserInRole("user"));
+		assertFalse(sc.isUserInRole("USER"));
 	}
 
 	@Test

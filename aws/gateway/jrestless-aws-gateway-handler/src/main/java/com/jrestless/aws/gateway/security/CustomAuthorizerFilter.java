@@ -59,7 +59,7 @@ public class CustomAuthorizerFilter extends AuthorizerFilter {
 	 * @return security context using the passed principal
 	 */
 	protected SecurityContext createSecurityContext(@Nonnull CustomAuthorizerPrincipal principal) {
-		return new AuthorizerSecurityContext("cognito_custom_authorizer", principal);
+		return new AuthorizerSecurityContext("custom_authorizer", principal);
 	}
 
 	@Override

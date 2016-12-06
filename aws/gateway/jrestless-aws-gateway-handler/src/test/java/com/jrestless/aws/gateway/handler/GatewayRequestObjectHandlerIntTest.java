@@ -30,6 +30,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -83,8 +85,8 @@ import com.jrestless.aws.gateway.io.GatewayIdentity;
 import com.jrestless.aws.gateway.io.GatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayRequestContext;
 import com.jrestless.aws.gateway.io.GatewayResponse;
-import com.jrestless.aws.security.CustomAuthorizerPrincipal;
 import com.jrestless.aws.security.CognitoUserPoolAuthorizerPrincipal;
+import com.jrestless.aws.security.CustomAuthorizerPrincipal;
 import com.jrestless.core.container.dpi.InstanceBinder;
 
 public class GatewayRequestObjectHandlerIntTest {
@@ -206,6 +208,11 @@ public class GatewayRequestObjectHandlerIntTest {
 	@Test
 	public void testBase64EncodingOfByteArray() {
 		testBase64Encoding("/byte-array");
+	}
+
+	@Test
+	public void testBase64EncodingOfFile() {
+		testBase64Encoding("/file");
 	}
 
 	@Test
@@ -411,6 +418,16 @@ public class GatewayRequestObjectHandlerIntTest {
 		@GET
 		public byte[] getByteArray() {
 			return "test".getBytes();
+		}
+
+		@Path("/file")
+		@GET
+		public File getFile() throws IOException {
+			File file = File.createTempFile("some-test-file", ".test");
+			try (OutputStream os = new FileOutputStream(file)) {
+				os.write("test".getBytes());
+			}
+			return file;
 		}
 
 		@Path("/data-source")
