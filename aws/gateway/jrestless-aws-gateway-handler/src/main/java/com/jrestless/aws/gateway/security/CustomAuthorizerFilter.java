@@ -69,8 +69,9 @@ public class CustomAuthorizerFilter extends AuthorizerFilter {
 			if (principalIdObj instanceof String) {
 				String principalId = (String) principalIdObj;
 				if (!principalId.trim().isEmpty()) {
-					CustomAuthorizerClaims customAuthorizerClaims = createCustomAuthorizerClaims(authorizerData, principalId);
-					CustomAuthorizerPrincipal principal = () -> customAuthorizerClaims;
+					CustomAuthorizerClaims authorizerClaims = createCustomAuthorizerClaims(authorizerData,
+							principalId);
+					CustomAuthorizerPrincipal principal = () -> authorizerClaims;
 					return createSecurityContext(principal);
 				} else {
 					LOG.warn("principalId may not be empty or blank");
@@ -82,7 +83,8 @@ public class CustomAuthorizerFilter extends AuthorizerFilter {
 		return null;
 	}
 
-	private CustomAuthorizerClaims createCustomAuthorizerClaims(Map<String, Object> authorizerData, String principalId) {
+	private CustomAuthorizerClaims createCustomAuthorizerClaims(Map<String, Object> authorizerData,
+			String principalId) {
 		return new CustomAuthorizerClaims() {
 			@Override
 			public String getPrincipalId() {

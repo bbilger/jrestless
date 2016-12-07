@@ -79,10 +79,10 @@ public class CognitoUserPoolAuthorizerFilter extends AuthorizerFilter {
 					OpenIdAddressClaims openIdAddressClaims = createAddressClaims(
 							(Map<String, Object>) claims.get(OpenIdClaimFieldNames.STANDARD_CLAIM_ADDRESS));
 
-					CognitoUserPoolAuthorizerClaims cognitoUserPoolAuthorizerClaims = createCognitoUserPoolAuthorizerClaims(
-							claims, openIdAddressClaims);
+					CognitoUserPoolAuthorizerClaims cognitoClaims = createCognitoUserPoolAuthorizerClaims(claims,
+							openIdAddressClaims);
 
-					CognitoUserPoolAuthorizerPrincipal principal = () -> cognitoUserPoolAuthorizerClaims;
+					CognitoUserPoolAuthorizerPrincipal principal = () -> cognitoClaims;
 					return createSecurityContext(principal);
 				} else {
 					LOG.warn("sub claim may not be empty or blank");
