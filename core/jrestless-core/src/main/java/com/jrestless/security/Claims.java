@@ -15,6 +15,19 @@
  */
 package com.jrestless.security;
 
+/**
+ * Access claims by their names - normally from a map.
+ *
+ * @author Bjoern Bilger
+ */
+@FunctionalInterface
 public interface Claims {
+	/**
+	 * Returns claim's value or null if it doesn't exist.
+	 *
+	 * @param name
+	 *            the name of the claim
+	 * @return the claim's value or null if it doesn't exist
+	 */
 	Object getClaim(String name);
 }
