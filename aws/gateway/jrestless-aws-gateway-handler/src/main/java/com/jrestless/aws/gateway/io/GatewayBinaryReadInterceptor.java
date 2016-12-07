@@ -20,7 +20,6 @@ import java.util.Base64;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
 
@@ -57,7 +56,7 @@ public class GatewayBinaryReadInterceptor implements ReaderInterceptor {
 	static final int PRIORITY_OFFSET = 100;
 
 	@Override
-	public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException, WebApplicationException {
+	public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException {
 		if (Boolean.TRUE.equals(context.getProperty(PROPERTY_BASE_64_ENCODED_REQUEST))) {
 			context.setInputStream(Base64.getDecoder().wrap(context.getInputStream()));
 		}

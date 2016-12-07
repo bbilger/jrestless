@@ -18,12 +18,10 @@ package com.jrestless.aws.service.io;
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -36,9 +34,7 @@ import javax.annotation.Nullable;
 *
 * @author Bjoern Bilger
 */
-public final class DefaultServiceRequest implements ServiceRequest {
-	private String body;
-	private Map<String, List<String>> headers = Collections.emptyMap();
+public final class DefaultServiceRequest extends ServiceDto implements ServiceRequest {
 	private URI requestUri;
 	private String httpMethod;
 
@@ -46,67 +42,15 @@ public final class DefaultServiceRequest implements ServiceRequest {
 	 * For de-serialization frameworks, only.
 	 */
 	public DefaultServiceRequest() {
+		super(Collections.emptyMap());
 		// for de-serialization
 	}
 
 	public DefaultServiceRequest(@Nullable String body, @Nonnull Map<String, List<String>> headers,
 			@Nonnull URI requestUri, @Nonnull String httpMethod) {
-		setBody(body);
-		setHeaders(headers);
+		super(body, headers, Collections.emptyMap());
 		setRequestUri(requestUri);
 		setHttpMethod(httpMethod);
-	}
-
-	/**
-	 * Returns the body.
-	 * <p>
-	 * Note: null is a possible and valid value.
-	 *
-	 * @return the body
-	 */
-	@Override
-	public String getBody() {
-		return body;
-	}
-
-	/**
-	 * For de-serialization frameworks, only.
-	 */
-	public void setBody(@Nullable String body) {
-		this.body = body;
-	}
-
-	/**
-	 * Returns the headers.
-	 * <p>
-	 * Note: it's possible that null is returned but this indicates an incorrect
-	 * initialization.
-	 *
-	 * @return the headers (immutable)
-	 */
-	@Override
-	public Map<String, List<String>> getHeaders() {
-		return headers;
-	}
-
-
-	/**
-	 * For de-serialization frameworks, only.
-	 */
-	public void setHeaders(@Nonnull Map<String, List<String>> headers) {
-		requireNonNull(headers);
-		this.headers = headers.entrySet().stream()
-				.filter(e -> e.getKey() != null)
-				.filter(e -> e.getValue() != null)
-				.collect(Collectors.collectingAndThen(
-						Collectors.toMap(
-								Map.Entry::getKey,
-								DefaultServiceRequest::copyList),
-						Collections::unmodifiableMap));
-	}
-
-	private static List<String> copyList(Map.Entry<String, List<String>> header) {
-		return Collections.unmodifiableList(new ArrayList<>(header.getValue()));
 	}
 
 	/**
@@ -163,18 +107,18 @@ public final class DefaultServiceRequest implements ServiceRequest {
 			return false;
 		}
 		DefaultServiceRequest castOther = (DefaultServiceRequest) other;
-		return Objects.equals(body, castOther.body) && Objects.equals(headers, castOther.headers)
+		return Objects.equals(getBody(), castOther.getBody()) && Objects.equals(getHeaders(), castOther.getHeaders())
 				&& Objects.equals(requestUri, castOther.requestUri) && Objects.equals(httpMethod, castOther.httpMethod);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(body, headers, requestUri, httpMethod);
+		return Objects.hash(getBody(), getHeaders(), requestUri, httpMethod);
 	}
 
 	@Override
 	public String toString() {
-		return "ServiceRequestImpl [body=" + body + ", headers=" + headers + ", requestUri=" + requestUri
+		return "ServiceRequestImpl [body=" + getBody() + ", headers=" + getHeaders() + ", requestUri=" + requestUri
 				+ ", httpMethod=" + httpMethod + "]";
 	}
 }

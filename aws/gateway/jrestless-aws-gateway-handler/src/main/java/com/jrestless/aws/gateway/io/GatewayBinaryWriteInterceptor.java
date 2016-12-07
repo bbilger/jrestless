@@ -20,7 +20,6 @@ import java.util.Base64;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
@@ -51,7 +50,7 @@ public class GatewayBinaryWriteInterceptor implements WriterInterceptor {
 	static final int PRIORITY_OFFSET = 100;
 
 	@Override
-	public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
+	public void aroundWriteTo(WriterInterceptorContext context) throws IOException {
 		Object headerValue = context.getHeaders().getFirst(GatewayBinaryResponseCheckFilter.HEADER_BINARY_RESPONSE);
 		if (Boolean.TRUE.equals(headerValue)) {
 			context.setOutputStream(Base64.getEncoder().wrap(context.getOutputStream()));

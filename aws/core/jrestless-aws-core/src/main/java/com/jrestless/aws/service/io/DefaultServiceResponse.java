@@ -15,14 +15,9 @@
  */
 package com.jrestless.aws.service.io;
 
-import static java.util.Objects.requireNonNull;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -35,9 +30,7 @@ import javax.annotation.Nullable;
  *
  * @author Bjoern Bilger
  */
-public final class DefaultServiceResponse implements ServiceResponse {
-	private String body;
-	private Map<String, List<String>> headers;
+public final class DefaultServiceResponse extends ServiceDto implements ServiceResponse {
 	private int statusCode;
 	private String reasonPhrase;
 
@@ -45,53 +38,15 @@ public final class DefaultServiceResponse implements ServiceResponse {
 	 * For de-serialization frameworks, only.
 	 */
 	public DefaultServiceResponse() {
+		super(null);
 		// for de-serialization
 	}
 
 	public DefaultServiceResponse(@Nullable String body, @Nonnull Map<String, List<String>> headers, int statusCode,
 			@Nullable String reasonPhrase) {
-		setBody(body);
-		setHeaders(headers);
+		super(body, headers, null);
 		setStatusCode(statusCode);
 		setReasonPhrase(reasonPhrase);
-	}
-
-	@Override
-	public String getBody() {
-		// we don't copy the value for performance reasons
-		return body;
-	}
-
-	/**
-	 * For de-serialization frameworks, only.
-	 */
-	public void setBody(@Nullable String body) {
-		// we don't copy the value for performance reasons
-		this.body = body;
-	}
-
-	@Override
-	public Map<String, List<String>> getHeaders() {
-		return headers;
-	}
-
-	/**
-	 * For de-serialization frameworks, only.
-	 */
-	public void setHeaders(@Nonnull Map<String, List<String>> headers) {
-		requireNonNull(headers);
-		this.headers = headers.entrySet().stream()
-			.filter(e -> e.getKey() != null)
-			.filter(e -> e.getValue() != null)
-			.collect(Collectors.collectingAndThen(
-					Collectors.toMap(
-							Map.Entry::getKey,
-							DefaultServiceResponse::copyList),
-					Collections::unmodifiableMap));
-	}
-
-	private static List<String> copyList(Map.Entry<String, List<String>> header) {
-		return Collections.unmodifiableList(new ArrayList<>(header.getValue()));
 	}
 
 	@Override
@@ -130,19 +85,19 @@ public final class DefaultServiceResponse implements ServiceResponse {
 			return false;
 		}
 		DefaultServiceResponse castOther = (DefaultServiceResponse) other;
-		return Objects.equals(body, castOther.body) && Objects.equals(headers, castOther.headers)
+		return Objects.equals(getBody(), castOther.getBody()) && Objects.equals(getHeaders(), castOther.getHeaders())
 				&& Objects.equals(statusCode, castOther.statusCode)
 				&& Objects.equals(reasonPhrase, castOther.reasonPhrase);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(body, headers, statusCode, reasonPhrase);
+		return Objects.hash(getBody(), getHeaders(), statusCode, reasonPhrase);
 	}
 
 	@Override
 	public String toString() {
-		return "ServiceResponseImpl [body=" + body + ", headers=" + headers + ", statusCode="
+		return "ServiceResponseImpl [body=" + getBody() + ", headers=" + getHeaders() + ", statusCode="
 				+ statusCode + ", reasonPhrase=" + reasonPhrase + "]";
 	}
 }
