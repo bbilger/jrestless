@@ -79,21 +79,10 @@ public class CognitoUserPoolAuthorizerFilter extends AuthorizerFilter {
 					OpenIdAddressClaims openIdAddressClaims = createAddressClaims(
 							(Map<String, Object>) claims.get(OpenIdClaimFieldNames.STANDARD_CLAIM_ADDRESS));
 
-					CognitoUserPoolAuthorizerPrincipal principal = new CognitoUserPoolAuthorizerPrincipal() {
-						@Override
-						public CognitoUserPoolAuthorizerClaims getClaims() {
-							return new CognitoUserPoolAuthorizerClaims() {
-								@Override
-								public OpenIdAddressClaims getAddress() {
-									return openIdAddressClaims;
-								}
-								@Override
-								public Object getClaim(String name) {
-									return claims.get(name);
-								}
-							};
-						}
-					};
+					CognitoUserPoolAuthorizerClaims cognitoUserPoolAuthorizerClaims = createCognitoUserPoolAuthorizerClaims(
+							claims, openIdAddressClaims);
+
+					CognitoUserPoolAuthorizerPrincipal principal = () -> cognitoUserPoolAuthorizerClaims;
 					return createSecurityContext(principal);
 				} else {
 					LOG.warn("sub claim may not be empty or blank");
@@ -109,10 +98,19 @@ public class CognitoUserPoolAuthorizerFilter extends AuthorizerFilter {
 		if (addressClaims == null) {
 			return null;
 		}
-		return new OpenIdAddressClaims() {
+		return name -> addressClaims.get(name);
+	}
+
+	private CognitoUserPoolAuthorizerClaims createCognitoUserPoolAuthorizerClaims(Map<String, Object> claims,
+			OpenIdAddressClaims openIdAddressClaims) {
+		return new CognitoUserPoolAuthorizerClaims() {
+			@Override
+			public OpenIdAddressClaims getAddress() {
+				return openIdAddressClaims;
+			}
 			@Override
 			public Object getClaim(String name) {
-				return addressClaims.get(name);
+				return claims.get(name);
 			}
 		};
 	}
