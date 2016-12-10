@@ -19,6 +19,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.jrestless.aws.service.io.ServiceRequest;
 
 /**
+ * Container for the service request and the lambda context.
  *
  * @author Bjoern Bilger
  *

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -29,8 +30,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.jrestless.core.container.JRestlessHandlerContainer;
 import com.jrestless.core.container.handler.SimpleRequestHandler.SimpleResponseWriter;
-import com.jrestless.core.container.io.JRestlessContainerRequest;
 import com.jrestless.core.container.io.DefaultJRestlessContainerRequest;
+import com.jrestless.core.container.io.JRestlessContainerRequest;
 
 public class SimpleRequestHandlerTest {
 
@@ -101,12 +102,14 @@ public class SimpleRequestHandlerTest {
 	@Test
 	public void delegateRequest_ContainerException_ShouldInvokeCallbacks() {
 		JRestlessContainerRequest request = createMinimalRequest();
-		doThrow(new RuntimeException()).when(container).handleRequest(any(), any(), any());
+		RuntimeException containerException = new RuntimeException();
+		doThrow(containerException).when(container).handleRequest(any(), any(), any(), any());
 		SimpleContainerResponse response = handler.delegateRequest(request);
 		assertEquals(500, response.getStatusType().getStatusCode());
 		assertTrue(response.getHeaders().isEmpty());
 		assertEquals(null, response.getBody());
 		verify(handler, times(1)).beforeHandleRequest(eq(request), any());
+		verify(handler, times(1)).onRequestFailure(same(containerException), eq(request), any());
 	}
 
 	@Test
@@ -117,7 +120,7 @@ public class SimpleRequestHandlerTest {
 		@SuppressWarnings("unchecked")
 		SimpleResponseWriter<SimpleContainerResponse> responseWriter = mock(SimpleResponseWriter.class);
 		when(responseWriter.getResponse()).thenReturn(containerResponse);
-		doReturn(responseWriter).when(handler).createResponseWriter();
+		doReturn(responseWriter).when(handler).createResponseWriter(request);
 		SimpleContainerResponse response = handler.delegateRequest(request);
 		assertEquals(new SimpleContainerResponse(Status.OK, "testBody", headers), response);
 	}
@@ -130,7 +133,7 @@ public class SimpleRequestHandlerTest {
 		@SuppressWarnings("unchecked")
 		SimpleResponseWriter<SimpleContainerResponse> responseWriter = mock(SimpleResponseWriter.class);
 		when(responseWriter.getResponse()).thenReturn(containerResponse);
-		doReturn(responseWriter).when(handler).createResponseWriter();
+		doReturn(responseWriter).when(handler).createResponseWriter(request);
 		SimpleContainerResponse response = handler.delegateRequest(request);
 		assertEquals(301, response.getStatusType().getStatusCode());
 		assertEquals(headers, response.getHeaders());
@@ -145,41 +148,10 @@ public class SimpleRequestHandlerTest {
 		@SuppressWarnings("unchecked")
 		SimpleResponseWriter<SimpleContainerResponse> responseWriter = mock(SimpleResponseWriter.class);
 		when(responseWriter.getResponse()).thenReturn(containerResponse);
-		doReturn(responseWriter).when(handler).createResponseWriter();
+		doReturn(responseWriter).when(handler).createResponseWriter(request);
 		handler.delegateRequest(request);
 		verify(handler).beforeHandleRequest(eq(request), any());
 		verify(handler).onRequestSuccess(eq(containerResponse), eq(request), any());
-	}
-
-	@Test
-	public void delegateRequest_ExceptionInOnRequestFailure_ShouldResultInAnInternalServerError() {
-		JRestlessContainerRequest request = mock(JRestlessContainerRequest.class);
-		doThrow(new RuntimeException()).when(container).handleRequest(any(), any(), any(), any());
-		doThrow(new RuntimeException()).when(handler).onRequestFailure(any(), eq(request), any());
-		@SuppressWarnings("unchecked")
-		SimpleResponseWriter<SimpleContainerResponse> responseWriter = mock(SimpleResponseWriter.class);
-		doReturn(responseWriter).when(handler).createResponseWriter();
-		SimpleContainerResponse response = handler.delegateRequest(request);
-		assertEquals(500, response.getStatusType().getStatusCode());
-		assertTrue(response.getHeaders().isEmpty());
-		assertEquals(null, response.getBody());
-		verify(container).handleRequest(any(), any(), any(), any());
-	}
-
-	@Test
-	public void delegateRequest_EmptyResponseFromCallback_ShouldResultInInternalServerError() {
-		JRestlessContainerRequest request = mock(JRestlessContainerRequest.class);
-		Map<String, List<String>> headers = ImmutableMap.of("k", ImmutableList.of("k", "v"));
-		SimpleContainerResponse containerResponse = new SimpleContainerResponse(Status.OK, "testBody", headers);
-		@SuppressWarnings("unchecked")
-		SimpleResponseWriter<SimpleContainerResponse> responseWriter = mock(SimpleResponseWriter.class);
-		when(responseWriter.getResponse()).thenReturn(containerResponse);
-		doReturn(responseWriter).when(handler).createResponseWriter();
-		doReturn(null).when(handler).onRequestSuccess(eq(containerResponse), eq(request), any());
-		SimpleContainerResponse response = handler.delegateRequest(request);
-		assertEquals(500, response.getStatusType().getStatusCode());
-		assertTrue(response.getHeaders().isEmpty());
-		assertEquals(null, response.getBody());
 	}
 
 	private JRestlessContainerRequest createMinimalRequest() {
@@ -195,13 +167,15 @@ public class SimpleRequestHandlerTest {
 			return request;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
-		public SimpleResponseWriter<SimpleContainerResponse> createResponseWriter() {
-			throw new UnsupportedOperationException();
+		public SimpleResponseWriter<SimpleContainerResponse> createResponseWriter(JRestlessContainerRequest request) {
+			return mock(SimpleResponseWriter.class);
 		}
 
 		@Override
-		public SimpleContainerResponse createInternalServerErrorResponse() {
+		public SimpleContainerResponse onRequestFailure(Exception e, JRestlessContainerRequest request,
+				JRestlessContainerRequest containerRequest) {
 			return new SimpleContainerResponse(Status.INTERNAL_SERVER_ERROR, null, new HashMap<>());
 		}
 	}

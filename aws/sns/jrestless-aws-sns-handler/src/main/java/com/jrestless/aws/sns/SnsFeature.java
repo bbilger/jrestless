@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jrestless.aws.service;
+package com.jrestless.aws.sns;
 
 import java.lang.reflect.Type;
 
@@ -26,12 +26,12 @@ import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.jersey.internal.inject.ReferencingFactory;
 import org.glassfish.jersey.internal.util.collection.Ref;
 
+import com.amazonaws.services.lambda.runtime.events.SNSEvent.SNSRecord;
 import com.jrestless.aws.AwsFeature;
-import com.jrestless.aws.service.io.ServiceRequest;
 import com.jrestless.core.container.dpi.AbstractReferencingBinder;
 
 /**
- * Binds Service specific values.
+ * Binds SNS specific values.
  *
  * <table border="1" summary="injected objects">
  * <tr>
@@ -41,7 +41,7 @@ import com.jrestless.core.container.dpi.AbstractReferencingBinder;
  * </tr>
  *
  * <tr>
- * <td>{@link ServiceRequest}
+ * <td>{@link SNSRecord}
  * <td>true
  * <td>request
  * </tr>
@@ -52,9 +52,9 @@ import com.jrestless.core.container.dpi.AbstractReferencingBinder;
  * @author Bjoern Bilger
  *
  */
-public class ServiceFeature implements Feature {
+public class SnsFeature implements Feature {
 
-	public static final Type SERVICE_REQUEST_TYPE = (new TypeLiteral<Ref<ServiceRequest>>() { }).getType();
+	public static final Type SNS_RECORD_TYPE = (new TypeLiteral<Ref<SNSRecord>>() { }).getType();
 
 	@Override
 	public boolean configure(FeatureContext context) {
@@ -66,14 +66,14 @@ public class ServiceFeature implements Feature {
 	private static class Binder extends AbstractReferencingBinder {
 		@Override
 		protected void configure() {
-			bindReferencingFactory(ServiceRequest.class, ReferencingServiceRequestFactory.class,
-					new TypeLiteral<Ref<ServiceRequest>>() { });
+			bindReferencingFactory(SNSRecord.class, ReferencingSnsRecordFactory.class,
+					new TypeLiteral<Ref<SNSRecord>>() { });
 		}
 	}
 
-	private static class ReferencingServiceRequestFactory extends ReferencingFactory<ServiceRequest> {
+	private static class ReferencingSnsRecordFactory extends ReferencingFactory<SNSRecord> {
 		@Inject
-		ReferencingServiceRequestFactory(final Provider<Ref<ServiceRequest>> referenceFactory) {
+		ReferencingSnsRecordFactory(final Provider<Ref<SNSRecord>> referenceFactory) {
 			super(referenceFactory);
 		}
 	}

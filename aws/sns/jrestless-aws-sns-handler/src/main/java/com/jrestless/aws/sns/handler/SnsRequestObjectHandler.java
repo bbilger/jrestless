@@ -13,38 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jrestless.aws.gateway.handler;
+package com.jrestless.aws.sns.handler;
 
 import java.net.URI;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.jrestless.aws.gateway.io.DefaultGatewayRequest;
-import com.jrestless.aws.gateway.io.GatewayResponse;
+import com.amazonaws.services.lambda.runtime.events.SNSEvent;
+import com.amazonaws.services.lambda.runtime.events.SNSEvent.SNSRecord;
 
 /**
  * AWS lambda request (object) handler that uses
  * {@link com.jrestless.core.container.JRestlessHandlerContainer} and so Jersey
- * to process incoming requests from AWS API Gateay.
+ * to process incoming requests from other Lambda functions.
  * <p>
  * Implementations must provide a no-args constructor.
  *
  * @author Bjoern Bilger
  *
  */
-public abstract class GatewayRequestObjectHandler extends GatewayRequestHandler
-		implements RequestHandler<DefaultGatewayRequest, GatewayResponse> {
+public abstract class SnsRequestObjectHandler extends SnsRequestHandler implements RequestHandler<SNSEvent, Void> {
 
-	public GatewayRequestObjectHandler() {
+	public SnsRequestObjectHandler() {
 		super();
 	}
 
-	public GatewayRequestObjectHandler(URI baseUri) {
+	public SnsRequestObjectHandler(URI baseUri) {
 		super(baseUri);
 	}
 
 	@Override
-	public GatewayResponse handleRequest(DefaultGatewayRequest request, Context lambdaContext) {
-		return delegateRequest(new GatewayRequestAndLambdaContext(request, lambdaContext));
+	public Void handleRequest(SNSEvent snsEvent, Context context) {
+		for (SNSRecord snsRecord : snsEvent.getRecords()) {
+			delegateRequest(new SnsRecordAndLambdaContext(snsRecord, context));
+		}
+		return null;
 	}
 }

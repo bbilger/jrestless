@@ -13,27 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jrestless.aws.dpi;
-
-import javax.inject.Inject;
-import javax.ws.rs.container.ContainerRequestContext;
+package com.jrestless.aws.sns.handler;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.jrestless.core.container.dpi.ContainerRequestContextPropertyFactory;
+import com.amazonaws.services.lambda.runtime.events.SNSEvent.SNSRecord;
 
 /**
- * Factory for fetching {@link Context} from the {@link ContainerRequestContext}
- * via the property name {@code 'awsLambdaContext'}.
+ * Container for the sns record and the lambda context of a request.
  *
  * @author Bjoern Bilger
  *
  */
-public class LambdaContextFactory extends ContainerRequestContextPropertyFactory<Context> {
+public class SnsRecordAndLambdaContext {
+	private final SNSRecord snsRecord;
+	private final Context lambdaContext;
 
-	public static final String PROPERTY_NAME = "awsLambdaContext";
-
-	@Inject
-	public LambdaContextFactory(ContainerRequestContext context) {
-		super(context, PROPERTY_NAME);
+	public SnsRecordAndLambdaContext(SNSRecord snsRecord, Context lambdaContext) {
+		this.snsRecord = snsRecord;
+		this.lambdaContext = lambdaContext;
 	}
+
+	public SNSRecord getSnsRecord() {
+		return snsRecord;
+	}
+
+	public Context getLambdaContext() {
+		return lambdaContext;
+	}
+
 }

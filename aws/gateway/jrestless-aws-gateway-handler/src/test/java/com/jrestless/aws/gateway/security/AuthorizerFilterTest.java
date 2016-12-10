@@ -16,43 +16,27 @@ import javax.ws.rs.core.SecurityContext;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import com.jrestless.aws.gateway.dpi.GatewayRequestContextFactory;
 import com.jrestless.aws.gateway.io.GatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayRequestContext;
 
 public abstract class AuthorizerFilterTest {
 
-	abstract AuthorizerFilter createCognitoAuthorizerFilter();
+	abstract AuthorizerFilter createCognitoAuthorizerFilter(GatewayRequest gatewayRequest);
 
-	protected final ContainerRequestContext createRequest(Map<String, Object> authorizerData) {
+	protected final GatewayRequest createRequest(Map<String, Object> authorizerData) {
 		GatewayRequestContext gatewayRequestContext = mock(GatewayRequestContext.class);
 		when(gatewayRequestContext.getAuthorizer()).thenReturn(authorizerData);
 
 		GatewayRequest gatewayRequest = mock(GatewayRequest.class);
 		when(gatewayRequest.getRequestContext()).thenReturn(gatewayRequestContext);
 
-		ContainerRequestContext containerRequestContext = mock(ContainerRequestContext.class);
-		when(containerRequestContext.getProperty(GatewayRequestContextFactory.PROPERTY_NAME))
-				.thenReturn(gatewayRequest);
-
-		return containerRequestContext;
-	}
-
-	@Test
-	public void noGatewayRequestSet_ShouldNotSetSecurityContext() {
-		ContainerRequestContext containerRequestContext = mock(ContainerRequestContext.class);
-		filterAndVerifyNoSecurityContextSet(containerRequestContext);
+		return gatewayRequest;
 	}
 
 	@Test
 	public void noGatewayRequestContextSet_ShouldNotSetSecurityContext() {
 		GatewayRequest gatewayRequest = mock(GatewayRequest.class);
-
-		ContainerRequestContext containerRequestContext = mock(ContainerRequestContext.class);
-		when(containerRequestContext.getProperty(GatewayRequestContextFactory.PROPERTY_NAME))
-				.thenReturn(gatewayRequest);
-
-		filterAndVerifyNoSecurityContextSet(containerRequestContext);
+		filterAndVerifyNoSecurityContextSet(gatewayRequest);
 	}
 
 	@Test
@@ -63,11 +47,7 @@ public abstract class AuthorizerFilterTest {
 		GatewayRequest gatewayRequest = mock(GatewayRequest.class);
 		when(gatewayRequest.getRequestContext()).thenReturn(gatewayRequestContext);
 
-		ContainerRequestContext containerRequestContext = mock(ContainerRequestContext.class);
-		when(containerRequestContext.getProperty(GatewayRequestContextFactory.PROPERTY_NAME))
-				.thenReturn(gatewayRequest);
-
-		filterAndVerifyNoSecurityContextSet(containerRequestContext);
+		filterAndVerifyNoSecurityContextSet(gatewayRequest);
 	}
 
 	@Test
@@ -78,19 +58,16 @@ public abstract class AuthorizerFilterTest {
 		GatewayRequest gatewayRequest = mock(GatewayRequest.class);
 		when(gatewayRequest.getRequestContext()).thenReturn(gatewayRequestContext);
 
-		ContainerRequestContext containerRequestContext = mock(ContainerRequestContext.class);
-		when(containerRequestContext.getProperty(GatewayRequestContextFactory.PROPERTY_NAME))
-				.thenReturn(gatewayRequest);
-
-		filterAndVerifyNoSecurityContextSet(containerRequestContext);
+		filterAndVerifyNoSecurityContextSet(gatewayRequest);
 	}
 
 	protected final SecurityContext filterAndReturnSetSecurityContext(Map<String, Object> authorizerData) {
 		return filterAndReturnSetSecurityContext(createRequest(authorizerData));
 	}
 
-	protected final SecurityContext filterAndReturnSetSecurityContext(ContainerRequestContext containerRequestContext) {
-		AuthorizerFilter filter = createCognitoAuthorizerFilter();
+	protected final SecurityContext filterAndReturnSetSecurityContext(GatewayRequest gatewayRequest) {
+		ContainerRequestContext containerRequestContext = mock(ContainerRequestContext.class);
+		AuthorizerFilter filter = createCognitoAuthorizerFilter(gatewayRequest);
 		ArgumentCaptor<SecurityContext> securityContextCapture = ArgumentCaptor.forClass(SecurityContext.class);
 		try {
 			filter.filter(containerRequestContext);
@@ -105,8 +82,9 @@ public abstract class AuthorizerFilterTest {
 		filterAndVerifyNoSecurityContextSet(createRequest(authorizerData));
 	}
 
-	protected final void filterAndVerifyNoSecurityContextSet(ContainerRequestContext containerRequestContext) {
-		AuthorizerFilter filter = createCognitoAuthorizerFilter();
+	protected final void filterAndVerifyNoSecurityContextSet(GatewayRequest gatewayRequest) {
+		ContainerRequestContext containerRequestContext = mock(ContainerRequestContext.class);
+		AuthorizerFilter filter = createCognitoAuthorizerFilter(gatewayRequest);
 		try {
 			filter.filter(containerRequestContext);
 		} catch (IOException e) {

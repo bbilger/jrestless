@@ -18,13 +18,14 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
+import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.utilities.Binder;
+import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.jrestless.aws.dpi.LambdaContextFactory;
 import com.jrestless.core.container.dpi.InstanceBinder;
 
 public class AwsFeatureIntTest extends JerseyTest {
@@ -121,16 +122,18 @@ public class AwsFeatureIntTest extends JerseyTest {
 	@Provider
 	public static class LambdaContextSetter implements ContainerRequestFilter {
 
-		private LambdaContextProvider lambdaContextProvider;
+		private final LambdaContextProvider lambdaContextProvider;
+		private final ServiceLocator serviceLocator;
 
 		@Inject
-		public LambdaContextSetter(LambdaContextProvider lambdaContextProvider) {
+		public LambdaContextSetter(LambdaContextProvider lambdaContextProvider, ServiceLocator serviceLocator) {
 			this.lambdaContextProvider = lambdaContextProvider;
+			this.serviceLocator = serviceLocator;
 		}
 
 		@Override
 		public void filter(ContainerRequestContext requestContext) throws IOException {
-			requestContext.setProperty(LambdaContextFactory.PROPERTY_NAME, lambdaContextProvider.getLambdaContext());
+			serviceLocator.<Ref<Context>>getService(AwsFeature.CONTEXT_TYPE).set(lambdaContextProvider.getLambdaContext());
 		}
 
 	}

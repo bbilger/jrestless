@@ -31,26 +31,29 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 
+import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.jrestless.aws.dpi.LambdaContextFactory;
-import com.jrestless.aws.service.dpi.ServiceRequestContextFactory;
+import com.jrestless.aws.AwsFeature;
+import com.jrestless.aws.service.ServiceFeature;
 import com.jrestless.aws.service.io.DefaultServiceResponse;
 import com.jrestless.aws.service.io.ServiceRequest;
 import com.jrestless.aws.service.io.ServiceResponse;
 import com.jrestless.core.container.handler.SimpleRequestHandler;
-import com.jrestless.core.container.io.JRestlessContainerRequest;
 import com.jrestless.core.container.io.DefaultJRestlessContainerRequest;
+import com.jrestless.core.container.io.JRestlessContainerRequest;
 
 /**
  * Base request handler.
  * <p>
  * Note: we don't implement
  * {@link com.amazonaws.services.lambda.runtime.RequestHandler RequestHandler}
- * in case s.o. needs
+ * in case we need
  * {@link com.amazonaws.services.lambda.runtime.RequestStreamHandler
- * RequestStreamHandler}.
+ * RequestStreamHandler} at some point.
  *
  * @author Bjoern Bilger
  *
@@ -58,7 +61,17 @@ import com.jrestless.core.container.io.DefaultJRestlessContainerRequest;
 public abstract class ServiceRequestHandler
 		extends SimpleRequestHandler<ServiceRequestAndLambdaContext, ServiceResponse> {
 
-	private static final URI ROOT_URI = URI.create("/");
+	private static final Logger LOG = LoggerFactory.getLogger(ServiceRequestHandler.class);
+
+	private final URI baseUri;
+
+	public ServiceRequestHandler() {
+		this(URI.create("/"));
+	}
+
+	public ServiceRequestHandler(URI baseUri) {
+		this.baseUri = baseUri;
+	}
 
 	@Override
 	public JRestlessContainerRequest createContainerRequest(ServiceRequestAndLambdaContext requestAndLambdaContext) {
@@ -72,7 +85,7 @@ public abstract class ServiceRequestHandler
 		} else {
 			entityStream = new ByteArrayInputStream(new byte[0]);
 		}
-		return new DefaultJRestlessContainerRequest(ROOT_URI, requestUri, request.getHttpMethod(), entityStream,
+		return new DefaultJRestlessContainerRequest(baseUri, requestUri, request.getHttpMethod(), entityStream,
 				request.getHeaders());
 	}
 
@@ -81,17 +94,33 @@ public abstract class ServiceRequestHandler
 			JRestlessContainerRequest containerRequest, ServiceRequestAndLambdaContext requestAndLambdaContext) {
 		ServiceRequest request = requestAndLambdaContext.getServiceRequest();
 		Context lambdaContext = requestAndLambdaContext.getLambdaContext();
-		actualContainerRequest.setProperty(LambdaContextFactory.PROPERTY_NAME, lambdaContext);
-		actualContainerRequest.setProperty(ServiceRequestContextFactory.PROPERTY_NAME, request);
+		actualContainerRequest.setRequestScopedInitializer(locator -> {
+			Ref<ServiceRequest> serviceRequestRef = locator
+					.<Ref<ServiceRequest>>getService(ServiceFeature.SERVICE_REQUEST_TYPE);
+			if (serviceRequestRef != null) {
+				serviceRequestRef.set(request);
+			} else {
+				LOG.error("ServiceFeature has not been registered. ServiceRequest injection won't work.");
+			}
+			Ref<Context> contextRef = locator.<Ref<Context>>getService(AwsFeature.CONTEXT_TYPE);
+			if (contextRef != null) {
+				contextRef.set(lambdaContext);
+			} else {
+				LOG.error("AwsFeature has not been registered. Context injection won't work.");
+			}
+		});
 	}
 
 	@Override
-	public SimpleResponseWriter<ServiceResponse> createResponseWriter() {
+	public SimpleResponseWriter<ServiceResponse> createResponseWriter(
+			ServiceRequestAndLambdaContext requestAndContext) {
 		return new ResponseWriter();
 	}
 
 	@Override
-	public ServiceResponse createInternalServerErrorResponse() {
+	public ServiceResponse onRequestFailure(Exception e, ServiceRequestAndLambdaContext request,
+			JRestlessContainerRequest containerRequest) {
+		LOG.error("request failed", e);
 		return new DefaultServiceResponse(null, Collections.emptyMap(), Status.INTERNAL_SERVER_ERROR.getStatusCode(),
 				Status.INTERNAL_SERVER_ERROR.getReasonPhrase());
 	}

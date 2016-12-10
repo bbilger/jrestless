@@ -60,8 +60,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.jrestless.core.container.dpi.InstanceBinder;
-import com.jrestless.core.container.io.JRestlessContainerRequest;
 import com.jrestless.core.container.io.DefaultJRestlessContainerRequest;
+import com.jrestless.core.container.io.JRestlessContainerRequest;
 
 public class SimpleRequestHandlerIntTest {
 
@@ -264,10 +264,10 @@ public class SimpleRequestHandlerIntTest {
 	private static class SimpleRequestHandlerImpl extends SimpleRequestHandler<JRestlessContainerRequest, SimpleContainerResponse> {
 
 		@Override
-		public SimpleResponseWriter<SimpleContainerResponse> createResponseWriter() {
+		public SimpleResponseWriter<SimpleContainerResponse> createResponseWriter(JRestlessContainerRequest containerRequest) {
 			return new SimpleResponseWriter<SimpleContainerResponse>() {
 
-				private SimpleContainerResponse response = createInternalServerErrorResponse();
+				private SimpleContainerResponse response = onRequestFailure(null, null, null);
 
 				@Override
 				public OutputStream getEntityOutputStream() {
@@ -293,7 +293,8 @@ public class SimpleRequestHandlerIntTest {
 		}
 
 		@Override
-		public SimpleContainerResponse createInternalServerErrorResponse() {
+		public SimpleContainerResponse onRequestFailure(Exception e, JRestlessContainerRequest request,
+				JRestlessContainerRequest containerRequest) {
 			return new SimpleContainerResponse(Status.INTERNAL_SERVER_ERROR, null, new HashMap<>());
 		}
 

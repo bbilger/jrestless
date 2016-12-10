@@ -19,6 +19,7 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.jrestless.aws.gateway.io.GatewayRequest;
 import com.jrestless.aws.security.CognitoUserPoolAuthorizerClaims;
 import com.jrestless.aws.security.CognitoUserPoolAuthorizerPrincipal;
 import com.jrestless.security.OpenIdAddressClaims;
@@ -26,8 +27,8 @@ import com.jrestless.security.OpenIdAddressClaims;
 public class CognitoUserPoolAuthorizerFilterTest extends AuthorizerFilterTest {
 
 	@Override
-	AuthorizerFilter createCognitoAuthorizerFilter() {
-		return new CognitoUserPoolAuthorizerFilter();
+	AuthorizerFilter createCognitoAuthorizerFilter(GatewayRequest gatewayRequest) {
+		return new CognitoUserPoolAuthorizerFilter(gatewayRequest);
 	}
 
 	@Test

@@ -15,14 +15,19 @@
  */
 package com.jrestless.aws;
 
+import java.lang.reflect.Type;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.process.internal.RequestScoped;
+import org.glassfish.hk2.api.TypeLiteral;
+import org.glassfish.jersey.internal.inject.ReferencingFactory;
+import org.glassfish.jersey.internal.util.collection.Ref;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.jrestless.aws.dpi.LambdaContextFactory;
+import com.jrestless.core.container.dpi.AbstractReferencingBinder;
 
 /**
  * Binds AWS specific values.
@@ -32,14 +37,12 @@ import com.jrestless.aws.dpi.LambdaContextFactory;
  * <th>injectable object
  * <th>proxiable
  * <th>scope
- * <th>factory
  * </tr>
  *
  * <tr>
  * <td>{@link Context}
  * <td>true
  * <td>request
- * <td>{@link LambdaContextFactory}
  * </tr>
  * </table>
  *
@@ -48,19 +51,26 @@ import com.jrestless.aws.dpi.LambdaContextFactory;
  */
 public class AwsFeature implements Feature {
 
+	public static final Type CONTEXT_TYPE = (new TypeLiteral<Ref<Context>>() { }).getType();
+
 	@Override
 	public boolean configure(FeatureContext context) {
-		context.register(new AbstractBinder() {
-			@Override
-			protected void configure() {
-				bindFactory(LambdaContextFactory.class)
-					.to(Context.class)
-					.proxy(true)
-					.proxyForSameScope(false)
-					.in(RequestScoped.class);
-			}
-		});
+		context.register(new Binder());
 		return true;
+	}
+
+	private static class Binder extends AbstractReferencingBinder {
+		@Override
+		protected void configure() {
+			bindReferencingFactory(Context.class, ReferencingContextFactory.class, new TypeLiteral<Ref<Context>>() { });
+		}
+	}
+
+	private static class ReferencingContextFactory extends ReferencingFactory<Context> {
+		@Inject
+		ReferencingContextFactory(Provider<Ref<Context>> referenceFactory) {
+			super(referenceFactory);
+		}
 	}
 
 }

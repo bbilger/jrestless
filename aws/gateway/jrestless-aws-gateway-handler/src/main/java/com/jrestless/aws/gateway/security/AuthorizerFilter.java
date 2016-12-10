@@ -17,21 +17,27 @@ package com.jrestless.aws.gateway.security;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.SecurityContext;
 
-import com.jrestless.aws.gateway.dpi.GatewayRequestContextFactory;
 import com.jrestless.aws.gateway.io.GatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayRequestContext;
 
 abstract class AuthorizerFilter implements ContainerRequestFilter {
 
+	private final GatewayRequest gatewayRequest;
+
+	AuthorizerFilter(@Nonnull GatewayRequest gatewayRequest) {
+		this.gatewayRequest = Objects.requireNonNull(gatewayRequest);
+	}
+
 	@Override
 	public final void filter(ContainerRequestContext requestContext) throws IOException {
-		Map<String, Object> authorizerData = getAuthorizerData(requestContext);
+		Map<String, Object> authorizerData = getAuthorizerData();
 		if (authorizerData != null) {
 			SecurityContext securityContext = createSecurityContext(authorizerData);
 			if (securityContext != null) {
@@ -40,13 +46,7 @@ abstract class AuthorizerFilter implements ContainerRequestFilter {
 		}
 	}
 
-	private Map<String, Object> getAuthorizerData(ContainerRequestContext requestContext) {
-		GatewayRequest gatewayRequest = (GatewayRequest) requestContext
-				.getProperty(GatewayRequestContextFactory.PROPERTY_NAME);
-		if (gatewayRequest == null) {
-			return null;
-		}
-
+	private Map<String, Object> getAuthorizerData() {
 		GatewayRequestContext gatewayRequestContext = gatewayRequest.getRequestContext();
 		if (gatewayRequestContext == null) {
 			return null;

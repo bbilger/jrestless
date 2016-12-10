@@ -55,6 +55,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -77,7 +78,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
-import com.jrestless.aws.gateway.GatewayResourceConfig;
+import com.jrestless.aws.gateway.GatewayFeature;
 import com.jrestless.aws.gateway.io.DefaultGatewayRequest;
 import com.jrestless.aws.gateway.io.DefaultGatewayRequestContext;
 import com.jrestless.aws.gateway.io.GatewayBinaryResponseCheckFilter;
@@ -93,13 +94,14 @@ public class GatewayRequestObjectHandlerIntTest {
 
 	private static final Logger LOGGER = Logger.getLogger(GatewayRequestObjectHandlerIntTest.class.getName());
 
-	private GatewayRequestObjectHandler handler;
+	private GatewayRequestObjectHandlerImpl handler;
 	private TestService testService;
 	private Context context = mock(Context.class);
 
 	@Before
 	public void setup() {
-		ResourceConfig config = new GatewayResourceConfig();
+		ResourceConfig config = new ResourceConfig();
+		config.register(GatewayFeature.class);
 		testService = mock(TestService.class);
 		Binder binder = new InstanceBinder.Builder().addInstance(testService, TestService.class).build();
 		config.register(binder);
@@ -108,8 +110,8 @@ public class GatewayRequestObjectHandlerIntTest {
 		config.register(GZipEncoder.class);
 		config.register(new LoggingFeature(LOGGER, LoggingFeature.Verbosity.PAYLOAD_ANY));
 		handler = spy(new GatewayRequestObjectHandlerImpl());
-		handler.init(config);
-		handler.start();
+		handler.doInit(config);
+		handler.doStart();
 	}
 
 	@Test
@@ -516,5 +518,11 @@ public class GatewayRequestObjectHandlerIntTest {
 	}
 
 	public static class GatewayRequestObjectHandlerImpl extends GatewayRequestObjectHandler {
+		void doStart() {
+			start();
+		}
+		void doInit(Application application) {
+			init(application);
+		}
 	}
 }

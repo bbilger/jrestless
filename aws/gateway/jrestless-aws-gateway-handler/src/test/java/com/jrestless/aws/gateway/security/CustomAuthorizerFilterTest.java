@@ -13,13 +13,14 @@ import javax.ws.rs.core.SecurityContext;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
+import com.jrestless.aws.gateway.io.GatewayRequest;
 import com.jrestless.aws.security.CustomAuthorizerPrincipal;
 
 public class CustomAuthorizerFilterTest extends AuthorizerFilterTest {
 
 	@Override
-	AuthorizerFilter createCognitoAuthorizerFilter() {
-		return new CustomAuthorizerFilter();
+	AuthorizerFilter createCognitoAuthorizerFilter(GatewayRequest gatewayRequest) {
+		return new CustomAuthorizerFilter(gatewayRequest);
 	}
 
 	@Test

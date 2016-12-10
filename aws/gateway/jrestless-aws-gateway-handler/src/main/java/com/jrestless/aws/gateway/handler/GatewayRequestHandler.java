@@ -34,11 +34,14 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 
+import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.jrestless.aws.dpi.LambdaContextFactory;
-import com.jrestless.aws.gateway.dpi.GatewayRequestContextFactory;
+import com.jrestless.aws.AwsFeature;
+import com.jrestless.aws.gateway.GatewayFeature;
 import com.jrestless.aws.gateway.io.GatewayBinaryReadInterceptor;
 import com.jrestless.aws.gateway.io.GatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayResponse;
@@ -48,13 +51,13 @@ import com.jrestless.core.container.io.JRestlessContainerRequest;
 import com.jrestless.core.util.HeaderUtils;
 
 /**
- * Base request handler.
+ * Base AWS API Gateway request handler.
  * <p>
  * Note: we don't implement
  * {@link com.amazonaws.services.lambda.runtime.RequestHandler RequestHandler}
- * in case s.o. needs
+ * in case we need
  * {@link com.amazonaws.services.lambda.runtime.RequestStreamHandler
- * RequestStreamHandler}.
+ * RequestStreamHandler} at some point.
  *
  * @author Bjoern Bilger
  *
@@ -62,7 +65,17 @@ import com.jrestless.core.util.HeaderUtils;
 public abstract class GatewayRequestHandler
 		extends SimpleRequestHandler<GatewayRequestAndLambdaContext, GatewayResponse> {
 
-	private static final URI ROOT_URI = URI.create("/");
+	private static final Logger LOG = LoggerFactory.getLogger(GatewayRequestHandler.class);
+
+	private final URI baseUri;
+
+	public GatewayRequestHandler() {
+		this(URI.create("/"));
+	}
+
+	public GatewayRequestHandler(URI baseUri) {
+		this.baseUri = baseUri;
+	}
 
 	@Override
 	public JRestlessContainerRequest createContainerRequest(GatewayRequestAndLambdaContext requestAndLambdaContext) {
@@ -78,7 +91,7 @@ public abstract class GatewayRequestHandler
 			entityStream = new ByteArrayInputStream(new byte[0]);
 		}
 		URI requestUri = URI.create(appendQueryParams(request.getPath(), request.getQueryStringParameters()));
-		return new DefaultJRestlessContainerRequest(ROOT_URI, requestUri, request.getHttpMethod(), entityStream,
+		return new DefaultJRestlessContainerRequest(baseUri, requestUri, request.getHttpMethod(), entityStream,
 				HeaderUtils.expandHeaders(request.getHeaders()));
 	}
 
@@ -115,19 +128,35 @@ public abstract class GatewayRequestHandler
 			JRestlessContainerRequest containerRequest, GatewayRequestAndLambdaContext requestAndLambdaContext) {
 		GatewayRequest request = requestAndLambdaContext.getGatewayRequest();
 		Context lambdaContext = requestAndLambdaContext.getLambdaContext();
-		actualContainerRequest.setProperty(LambdaContextFactory.PROPERTY_NAME, lambdaContext);
-		actualContainerRequest.setProperty(GatewayRequestContextFactory.PROPERTY_NAME, request);
+		actualContainerRequest.setRequestScopedInitializer(locator -> {
+			Ref<GatewayRequest> gatewayRequestRef = locator
+					.<Ref<GatewayRequest>>getService(GatewayFeature.GATEWAY_REQUEST_TYPE);
+			if (gatewayRequestRef != null) {
+				gatewayRequestRef.set(request);
+			} else {
+				LOG.error("GatewayFeature has not been registered. GatewayRequest injection won't work.");
+			}
+			Ref<Context> contextRef = locator.<Ref<Context>>getService(AwsFeature.CONTEXT_TYPE);
+			if (contextRef != null) {
+				contextRef.set(lambdaContext);
+			} else {
+				LOG.error("AwsFeature has not been registered. Context injection won't work.");
+			}
+		});
 		actualContainerRequest.setProperty(GatewayBinaryReadInterceptor.PROPERTY_BASE_64_ENCODED_REQUEST,
 				request.isBase64Encoded());
 	}
 
 	@Override
-	public SimpleResponseWriter<GatewayResponse> createResponseWriter() {
+	public SimpleResponseWriter<GatewayResponse> createResponseWriter(
+			GatewayRequestAndLambdaContext requestAndContext) {
 		return new ResponseWriter();
 	}
 
 	@Override
-	public GatewayResponse createInternalServerErrorResponse() {
+	public GatewayResponse onRequestFailure(Exception e, GatewayRequestAndLambdaContext request,
+			JRestlessContainerRequest containerRequest) {
+		LOG.error("request failed", e);
 		return new GatewayResponse(null, Collections.emptyMap(), Status.INTERNAL_SERVER_ERROR, false);
 	}
 

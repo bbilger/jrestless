@@ -26,8 +26,6 @@ import javax.ws.rs.core.SecurityContext;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.utilities.Binder;
 import org.glassfish.jersey.server.ContainerRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.jrestless.core.container.JRestlessHandlerContainer;
 import com.jrestless.core.container.io.JRestlessContainerRequest;
@@ -45,8 +43,6 @@ import com.jrestless.core.security.AnonSecurityContext;
  */
 public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(SimpleRequestHandler.class);
-
 	private JRestlessHandlerContainer<JRestlessContainerRequest> container;
 
 	private boolean initialized = false;
@@ -59,7 +55,7 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	 *
 	 * @param application
 	 */
-	public final void init(@Nonnull Application application) {
+	protected final void init(@Nonnull Application application) {
 		requireNonNull(application);
 		init(new JRestlessHandlerContainer<>(application));
 	}
@@ -71,7 +67,7 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	 *
 	 * @param application
 	 */
-	public final void init(@Nonnull Application application, @Nullable Binder customBinder,
+	protected final void init(@Nonnull Application application, @Nullable Binder customBinder,
 			@Nonnull ServiceLocator parent) {
 		requireNonNull(application);
 		requireNonNull(parent);
@@ -84,7 +80,7 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	 *
 	 * @param handlerContainer
 	 */
-	public final void init(@Nonnull JRestlessHandlerContainer<JRestlessContainerRequest> handlerContainer) {
+	protected final void init(@Nonnull JRestlessHandlerContainer<JRestlessContainerRequest> handlerContainer) {
 		requireNonNull(handlerContainer);
 		checkState(!initialized, "handler has already been initlialized");
 		this.container = handlerContainer;
@@ -98,7 +94,7 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	 * <p>
 	 * One of the init methods must be called, first.
 	 */
-	public final void start() {
+	protected final void start() {
 		checkState(initialized, "handler has not been initialized");
 		checkState(!started, "container has already been started");
 		container.onStartup();
@@ -111,7 +107,7 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	 * @param request
 	 * @return
 	 */
-	public final ResponseT delegateRequest(@Nonnull RequestT request) {
+	protected final ResponseT delegateRequest(@Nonnull RequestT request) {
 		ResponseT containerResponse;
 		JRestlessContainerRequest containerRequest = null;
 		try {
@@ -120,33 +116,20 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 			containerRequest = createContainerRequest(request);
 			JRestlessContainerRequest containerRequestFinal = containerRequest;
 			beforeHandleRequest(request, containerRequest);
-			SimpleResponseWriter<ResponseT> responseWriter = createResponseWriter();
+			SimpleResponseWriter<ResponseT> responseWriter = createResponseWriter(request);
 			container.handleRequest(containerRequest, responseWriter, createSecurityContext(request, containerRequest),
 					cReq -> extendActualJerseyContainerRequest(cReq, containerRequestFinal, request));
 			containerResponse = responseWriter.getResponse();
-			requireNonNull(containerResponse);
 			containerResponse = onRequestSuccess(containerResponse, request, containerRequest);
 		} catch (Exception e) {
-			LOG.error("request failed", e);
-			try {
-				containerResponse = onRequestFailure(e, request, containerRequest);
-			} catch (Exception requestFailureException) {
-				LOG.error("onRequestFailure hook failed", requestFailureException);
-				containerResponse = createInternalServerErrorResponse();
-			}
-		}
-		if (containerResponse == null) {
-			LOG.error("no containerResponse set => responding with internal server error");
-			containerResponse = createInternalServerErrorResponse();
+			containerResponse = onRequestFailure(e, request, containerRequest);
 		}
 		return containerResponse;
 	}
 
-	public abstract SimpleResponseWriter<ResponseT> createResponseWriter();
+	protected abstract SimpleResponseWriter<ResponseT> createResponseWriter(@Nonnull RequestT request);
 
-	public abstract JRestlessContainerRequest createContainerRequest(RequestT request);
-
-	public abstract ResponseT createInternalServerErrorResponse();
+	protected abstract JRestlessContainerRequest createContainerRequest(RequestT request);
 
 	/**
 	 * Hook that is invoked before the request is handled by the container.
@@ -154,7 +137,7 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	 * @param request
 	 * @param containerRequest
 	 */
-	public void beforeHandleRequest(RequestT request, JRestlessContainerRequest containerRequest) {
+	protected void beforeHandleRequest(RequestT request, JRestlessContainerRequest containerRequest) {
 	}
 
 	/**
@@ -166,7 +149,7 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	 * @param containerRequest
 	 * @return the container response
 	 */
-	public ResponseT onRequestSuccess(ResponseT response, RequestT request,
+	protected ResponseT onRequestSuccess(ResponseT response, RequestT request,
 			JRestlessContainerRequest containerRequest) {
 		return response;
 	}
@@ -175,18 +158,15 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	 * Hook that is invoked when the request couldn't be handled by the
 	 * container.
 	 * <p>
-	 * By default an internal server error is created.
+	 * In general an internal server error should be created.
 	 *
 	 * @param e
 	 * @param request
 	 * @param containerRequest
 	 * @return the error container response
 	 */
-	public ResponseT onRequestFailure(Exception e, RequestT request,
-			@Nullable JRestlessContainerRequest containerRequest) {
-		return createInternalServerErrorResponse();
-	}
-
+	protected abstract ResponseT onRequestFailure(Exception e, RequestT request,
+			@Nullable JRestlessContainerRequest containerRequest);
 	/**
 	 * Hook that allows to extend the actual containerRequest passed to the Jersey container.
 	 *
@@ -194,7 +174,7 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	 * @param containerRequest
 	 * @param request
 	 */
-	public void extendActualJerseyContainerRequest(ContainerRequest actualContainerRequest,
+	protected void extendActualJerseyContainerRequest(ContainerRequest actualContainerRequest,
 			JRestlessContainerRequest containerRequest, RequestT request) {
 	}
 
@@ -207,7 +187,7 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	 * @return
 	 */
 	@Nonnull
-	public SecurityContext createSecurityContext(RequestT request, JRestlessContainerRequest containerRequest) {
+	protected SecurityContext createSecurityContext(RequestT request, JRestlessContainerRequest containerRequest) {
 		return new AnonSecurityContext();
 	}
 

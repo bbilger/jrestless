@@ -1,0 +1,19 @@
+group = 'com.jrestless.aws'
+version = "${globaleModuleVersion}"
+
+dependencies {
+	compile project(':aws:core:jrestless-aws-core-handler')
+	compile project(':aws:core:jrestless-aws-core')
+	compile (
+		libraries.aws_lambda_events_plain,
+		libraries.aws_lambda_events_joda_time
+	)
+	testCompile project(':test:jrestless-test')
+	testCompile (
+		libraries.junit,
+		libraries.mockito_core,
+		libraries.slf4j_simple,
+		libraries.jersey_media_json_jackson,
+		'org.skyscreamer:jsonassert:1.3.0'
+	)
+}

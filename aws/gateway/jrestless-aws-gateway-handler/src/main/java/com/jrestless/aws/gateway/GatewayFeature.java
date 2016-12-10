@@ -15,61 +15,87 @@
  */
 package com.jrestless.aws.gateway;
 
+import java.lang.reflect.Type;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.process.internal.RequestScoped;
+import org.glassfish.hk2.api.TypeLiteral;
+import org.glassfish.jersey.internal.inject.ReferencingFactory;
+import org.glassfish.jersey.internal.util.collection.Ref;
 
-import com.jrestless.aws.gateway.dpi.GatewayRequestContextFactory;
+import com.jrestless.aws.AwsFeature;
 import com.jrestless.aws.gateway.io.GatewayBinaryReadInterceptor;
 import com.jrestless.aws.gateway.io.GatewayBinaryResponseCheckFilter;
 import com.jrestless.aws.gateway.io.GatewayBinaryWriteInterceptor;
 import com.jrestless.aws.gateway.io.GatewayRequest;
-import com.jrestless.aws.gateway.security.CustomAuthorizerFilter;
 import com.jrestless.aws.gateway.security.CognitoUserPoolAuthorizerFilter;
+import com.jrestless.aws.gateway.security.CustomAuthorizerFilter;
+import com.jrestless.core.container.dpi.AbstractReferencingBinder;
 
 /**
- * Binds Gateway specific values.
+ * Binds Gateway specific values and registers Gateway specific features.
+ *
+ * Injected objects:
  *
  * <table border="1" summary="injected objects">
  * <tr>
  * <th>injectable object
  * <th>proxiable
  * <th>scope
- * <th>factory
  * </tr>
  *
  * <tr>
  * <td>{@link GatewayRequest}
  * <td>true
  * <td>request
- * <td>{@link GatewayRequestContextFactory}
  * </tr>
  *
  * </table>
+ * <p>
+ * Registers features:
+ * <ul>
+ * <li>{@link AwsFeature}
+ * <li>{@link GatewayBinaryReadInterceptor}
+ * <li>{@link GatewayBinaryResponseCheckFilter}
+ * <li>{@link GatewayBinaryWriteInterceptor}
+ * <li>{@link CustomAuthorizerFilter}
+ * <li>{@link CognitoUserPoolAuthorizerFilter}
+ * </ul>
  *
  * @author Bjoern Bilger
  *
  */
 public class GatewayFeature implements Feature {
+
+	public static final Type GATEWAY_REQUEST_TYPE = (new TypeLiteral<Ref<GatewayRequest>>() { }).getType();
+
 	@Override
 	public boolean configure(FeatureContext context) {
-		context.register(new AbstractBinder() {
-			@Override
-			protected void configure() {
-				bindFactory(GatewayRequestContextFactory.class)
-					.to(GatewayRequest.class)
-					.proxy(true)
-					.proxyForSameScope(false)
-					.in(RequestScoped.class);
-			}
-		});
+		context.register(new Binder());
 		context.register(GatewayBinaryReadInterceptor.class);
 		context.register(GatewayBinaryResponseCheckFilter.class);
 		context.register(GatewayBinaryWriteInterceptor.class);
 		context.register(CustomAuthorizerFilter.class);
 		context.register(CognitoUserPoolAuthorizerFilter.class);
+		context.register(AwsFeature.class);
 		return true;
+	}
+
+	private static class Binder extends AbstractReferencingBinder {
+		@Override
+		protected void configure() {
+			bindReferencingFactory(GatewayRequest.class, ReferencingGatewayRequestFactory.class,
+					new TypeLiteral<Ref<GatewayRequest>>() { });
+		}
+	}
+
+	private static class ReferencingGatewayRequestFactory extends ReferencingFactory<GatewayRequest> {
+		@Inject
+		ReferencingGatewayRequestFactory(final Provider<Ref<GatewayRequest>> referenceFactory) {
+			super(referenceFactory);
+		}
 	}
 }

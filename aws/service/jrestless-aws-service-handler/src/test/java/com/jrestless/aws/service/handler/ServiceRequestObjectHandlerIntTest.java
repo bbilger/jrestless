@@ -17,11 +17,13 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -37,7 +39,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
-import com.jrestless.aws.service.ServiceResourceConfig;
+import com.jrestless.aws.service.ServiceFeature;
 import com.jrestless.aws.service.io.DefaultServiceRequest;
 import com.jrestless.aws.service.io.DefaultServiceResponse;
 import com.jrestless.aws.service.io.ServiceRequest;
@@ -46,20 +48,21 @@ import com.jrestless.core.container.dpi.InstanceBinder;
 
 public class ServiceRequestObjectHandlerIntTest {
 
-	private ServiceRequestObjectHandler handler;
+	private ServiceRequestObjectHandlerImpl handler;
 	private TestService testService;
 	private Context context = mock(Context.class);
 
 	@Before
 	public void setup() {
-		ResourceConfig config = new ServiceResourceConfig();
+		ResourceConfig config = new ResourceConfig();
+		config.register(ServiceFeature.class);
 		testService = mock(TestService.class);
 		Binder binder = new InstanceBinder.Builder().addInstance(testService, TestService.class).build();
 		config.register(binder);
 		config.register(TestResource.class);
 		handler = spy(new ServiceRequestObjectHandlerImpl());
-		handler.init(config);
-		handler.start();
+		handler.doInit(config);
+		handler.doStart();
 	}
 
 	@Test
@@ -118,6 +121,7 @@ public class ServiceRequestObjectHandlerIntTest {
 		assertEquals(new DefaultServiceResponse(responseBody, responseHeaders, 200, "OK"), response);
 	}
 
+	@Singleton
 	@Path("/")
 	public static class TestResource {
 
@@ -222,5 +226,11 @@ public class ServiceRequestObjectHandlerIntTest {
 	}
 
 	public static class ServiceRequestObjectHandlerImpl extends ServiceRequestObjectHandler {
+		void doStart() {
+			start();
+		}
+		void doInit(Application application) {
+			init(application);
+		}
 	}
 }

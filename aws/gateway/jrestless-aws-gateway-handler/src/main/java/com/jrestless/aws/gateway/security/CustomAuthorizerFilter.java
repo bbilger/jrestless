@@ -19,12 +19,14 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Priority;
+import javax.inject.Inject;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.core.SecurityContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jrestless.aws.gateway.io.GatewayRequest;
 import com.jrestless.aws.security.CustomAuthorizerClaims;
 import com.jrestless.aws.security.CustomAuthorizerPrincipal;
 
@@ -46,6 +48,11 @@ import com.jrestless.aws.security.CustomAuthorizerPrincipal;
 public class CustomAuthorizerFilter extends AuthorizerFilter {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CognitoUserPoolAuthorizerFilter.class);
+
+	@Inject
+	public CustomAuthorizerFilter(GatewayRequest gatewayRequest) {
+		super(gatewayRequest);
+	}
 
 	/**
 	 * Creates a security context using the passed principal.

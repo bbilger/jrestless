@@ -5,8 +5,6 @@ import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -21,7 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
+import org.glassfish.jersey.server.spi.RequestScopedInitializer;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -29,52 +30,80 @@ import org.mockito.ArgumentCaptor;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.jrestless.aws.AwsFeature;
+import com.jrestless.aws.service.ServiceFeature;
 import com.jrestless.aws.service.io.DefaultServiceRequest;
-import com.jrestless.aws.service.io.DefaultServiceResponse;
 import com.jrestless.aws.service.io.ServiceRequest;
 import com.jrestless.core.container.JRestlessHandlerContainer;
-import com.jrestless.core.container.handler.SimpleRequestHandler.SimpleResponseWriter;
 import com.jrestless.core.container.io.JRestlessContainerRequest;
 
 public class ServiceRequestHandlerTest {
 
-
 	private JRestlessHandlerContainer<JRestlessContainerRequest> container;
-	private ServiceRequestHandler gatewayHandler;
+	private ServiceRequestHandlerImpl serviceHandler;
 
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setup() {
 		container = mock(JRestlessHandlerContainer.class);
-		gatewayHandler = spy(new ServiceRequestHandlerImpl());
-		gatewayHandler.init(container);
-		gatewayHandler.start();
+		serviceHandler = spy(new ServiceRequestHandlerImpl());
+		serviceHandler.doInit(container);
+		serviceHandler.doStart();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void delegateRequest_ValidRequestAndReferencesGiven_ShouldSetReferencesOnRequestInitialization() {
+		Context context = mock(Context.class);
+		DefaultServiceRequest request = new DefaultServiceRequest(null, new HashMap<>(), URI.create("/"), "GET");
+
+		RequestScopedInitializer requestScopedInitializer = getSetRequestScopedInitializer(context, request);
+
+		Ref<ServiceRequest> serviceRequestRef = mock(Ref.class);
+		Ref<Context> contextRef = mock(Ref.class);
+
+		ServiceLocator serviceLocator = mock(ServiceLocator.class);
+		when(serviceLocator.getService(ServiceFeature.SERVICE_REQUEST_TYPE)).thenReturn(serviceRequestRef);
+		when(serviceLocator.getService(AwsFeature.CONTEXT_TYPE)).thenReturn(contextRef);
+
+		requestScopedInitializer.initialize(serviceLocator);
+
+		verify(serviceRequestRef).set(request);
+		verify(contextRef).set(context);
+	}
+
+	@Test
+	public void delegateRequest_ValidRequestAndNoReferencesGiven_ShouldNotFailOnRequestInitialization() {
+		Context context = mock(Context.class);
+		DefaultServiceRequest request = new DefaultServiceRequest(null, new HashMap<>(), URI.create("/"), "GET");
+
+		RequestScopedInitializer requestScopedInitializer = getSetRequestScopedInitializer(context, request);
+
+		ServiceLocator serviceLocator = mock(ServiceLocator.class);
+		requestScopedInitializer.initialize(serviceLocator);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Test
-	public void delegateRequest_ValidRequestGiven_ShouldRegisterContextsOnRequest() {
-		Context context = mock(Context.class);
-		DefaultServiceRequest request = new DefaultServiceRequest(null, new HashMap<>(), URI.create("/"), "GET");
+	private RequestScopedInitializer getSetRequestScopedInitializer(Context context, ServiceRequest request) {
 		ServiceRequestAndLambdaContext reqAndContext = new ServiceRequestAndLambdaContext(request, context);
-		DefaultServiceResponse response = new DefaultServiceResponse("testBody", new HashMap<>(), 200, "");
-		SimpleResponseWriter<DefaultServiceResponse> responseWriter = mock(SimpleResponseWriter.class);
-		when(responseWriter.getResponse()).thenReturn(response);
-		doReturn(responseWriter).when(gatewayHandler).createResponseWriter();
-		ArgumentCaptor<Consumer> containerEnhancerCapure = ArgumentCaptor.forClass(Consumer.class);
-		gatewayHandler.delegateRequest(reqAndContext);
-		verify(container).handleRequest(any(), eq(responseWriter), any(), containerEnhancerCapure.capture());
+		ArgumentCaptor<Consumer> containerEnhancerCaptor = ArgumentCaptor.forClass(Consumer.class);
+		serviceHandler.doDelegateRequest(reqAndContext);
+		verify(container).handleRequest(any(), any(), any(), containerEnhancerCaptor.capture());
 
 		ContainerRequest containerRequest = mock(ContainerRequest.class);
-		containerEnhancerCapure.getValue().accept(containerRequest);
-		verify(containerRequest).setProperty("awsLambdaContext", context);
-		verify(containerRequest).setProperty("awsServiceRequest", request);
+		containerEnhancerCaptor.getValue().accept(containerRequest);
+
+		ArgumentCaptor<RequestScopedInitializer> requestScopedInitializerCaptor = ArgumentCaptor.forClass(RequestScopedInitializer.class);
+
+		verify(containerRequest).setRequestScopedInitializer(requestScopedInitializerCaptor.capture());
+
+		return requestScopedInitializerCaptor.getValue();
 	}
 
 	@Test
 	public void createContainerRequest_NoBodyGiven_ShouldUseEmptyBaos() {
 		ServiceRequestAndLambdaContext request = createMinimalRequest();
-		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
+		JRestlessContainerRequest containerRequest = serviceHandler.createContainerRequest(request);
 		InputStream is = containerRequest.getEntityStream();
 		assertEquals(ByteArrayInputStream.class, is.getClass());
 		assertArrayEquals(new byte[0], toBytes((ByteArrayInputStream) is));
@@ -84,7 +113,7 @@ public class ServiceRequestHandlerTest {
 	public void createContainerRequest_BodyGiven_ShouldUseBody() {
 		ServiceRequestAndLambdaContext request = createMinimalRequest();
 		((DefaultServiceRequest) request.getServiceRequest()).setBody("abc");
-		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
+		JRestlessContainerRequest containerRequest = serviceHandler.createContainerRequest(request);
 		InputStream is = containerRequest.getEntityStream();
 		assertEquals(ByteArrayInputStream.class, is.getClass());
 		assertArrayEquals("abc".getBytes(), toBytes((ByteArrayInputStream) is));
@@ -94,7 +123,7 @@ public class ServiceRequestHandlerTest {
 	public void createContainerRequest_HttpMethodGiven_ShouldUseHttpMethod() {
 		ServiceRequestAndLambdaContext request = createMinimalRequest();
 		((DefaultServiceRequest) request.getServiceRequest()).setHttpMethod("X");
-		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
+		JRestlessContainerRequest containerRequest = serviceHandler.createContainerRequest(request);
 		assertEquals("X", containerRequest.getHttpMethod());
 	}
 
@@ -102,7 +131,7 @@ public class ServiceRequestHandlerTest {
 	public void createContainerRequest_PathGiven_ShouldUsePath() {
 		ServiceRequestAndLambdaContext request = createMinimalRequest();
 		((DefaultServiceRequest) request.getServiceRequest()).setRequestUri(URI.create("/a?b=c&d=e"));
-		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
+		JRestlessContainerRequest containerRequest = serviceHandler.createContainerRequest(request);
 		assertEquals(URI.create("/a?b=c&d=e"), containerRequest.getRequestUri());
 	}
 
@@ -111,7 +140,7 @@ public class ServiceRequestHandlerTest {
 		ServiceRequestAndLambdaContext request = createMinimalRequest();
 		Map<String, List<String>> headers = ImmutableMap.of("0", emptyList(), "1", singletonList("a"), "2", ImmutableList.of("b", "c"));
 		((DefaultServiceRequest) request.getServiceRequest()).setHeaders(headers);
-		JRestlessContainerRequest containerRequest = gatewayHandler.createContainerRequest(request);
+		JRestlessContainerRequest containerRequest = serviceHandler.createContainerRequest(request);
 		assertEquals(headers, containerRequest.getHeaders());
 	}
 
@@ -130,6 +159,16 @@ public class ServiceRequestHandlerTest {
 
 		return array;
 	}
+
 	private static class ServiceRequestHandlerImpl extends ServiceRequestHandler {
+		void doStart() {
+			start();
+		}
+		void doInit(JRestlessHandlerContainer<JRestlessContainerRequest> container) {
+			init(container);
+		}
+		void doDelegateRequest(ServiceRequestAndLambdaContext reqAndContext) {
+			delegateRequest(reqAndContext);
+		}
 	}
 }
