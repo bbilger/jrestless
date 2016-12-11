@@ -152,16 +152,6 @@ subprojects {
 				artifact sourcesJar 
 				artifact javadocJar
 			}
-			// change from runtime to compile time
-			all {
-				pom.withXml {
-    				asNode().dependencies.'*'.findAll() {
-      					it.scope.text() == 'runtime' && project.configurations.compile.allDependencies.find { dep ->
-        					dep.name == it.artifactId.text()
-      					}
-    				}.each { it.scope*.value = 'compile'}
-  				}
-			}
 		}
 	}
 }
@@ -179,5 +169,5 @@ dependencies {
 }
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '3.0'
+	gradleVersion = '3.2.1'
 }
