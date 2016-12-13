@@ -3,6 +3,7 @@ package com.jrestless.security;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -27,8 +28,8 @@ public class OpenIdSubClaimTest extends ClaimsTest<OpenIdSubClaim> {
 	OpenIdSubClaim getClaims() {
 		return new OpenIdSubClaim() {
 			@Override
-			public Object getClaim(String name) {
-				return getClaimsMap().get(name);
+			public Map<String, Object> getAllClaims() {
+				return getClaimsMap();
 			}
 		};
 	}

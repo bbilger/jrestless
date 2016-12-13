@@ -97,9 +97,10 @@ public class CustomAuthorizerFilter extends AuthorizerFilter {
 			public String getPrincipalId() {
 				return principalId;
 			}
+
 			@Override
-			public Object getClaim(String name) {
-				return authorizerData.get(name);
+			public Map<String, Object> getAllClaims() {
+				return authorizerData;
 			}
 		};
 	}

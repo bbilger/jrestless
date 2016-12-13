@@ -2,6 +2,9 @@ group = 'com.jrestless.core'
 version = "${globaleModuleVersion}"
 
 dependencies {
+	compile(
+		libraries.findbugs_jsr305
+	)
 	testCompile(
 		libraries.junit
 	)

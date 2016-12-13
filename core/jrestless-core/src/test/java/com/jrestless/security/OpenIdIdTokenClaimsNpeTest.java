@@ -5,6 +5,8 @@ import static org.junit.Assert.assertTrue;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,8 +29,8 @@ public class OpenIdIdTokenClaimsNpeTest {
 
 	private OpenIdIdTokenClaims openIdIdTokenClaims = new OpenIdIdTokenClaims() {
 		@Override
-		public Object getClaim(String name) {
-			return null;
+		public Map<String, Object> getAllClaims() {
+			return Collections.emptyMap();
 		}
 	};
 

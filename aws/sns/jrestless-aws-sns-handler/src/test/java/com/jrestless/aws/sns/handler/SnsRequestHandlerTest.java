@@ -51,8 +51,8 @@ public class SnsRequestHandlerTest {
 	public void setup() {
 		container = mock(JRestlessHandlerContainer.class);
 		snsHandler = spy(new SnsRequestHandlerImpl());
-		snsHandler.doInit(container);
-		snsHandler.doStart();
+		snsHandler.init(container);
+		snsHandler.start();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -99,7 +99,7 @@ public class SnsRequestHandlerTest {
 	private RequestScopedInitializer getSetRequestScopedInitializer(Context context, SNSRecord snsRecord) {
 		SnsRecordAndLambdaContext reqAndContext = new SnsRecordAndLambdaContext(snsRecord, context);
 		ArgumentCaptor<Consumer> containerEnhancerCaptor = ArgumentCaptor.forClass(Consumer.class);
-		snsHandler.doDelegateRequest(reqAndContext);
+		snsHandler.delegateRequest(reqAndContext);
 		verify(container).handleRequest(any(), any(), any(), containerEnhancerCaptor.capture());
 
 		ContainerRequest containerRequest = mock(ContainerRequest.class);
@@ -203,7 +203,7 @@ public class SnsRequestHandlerTest {
 
 		ArgumentCaptor<JRestlessContainerRequest> containerRequestCaptor = ArgumentCaptor
 				.forClass(JRestlessContainerRequest.class);
-		snsHandler.doDelegateRequest(reqAndContext);
+		snsHandler.delegateRequest(reqAndContext);
 
 		verify(container).handleRequest(containerRequestCaptor.capture(), any(), any(), any());
 
@@ -236,14 +236,5 @@ public class SnsRequestHandlerTest {
 	}
 
 	private static class SnsRequestHandlerImpl extends SnsRequestHandler {
-		void doStart() {
-			start();
-		}
-		void doInit(JRestlessHandlerContainer<JRestlessContainerRequest> container) {
-			init(container);
-		}
-		void doDelegateRequest(SnsRecordAndLambdaContext request) {
-			delegateRequest(request);
-		}
 	}
 }

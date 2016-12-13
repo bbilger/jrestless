@@ -105,7 +105,7 @@ public class CognitoUserPoolAuthorizerFilter extends AuthorizerFilter {
 		if (addressClaims == null) {
 			return null;
 		}
-		return name -> addressClaims.get(name);
+		return () -> addressClaims;
 	}
 
 	private CognitoUserPoolAuthorizerClaims createCognitoUserPoolAuthorizerClaims(Map<String, Object> claims,
@@ -116,8 +116,8 @@ public class CognitoUserPoolAuthorizerFilter extends AuthorizerFilter {
 				return openIdAddressClaims;
 			}
 			@Override
-			public Object getClaim(String name) {
-				return claims.get(name);
+			public Map<String, Object> getAllClaims() {
+				return claims;
 			}
 		};
 	}

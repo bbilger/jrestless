@@ -96,14 +96,14 @@ public class CustomAuthorizerFilterTest extends AuthorizerFilterTest {
 	public void principalIdGiven_ShouldMakePrincipalIdAvailableThroughClaims() {
 		SecurityContext sc = filterAndReturnSetSecurityContext(Collections.singletonMap("principalId", "123"));
 		CustomAuthorizerPrincipal principal = ((CustomAuthorizerPrincipal) sc.getUserPrincipal());
-		assertEquals("123", principal.getClaims().getClaim("principalId"));
+		assertEquals("123", principal.getClaims().getAllClaims().get("principalId"));
 	}
 
 	@Test
 	public void principalIdAndAdditionalClaimGiven_ShouldMakeClaimAvailable() {
 		SecurityContext sc = filterAndReturnSetSecurityContext(ImmutableMap.of("someClaimKey", true, "principalId", "123"));
 		CustomAuthorizerPrincipal principal = ((CustomAuthorizerPrincipal) sc.getUserPrincipal());
-		assertTrue((Boolean) principal.getClaims().getClaim("someClaimKey"));
+		assertTrue((Boolean) principal.getClaims().getAllClaims().get("someClaimKey"));
 	}
 
 }

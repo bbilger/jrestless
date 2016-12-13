@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -41,8 +42,8 @@ public class OpenIdIdTokenClaimsTest extends ClaimsTest<OpenIdIdTokenClaims> {
 	OpenIdIdTokenClaims getClaims() {
 		return new OpenIdIdTokenClaims() {
 			@Override
-			public Object getClaim(String name) {
-				return getClaimsMap().get(name);
+			public Map<String, Object> getAllClaims() {
+				return getClaimsMap();
 			}
 		};
 	}

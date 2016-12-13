@@ -13,7 +13,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.Application;
 
 import org.glassfish.hk2.utilities.Binder;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -46,8 +45,8 @@ public class SnsRequestHandlerIntTest {
 		config.register(binder);
 		config.register(TestResource.class);
 		handler = new SnsRequestObjectHandlerImpl();
-		handler.doInit(config);
-		handler.doStart();
+		handler.init(config);
+		handler.start();
 	}
 
 	@Test
@@ -306,11 +305,5 @@ public class SnsRequestHandlerIntTest {
 	}
 
 	private static class SnsRequestObjectHandlerImpl extends SnsRequestObjectHandler {
-		void doStart() {
-			start();
-		}
-		void doInit(Application application) {
-			init(application);
-		}
 	}
 }

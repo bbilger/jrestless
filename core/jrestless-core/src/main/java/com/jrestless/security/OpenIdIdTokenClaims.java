@@ -46,7 +46,7 @@ public interface OpenIdIdTokenClaims extends Claims, OpenIdSubClaim {
 	 */
 	@Override
 	default String getSub() {
-		String sub = (String) getClaim(CLAIM_SUB);
+		String sub = (String) getAllClaims().get(CLAIM_SUB);
 		if (sub == null) {
 			throw new NullPointerException("sub not set");
 		}
@@ -63,7 +63,7 @@ public interface OpenIdIdTokenClaims extends Claims, OpenIdSubClaim {
 	 *             if the value is not set
 	 */
 	default String getIss() {
-		String iss = (String) getClaim(ID_TOKEN_CLAIM_ISS);
+		String iss = (String) getAllClaims().get(ID_TOKEN_CLAIM_ISS);
 		if (iss == null) {
 			throw new NullPointerException("iss not set");
 		}
@@ -86,7 +86,7 @@ public interface OpenIdIdTokenClaims extends Claims, OpenIdSubClaim {
 	 */
 	@SuppressWarnings("unchecked")
 	default Collection<String> getAud() {
-		Object amrObj = getClaim(ID_TOKEN_CLAIM_AUD);
+		Object amrObj = getAllClaims().get(ID_TOKEN_CLAIM_AUD);
 		if (amrObj == null) {
 			throw new NullPointerException("aud is not set");
 		} else if (amrObj instanceof Collection) {
@@ -105,7 +105,7 @@ public interface OpenIdIdTokenClaims extends Claims, OpenIdSubClaim {
 	 *             if the value is not set
 	 */
 	default String getSingleAud() {
-		String aud = (String) getClaim(ID_TOKEN_CLAIM_AUD);
+		String aud = (String) getAllClaims().get(ID_TOKEN_CLAIM_AUD);
 		if (aud == null) {
 			throw new NullPointerException("aud not set");
 		}
@@ -126,7 +126,7 @@ public interface OpenIdIdTokenClaims extends Claims, OpenIdSubClaim {
 	 *             if the value is not set
 	 */
 	default long getExp() {
-		return (long) getClaim(ID_TOKEN_CLAIM_EXP);
+		return (long) getAllClaims().get(ID_TOKEN_CLAIM_EXP);
 	}
 
 	/**
@@ -138,7 +138,7 @@ public interface OpenIdIdTokenClaims extends Claims, OpenIdSubClaim {
 	 *             if the value is not set
 	 */
 	default long getIat() {
-		return (long) getClaim(ID_TOKEN_CLAIM_IAT);
+		return (long) getAllClaims().get(ID_TOKEN_CLAIM_IAT);
 	}
 
 	/**
@@ -151,7 +151,7 @@ public interface OpenIdIdTokenClaims extends Claims, OpenIdSubClaim {
 	 * response parameter.)
 	 */
 	default Long getAuthTime() {
-		return (Long) getClaim(ID_TOKEN_CLAIM_AUTH_TIME);
+		return (Long) getAllClaims().get(ID_TOKEN_CLAIM_AUTH_TIME);
 	}
 
 	/**
@@ -167,7 +167,7 @@ public interface OpenIdIdTokenClaims extends Claims, OpenIdSubClaim {
 	 * string.
 	 */
 	default String getNonce() {
-		return (String) getClaim(ID_TOKEN_CLAIM_NONCE);
+		return (String) getAllClaims().get(ID_TOKEN_CLAIM_NONCE);
 	}
 
 	/**
@@ -191,7 +191,7 @@ public interface OpenIdIdTokenClaims extends Claims, OpenIdSubClaim {
 	 * case sensitive string.
 	 */
 	default String getAcr() {
-		return (String) getClaim(ID_TOKEN_CLAIM_ACR);
+		return (String) getAllClaims().get(ID_TOKEN_CLAIM_ACR);
 	}
 
 	/**
@@ -209,7 +209,7 @@ public interface OpenIdIdTokenClaims extends Claims, OpenIdSubClaim {
 	 */
 	@SuppressWarnings({ "unchecked" })
 	default Collection<String> getAmr() {
-		Object amrObj = getClaim(ID_TOKEN_CLAIM_AMR);
+		Object amrObj = getAllClaims().get(ID_TOKEN_CLAIM_AMR);
 		if (amrObj == null) {
 			return null;
 		} else if (amrObj instanceof Collection) {
@@ -230,6 +230,6 @@ public interface OpenIdIdTokenClaims extends Claims, OpenIdSubClaim {
 	 * value is a case sensitive string containing a StringOrURI value.
 	 */
 	default String getAzp() {
-		return (String) getClaim(ID_TOKEN_CLAIM_AZP);
+		return (String) getAllClaims().get(ID_TOKEN_CLAIM_AZP);
 	}
 }

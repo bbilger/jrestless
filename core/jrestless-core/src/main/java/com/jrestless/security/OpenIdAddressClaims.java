@@ -41,7 +41,7 @@ public interface OpenIdAddressClaims extends Claims {
 	 * as a single line feed character ("\n").
 	 */
 	default String getFormatted() {
-		return (String) getClaim(ADDRESS_CLAIM_FORMATTED);
+		return (String) getAllClaims().get(ADDRESS_CLAIM_FORMATTED);
 	}
 
 	/**
@@ -52,35 +52,35 @@ public interface OpenIdAddressClaims extends Claims {
 	 * feed pair ("\r\n") or as a single line feed character ("\n").
 	 */
 	default String getStreetAddress() {
-		return (String) getClaim(ADDRESS_CLAIM_STREET_ADDRESS);
+		return (String) getAllClaims().get(ADDRESS_CLAIM_STREET_ADDRESS);
 	}
 
 	/**
 	 * City or locality component.
 	 */
 	default String getLocality() {
-		return (String) getClaim(ADDRESS_CLAIM_LOCALITY);
+		return (String) getAllClaims().get(ADDRESS_CLAIM_LOCALITY);
 	}
 
 	/**
 	 * State, province, prefecture, or region component.
 	 */
 	default String getRegion() {
-		return (String) getClaim(ADDRESS_CLAIM_REGION);
+		return (String) getAllClaims().get(ADDRESS_CLAIM_REGION);
 	}
 
 	/**
 	 * Zip code or postal code component.
 	 */
 	default String getPostalCode() {
-		return (String) getClaim(ADDRESS_CLAIM_POSTAL_CODE);
+		return (String) getAllClaims().get(ADDRESS_CLAIM_POSTAL_CODE);
 	}
 
 	/**
 	 * Country name component.
 	 */
 	default String getCountry() {
-		return (String) getClaim(ADDRESS_CLAIM_COUNTRY);
+		return (String) getAllClaims().get(ADDRESS_CLAIM_COUNTRY);
 	}
 
 }

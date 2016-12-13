@@ -69,8 +69,8 @@ public class GatewayRequestHandlerTest {
 	public void setup() {
 		container = mock(JRestlessHandlerContainer.class);
 		gatewayHandler = spy(new GatewayRequestHandlerImpl());
-		gatewayHandler.doInit(container);
-		gatewayHandler.doStart();
+		gatewayHandler.init(container);
+		gatewayHandler.start();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -116,7 +116,7 @@ public class GatewayRequestHandlerTest {
 	private RequestScopedInitializer getSetRequestScopedInitializer(Context context, GatewayRequest request) {
 		GatewayRequestAndLambdaContext reqAndContext = new GatewayRequestAndLambdaContext(request, context);
 		ArgumentCaptor<Consumer> containerEnhancerCaptor = ArgumentCaptor.forClass(Consumer.class);
-		gatewayHandler.doDelegateRequest(reqAndContext);
+		gatewayHandler.delegateRequest(reqAndContext);
 		verify(container).handleRequest(any(), any(), any(), containerEnhancerCaptor.capture());
 
 		ContainerRequest containerRequest = mock(ContainerRequest.class);
@@ -301,14 +301,5 @@ public class GatewayRequestHandlerTest {
 		return new String(chars);
 	}
 	private static class GatewayRequestHandlerImpl extends GatewayRequestHandler {
-		void doStart() {
-			start();
-		}
-		void doInit(JRestlessHandlerContainer<JRestlessContainerRequest> container) {
-			init(container);
-		}
-		void doDelegateRequest(GatewayRequestAndLambdaContext reqAndContext) {
-			delegateRequest(reqAndContext);
-		}
 	}
 }

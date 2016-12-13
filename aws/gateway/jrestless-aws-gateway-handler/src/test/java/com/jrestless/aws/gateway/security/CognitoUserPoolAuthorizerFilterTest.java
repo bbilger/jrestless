@@ -109,7 +109,7 @@ public class CognitoUserPoolAuthorizerFilterTest extends AuthorizerFilterTest {
 	public void subClaimGiven_ShouldMakeSubClaimAvailableThroughClaims() {
 		SecurityContext sc = filterWithClaimsAndReturnSecurityContext(Collections.singletonMap("sub", "123"));
 		CognitoUserPoolAuthorizerPrincipal principal = ((CognitoUserPoolAuthorizerPrincipal) sc.getUserPrincipal());
-		assertEquals("123", principal.getClaims().getClaim("sub"));
+		assertEquals("123", principal.getClaims().getAllClaims().get("sub"));
 	}
 
 	@Test
@@ -161,45 +161,45 @@ public class CognitoUserPoolAuthorizerFilterTest extends AuthorizerFilterTest {
 		CognitoUserPoolAuthorizerPrincipal principal = ((CognitoUserPoolAuthorizerPrincipal) sc.getUserPrincipal());
 
 		CognitoUserPoolAuthorizerClaims congitoUserPoolClaims = principal.getClaims();
-		assertEquals2("someSubValue", congitoUserPoolClaims.getSub(), congitoUserPoolClaims.getClaim("sub"));
-		assertEquals2("someIssValue", congitoUserPoolClaims.getIss(), congitoUserPoolClaims.getClaim("iss"));
-		assertEquals2(ImmutableList.of("someAud0", "someAud1"), congitoUserPoolClaims.getAud(), congitoUserPoolClaims.getClaim("aud"));
-		assertEquals2(1L, congitoUserPoolClaims.getExp(), congitoUserPoolClaims.getClaim("exp"));
-		assertEquals2(2L, congitoUserPoolClaims.getIat(), congitoUserPoolClaims.getClaim("iat"));
-		assertEquals2(3L, congitoUserPoolClaims.getAuthTime(), congitoUserPoolClaims.getClaim("auth_time"));
-		assertEquals2("someNonceValue", congitoUserPoolClaims.getNonce(), congitoUserPoolClaims.getClaim("nonce"));
-		assertEquals2("someAcrValue", congitoUserPoolClaims.getAcr(), congitoUserPoolClaims.getClaim("acr"));
-		assertEquals2(ImmutableList.of("someAmr0", "someAmr1"), congitoUserPoolClaims.getAmr(), congitoUserPoolClaims.getClaim("amr"));
-		assertEquals2("someAzpValue", congitoUserPoolClaims.getAzp(), congitoUserPoolClaims.getClaim("azp"));
-		assertEquals2("someCognitoUsernameValue", congitoUserPoolClaims.getCognitoUserName(), congitoUserPoolClaims.getClaim("cognito:username"));
-		assertEquals("someCustomBlubValue", congitoUserPoolClaims.getClaim("custom:blub"));
+		assertEquals2("someSubValue", congitoUserPoolClaims.getSub(), congitoUserPoolClaims.getAllClaims().get("sub"));
+		assertEquals2("someIssValue", congitoUserPoolClaims.getIss(), congitoUserPoolClaims.getAllClaims().get("iss"));
+		assertEquals2(ImmutableList.of("someAud0", "someAud1"), congitoUserPoolClaims.getAud(), congitoUserPoolClaims.getAllClaims().get("aud"));
+		assertEquals2(1L, congitoUserPoolClaims.getExp(), congitoUserPoolClaims.getAllClaims().get("exp"));
+		assertEquals2(2L, congitoUserPoolClaims.getIat(), congitoUserPoolClaims.getAllClaims().get("iat"));
+		assertEquals2(3L, congitoUserPoolClaims.getAuthTime(), congitoUserPoolClaims.getAllClaims().get("auth_time"));
+		assertEquals2("someNonceValue", congitoUserPoolClaims.getNonce(), congitoUserPoolClaims.getAllClaims().get("nonce"));
+		assertEquals2("someAcrValue", congitoUserPoolClaims.getAcr(), congitoUserPoolClaims.getAllClaims().get("acr"));
+		assertEquals2(ImmutableList.of("someAmr0", "someAmr1"), congitoUserPoolClaims.getAmr(), congitoUserPoolClaims.getAllClaims().get("amr"));
+		assertEquals2("someAzpValue", congitoUserPoolClaims.getAzp(), congitoUserPoolClaims.getAllClaims().get("azp"));
+		assertEquals2("someCognitoUsernameValue", congitoUserPoolClaims.getCognitoUserName(), congitoUserPoolClaims.getAllClaims().get("cognito:username"));
+		assertEquals("someCustomBlubValue", congitoUserPoolClaims.getAllClaims().get("custom:blub"));
 
-		assertEquals2("someNameValue", congitoUserPoolClaims.getName(), congitoUserPoolClaims.getClaim("name"));
-		assertEquals2("someGivenNameValue", congitoUserPoolClaims.getGivenName(), congitoUserPoolClaims.getClaim("given_name"));
-		assertEquals2("someFamilyNameValue", congitoUserPoolClaims.getFamilyName(), congitoUserPoolClaims.getClaim("family_name"));
-		assertEquals2("someMiddleNameValue", congitoUserPoolClaims.getMiddleName(), congitoUserPoolClaims.getClaim("middle_name"));
-		assertEquals2("somePreferredUsernameValue", congitoUserPoolClaims.getPreferredUsername(), congitoUserPoolClaims.getClaim("preferred_username"));
-		assertEquals2("someProfileValue", congitoUserPoolClaims.getProfile(), congitoUserPoolClaims.getClaim("profile"));
-		assertEquals2("somePictureValue", congitoUserPoolClaims.getPicture(), congitoUserPoolClaims.getClaim("picture"));
-		assertEquals2("someWebsiteValue", congitoUserPoolClaims.getWebsite(), congitoUserPoolClaims.getClaim("website"));
-		assertEquals2("someEmailValue", congitoUserPoolClaims.getEmail(), congitoUserPoolClaims.getClaim("email"));
-		assertEquals2(true, congitoUserPoolClaims.getEmailVerified(), congitoUserPoolClaims.getClaim("email_verified"));
-		assertEquals2("someGenderValue", congitoUserPoolClaims.getGender(), congitoUserPoolClaims.getClaim("gender"));
-		assertEquals2("someBirthdateValue", congitoUserPoolClaims.getBirthdate(), congitoUserPoolClaims.getClaim("birthdate"));
-		assertEquals2("someZoneinfoValue", congitoUserPoolClaims.getZoneinfo(), congitoUserPoolClaims.getClaim("zoneinfo"));
-		assertEquals2("someLocaleValue", congitoUserPoolClaims.getLocale(), congitoUserPoolClaims.getClaim("locale"));
-		assertEquals2("somePhoneNumberValue", congitoUserPoolClaims.getPhoneNumber(), congitoUserPoolClaims.getClaim("phone_number"));
-		assertEquals2(true, congitoUserPoolClaims.getPhoneNumberVerified(), congitoUserPoolClaims.getClaim("phone_number_verified"));
-		assertEquals2(4L, congitoUserPoolClaims.getUpdatedAt(), congitoUserPoolClaims.getClaim("updated_at"));
+		assertEquals2("someNameValue", congitoUserPoolClaims.getName(), congitoUserPoolClaims.getAllClaims().get("name"));
+		assertEquals2("someGivenNameValue", congitoUserPoolClaims.getGivenName(), congitoUserPoolClaims.getAllClaims().get("given_name"));
+		assertEquals2("someFamilyNameValue", congitoUserPoolClaims.getFamilyName(), congitoUserPoolClaims.getAllClaims().get("family_name"));
+		assertEquals2("someMiddleNameValue", congitoUserPoolClaims.getMiddleName(), congitoUserPoolClaims.getAllClaims().get("middle_name"));
+		assertEquals2("somePreferredUsernameValue", congitoUserPoolClaims.getPreferredUsername(), congitoUserPoolClaims.getAllClaims().get("preferred_username"));
+		assertEquals2("someProfileValue", congitoUserPoolClaims.getProfile(), congitoUserPoolClaims.getAllClaims().get("profile"));
+		assertEquals2("somePictureValue", congitoUserPoolClaims.getPicture(), congitoUserPoolClaims.getAllClaims().get("picture"));
+		assertEquals2("someWebsiteValue", congitoUserPoolClaims.getWebsite(), congitoUserPoolClaims.getAllClaims().get("website"));
+		assertEquals2("someEmailValue", congitoUserPoolClaims.getEmail(), congitoUserPoolClaims.getAllClaims().get("email"));
+		assertEquals2(true, congitoUserPoolClaims.getEmailVerified(), congitoUserPoolClaims.getAllClaims().get("email_verified"));
+		assertEquals2("someGenderValue", congitoUserPoolClaims.getGender(), congitoUserPoolClaims.getAllClaims().get("gender"));
+		assertEquals2("someBirthdateValue", congitoUserPoolClaims.getBirthdate(), congitoUserPoolClaims.getAllClaims().get("birthdate"));
+		assertEquals2("someZoneinfoValue", congitoUserPoolClaims.getZoneinfo(), congitoUserPoolClaims.getAllClaims().get("zoneinfo"));
+		assertEquals2("someLocaleValue", congitoUserPoolClaims.getLocale(), congitoUserPoolClaims.getAllClaims().get("locale"));
+		assertEquals2("somePhoneNumberValue", congitoUserPoolClaims.getPhoneNumber(), congitoUserPoolClaims.getAllClaims().get("phone_number"));
+		assertEquals2(true, congitoUserPoolClaims.getPhoneNumberVerified(), congitoUserPoolClaims.getAllClaims().get("phone_number_verified"));
+		assertEquals2(4L, congitoUserPoolClaims.getUpdatedAt(), congitoUserPoolClaims.getAllClaims().get("updated_at"));
 
 		OpenIdAddressClaims addressClaims = congitoUserPoolClaims.getAddress();
-		assertEquals2("someFormattedValue", addressClaims.getFormatted(), addressClaims.getClaim("formatted"));
-		assertEquals2("someStreetAddressValue", addressClaims.getStreetAddress(), addressClaims.getClaim("street_address"));
-		assertEquals2("someLocalityValue", addressClaims.getLocality(), addressClaims.getClaim("locality"));
-		assertEquals2("someRegionValue", addressClaims.getRegion(), addressClaims.getClaim("region"));
-		assertEquals2("somePostalCodeValue", addressClaims.getPostalCode(), addressClaims.getClaim("postal_code"));
-		assertEquals2("someCountryValue", addressClaims.getCountry(), addressClaims.getClaim("country"));
-		assertEquals("someCustomMuhValue", addressClaims.getClaim("custom:muh"));
+		assertEquals2("someFormattedValue", addressClaims.getFormatted(), addressClaims.getAllClaims().get("formatted"));
+		assertEquals2("someStreetAddressValue", addressClaims.getStreetAddress(), addressClaims.getAllClaims().get("street_address"));
+		assertEquals2("someLocalityValue", addressClaims.getLocality(), addressClaims.getAllClaims().get("locality"));
+		assertEquals2("someRegionValue", addressClaims.getRegion(), addressClaims.getAllClaims().get("region"));
+		assertEquals2("somePostalCodeValue", addressClaims.getPostalCode(), addressClaims.getAllClaims().get("postal_code"));
+		assertEquals2("someCountryValue", addressClaims.getCountry(), addressClaims.getAllClaims().get("country"));
+		assertEquals("someCustomMuhValue", addressClaims.getAllClaims().get("custom:muh"));
 	}
 
 	@Test
@@ -208,37 +208,37 @@ public class CognitoUserPoolAuthorizerFilterTest extends AuthorizerFilterTest {
 		CognitoUserPoolAuthorizerPrincipal principal = ((CognitoUserPoolAuthorizerPrincipal) sc.getUserPrincipal());
 
 		CognitoUserPoolAuthorizerClaims congitoUserPoolClaims = principal.getClaims();
-		assertEquals2("123", congitoUserPoolClaims.getSub(), congitoUserPoolClaims.getClaim("sub"));
-		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getIss, congitoUserPoolClaims.getClaim("iss"));
-		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getAud, congitoUserPoolClaims.getClaim("aud"));
-		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getSingleAud, congitoUserPoolClaims.getClaim("aud"));
-		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getExp, congitoUserPoolClaims.getClaim("exp"));
-		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getIat, congitoUserPoolClaims.getClaim("iat"));
-		assertNull2(congitoUserPoolClaims.getAuthTime(), congitoUserPoolClaims.getClaim("auth_time"));
-		assertNull2(congitoUserPoolClaims.getNonce(), congitoUserPoolClaims.getClaim("nonce"));
-		assertNull2(congitoUserPoolClaims.getAcr(), congitoUserPoolClaims.getClaim("acr"));
-		assertNull2(congitoUserPoolClaims.getAmr(), congitoUserPoolClaims.getClaim("amr"));
-		assertNull2(congitoUserPoolClaims.getAzp(), congitoUserPoolClaims.getClaim("azp"));
-		assertNull2(congitoUserPoolClaims.getCognitoUserName(), congitoUserPoolClaims.getClaim("cognito:username"));
-		assertNull(congitoUserPoolClaims.getClaim("custom:blub"));
+		assertEquals2("123", congitoUserPoolClaims.getSub(), congitoUserPoolClaims.getAllClaims().get("sub"));
+		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getIss, congitoUserPoolClaims.getAllClaims().get("iss"));
+		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getAud, congitoUserPoolClaims.getAllClaims().get("aud"));
+		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getSingleAud, congitoUserPoolClaims.getAllClaims().get("aud"));
+		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getExp, congitoUserPoolClaims.getAllClaims().get("exp"));
+		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getIat, congitoUserPoolClaims.getAllClaims().get("iat"));
+		assertNull2(congitoUserPoolClaims.getAuthTime(), congitoUserPoolClaims.getAllClaims().get("auth_time"));
+		assertNull2(congitoUserPoolClaims.getNonce(), congitoUserPoolClaims.getAllClaims().get("nonce"));
+		assertNull2(congitoUserPoolClaims.getAcr(), congitoUserPoolClaims.getAllClaims().get("acr"));
+		assertNull2(congitoUserPoolClaims.getAmr(), congitoUserPoolClaims.getAllClaims().get("amr"));
+		assertNull2(congitoUserPoolClaims.getAzp(), congitoUserPoolClaims.getAllClaims().get("azp"));
+		assertNull2(congitoUserPoolClaims.getCognitoUserName(), congitoUserPoolClaims.getAllClaims().get("cognito:username"));
+		assertNull(congitoUserPoolClaims.getAllClaims().get("custom:blub"));
 
-		assertNull2(congitoUserPoolClaims.getName(), congitoUserPoolClaims.getClaim("name"));
-		assertNull2(congitoUserPoolClaims.getGivenName(), congitoUserPoolClaims.getClaim("given_name"));
-		assertNull2(congitoUserPoolClaims.getFamilyName(), congitoUserPoolClaims.getClaim("family_name"));
-		assertNull2(congitoUserPoolClaims.getMiddleName(), congitoUserPoolClaims.getClaim("middle_name"));
-		assertNull2(congitoUserPoolClaims.getPreferredUsername(), congitoUserPoolClaims.getClaim("preferred_username"));
-		assertNull2(congitoUserPoolClaims.getProfile(), congitoUserPoolClaims.getClaim("profile"));
-		assertNull2(congitoUserPoolClaims.getPicture(), congitoUserPoolClaims.getClaim("picture"));
-		assertNull2(congitoUserPoolClaims.getWebsite(), congitoUserPoolClaims.getClaim("website"));
-		assertNull2(congitoUserPoolClaims.getEmail(), congitoUserPoolClaims.getClaim("email"));
-		assertNull2(congitoUserPoolClaims.getEmailVerified(), congitoUserPoolClaims.getClaim("email_verified"));
-		assertNull2(congitoUserPoolClaims.getGender(), congitoUserPoolClaims.getClaim("gender"));
-		assertNull2(congitoUserPoolClaims.getBirthdate(), congitoUserPoolClaims.getClaim("birthdate"));
-		assertNull2(congitoUserPoolClaims.getZoneinfo(), congitoUserPoolClaims.getClaim("zoneinfo"));
-		assertNull2(congitoUserPoolClaims.getLocale(), congitoUserPoolClaims.getClaim("locale"));
-		assertNull2(congitoUserPoolClaims.getPhoneNumber(), congitoUserPoolClaims.getClaim("phone_number"));
-		assertNull2(congitoUserPoolClaims.getPhoneNumberVerified(), congitoUserPoolClaims.getClaim("phone_number_verified"));
-		assertNull2(congitoUserPoolClaims.getUpdatedAt(), congitoUserPoolClaims.getClaim("updated_at"));
+		assertNull2(congitoUserPoolClaims.getName(), congitoUserPoolClaims.getAllClaims().get("name"));
+		assertNull2(congitoUserPoolClaims.getGivenName(), congitoUserPoolClaims.getAllClaims().get("given_name"));
+		assertNull2(congitoUserPoolClaims.getFamilyName(), congitoUserPoolClaims.getAllClaims().get("family_name"));
+		assertNull2(congitoUserPoolClaims.getMiddleName(), congitoUserPoolClaims.getAllClaims().get("middle_name"));
+		assertNull2(congitoUserPoolClaims.getPreferredUsername(), congitoUserPoolClaims.getAllClaims().get("preferred_username"));
+		assertNull2(congitoUserPoolClaims.getProfile(), congitoUserPoolClaims.getAllClaims().get("profile"));
+		assertNull2(congitoUserPoolClaims.getPicture(), congitoUserPoolClaims.getAllClaims().get("picture"));
+		assertNull2(congitoUserPoolClaims.getWebsite(), congitoUserPoolClaims.getAllClaims().get("website"));
+		assertNull2(congitoUserPoolClaims.getEmail(), congitoUserPoolClaims.getAllClaims().get("email"));
+		assertNull2(congitoUserPoolClaims.getEmailVerified(), congitoUserPoolClaims.getAllClaims().get("email_verified"));
+		assertNull2(congitoUserPoolClaims.getGender(), congitoUserPoolClaims.getAllClaims().get("gender"));
+		assertNull2(congitoUserPoolClaims.getBirthdate(), congitoUserPoolClaims.getAllClaims().get("birthdate"));
+		assertNull2(congitoUserPoolClaims.getZoneinfo(), congitoUserPoolClaims.getAllClaims().get("zoneinfo"));
+		assertNull2(congitoUserPoolClaims.getLocale(), congitoUserPoolClaims.getAllClaims().get("locale"));
+		assertNull2(congitoUserPoolClaims.getPhoneNumber(), congitoUserPoolClaims.getAllClaims().get("phone_number"));
+		assertNull2(congitoUserPoolClaims.getPhoneNumberVerified(), congitoUserPoolClaims.getAllClaims().get("phone_number_verified"));
+		assertNull2(congitoUserPoolClaims.getUpdatedAt(), congitoUserPoolClaims.getAllClaims().get("updated_at"));
 
 		assertNull(congitoUserPoolClaims.getAddress());
 	}

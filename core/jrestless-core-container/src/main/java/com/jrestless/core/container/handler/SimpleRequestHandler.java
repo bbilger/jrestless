@@ -55,7 +55,7 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	 *
 	 * @param application
 	 */
-	protected final void init(@Nonnull Application application) {
+	public final void init(@Nonnull Application application) {
 		requireNonNull(application);
 		init(new JRestlessHandlerContainer<>(application));
 	}
@@ -67,7 +67,7 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	 *
 	 * @param application
 	 */
-	protected final void init(@Nonnull Application application, @Nullable Binder customBinder,
+	public final void init(@Nonnull Application application, @Nullable Binder customBinder,
 			@Nonnull ServiceLocator parent) {
 		requireNonNull(application);
 		requireNonNull(parent);
@@ -80,7 +80,7 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	 *
 	 * @param handlerContainer
 	 */
-	protected final void init(@Nonnull JRestlessHandlerContainer<JRestlessContainerRequest> handlerContainer) {
+	public final void init(@Nonnull JRestlessHandlerContainer<JRestlessContainerRequest> handlerContainer) {
 		requireNonNull(handlerContainer);
 		checkState(!initialized, "handler has already been initlialized");
 		this.container = handlerContainer;
@@ -94,7 +94,7 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	 * <p>
 	 * One of the init methods must be called, first.
 	 */
-	protected final void start() {
+	public final void start() {
 		checkState(initialized, "handler has not been initialized");
 		checkState(!started, "container has already been started");
 		container.onStartup();
@@ -107,7 +107,7 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	 * @param request
 	 * @return
 	 */
-	protected final ResponseT delegateRequest(@Nonnull RequestT request) {
+	public final ResponseT delegateRequest(@Nonnull RequestT request) {
 		ResponseT containerResponse;
 		JRestlessContainerRequest containerRequest = null;
 		try {

@@ -55,7 +55,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -110,8 +109,8 @@ public class GatewayRequestObjectHandlerIntTest {
 		config.register(GZipEncoder.class);
 		config.register(new LoggingFeature(LOGGER, LoggingFeature.Verbosity.PAYLOAD_ANY));
 		handler = spy(new GatewayRequestObjectHandlerImpl());
-		handler.doInit(config);
-		handler.doStart();
+		handler.init(config);
+		handler.start();
 	}
 
 	@Test
@@ -303,7 +302,7 @@ public class GatewayRequestObjectHandlerIntTest {
 		CustomAuthorizerPrincipal cognitoCustomPrincipal = (CustomAuthorizerPrincipal) principal;
 		assertEquals("123", cognitoCustomPrincipal.getName());
 		assertEquals("123", cognitoCustomPrincipal.getClaims().getPrincipalId());
-		assertEquals("blub", cognitoCustomPrincipal.getClaims().getClaim("custom:value"));
+		assertEquals("blub", cognitoCustomPrincipal.getClaims().getAllClaims().get("custom:value"));
 	}
 
 	@Test
@@ -318,7 +317,7 @@ public class GatewayRequestObjectHandlerIntTest {
 		assertEquals("123", cognitoUserPoolPrincipal.getName());
 		assertNotNull(cognitoUserPoolPrincipal.getClaims());
 		assertEquals("123", cognitoUserPoolPrincipal.getClaims().getSub());
-		assertEquals("123", cognitoUserPoolPrincipal.getClaims().getClaim("sub"));
+		assertEquals("123", cognitoUserPoolPrincipal.getClaims().getAllClaims().get("sub"));
 	}
 
 	private Principal testPrincipal(Map<String, Object> authorizerData) {
@@ -518,11 +517,5 @@ public class GatewayRequestObjectHandlerIntTest {
 	}
 
 	public static class GatewayRequestObjectHandlerImpl extends GatewayRequestObjectHandler {
-		void doStart() {
-			start();
-		}
-		void doInit(Application application) {
-			init(application);
-		}
 	}
 }

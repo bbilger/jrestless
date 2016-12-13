@@ -23,7 +23,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -61,8 +60,8 @@ public class ServiceRequestObjectHandlerIntTest {
 		config.register(binder);
 		config.register(TestResource.class);
 		handler = spy(new ServiceRequestObjectHandlerImpl());
-		handler.doInit(config);
-		handler.doStart();
+		handler.init(config);
+		handler.start();
 	}
 
 	@Test
@@ -226,11 +225,5 @@ public class ServiceRequestObjectHandlerIntTest {
 	}
 
 	public static class ServiceRequestObjectHandlerImpl extends ServiceRequestObjectHandler {
-		void doStart() {
-			start();
-		}
-		void doInit(Application application) {
-			init(application);
-		}
 	}
 }

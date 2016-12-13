@@ -17,8 +17,8 @@ public class OpenIdIdTokenClaimsTransformTest {
 	private Map<String, Object> claimsMaps = new HashMap<>();
 	private OpenIdIdTokenClaims openIdIdTokenClaims = new OpenIdIdTokenClaims() {
 		@Override
-		public Object getClaim(String name) {
-			return claimsMaps.get(name);
+		public Map<String, Object> getAllClaims() {
+			return claimsMaps;
 		}
 	};
 

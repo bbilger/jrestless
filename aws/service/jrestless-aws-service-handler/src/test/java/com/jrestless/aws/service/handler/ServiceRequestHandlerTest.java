@@ -47,8 +47,8 @@ public class ServiceRequestHandlerTest {
 	public void setup() {
 		container = mock(JRestlessHandlerContainer.class);
 		serviceHandler = spy(new ServiceRequestHandlerImpl());
-		serviceHandler.doInit(container);
-		serviceHandler.doStart();
+		serviceHandler.init(container);
+		serviceHandler.start();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -87,7 +87,7 @@ public class ServiceRequestHandlerTest {
 	private RequestScopedInitializer getSetRequestScopedInitializer(Context context, ServiceRequest request) {
 		ServiceRequestAndLambdaContext reqAndContext = new ServiceRequestAndLambdaContext(request, context);
 		ArgumentCaptor<Consumer> containerEnhancerCaptor = ArgumentCaptor.forClass(Consumer.class);
-		serviceHandler.doDelegateRequest(reqAndContext);
+		serviceHandler.delegateRequest(reqAndContext);
 		verify(container).handleRequest(any(), any(), any(), containerEnhancerCaptor.capture());
 
 		ContainerRequest containerRequest = mock(ContainerRequest.class);
@@ -161,14 +161,5 @@ public class ServiceRequestHandlerTest {
 	}
 
 	private static class ServiceRequestHandlerImpl extends ServiceRequestHandler {
-		void doStart() {
-			start();
-		}
-		void doInit(JRestlessHandlerContainer<JRestlessContainerRequest> container) {
-			init(container);
-		}
-		void doDelegateRequest(ServiceRequestAndLambdaContext reqAndContext) {
-			delegateRequest(reqAndContext);
-		}
 	}
 }

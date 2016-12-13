@@ -15,19 +15,24 @@
  */
 package com.jrestless.security;
 
+import java.util.Map;
+
+import javax.annotation.Nonnull;
+
 /**
- * Access claims by their names - normally from a map.
  *
  * @author Bjoern Bilger
  */
 @FunctionalInterface
 public interface Claims {
 	/**
-	 * Returns claim's value or null if it doesn't exist.
+	 * Returns all claims.
+	 * <p>
+	 * The returned Map should be (considered as) unmodifiable and is never
+	 * null.
 	 *
-	 * @param name
-	 *            the name of the claim
-	 * @return the claim's value or null if it doesn't exist
+	 * @return all claims
 	 */
-	Object getClaim(String name);
+	@Nonnull
+	Map<String, Object> getAllClaims();
 }

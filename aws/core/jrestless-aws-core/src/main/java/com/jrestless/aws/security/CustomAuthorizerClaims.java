@@ -24,7 +24,7 @@ import com.jrestless.security.Claims;
  * <p>
  * At minimum a custom authorizer must return a the principalId but it can
  * return additional claims via context. The additional claims can be accessed
- * via {@link CustomAuthorizerClaims#getClaim(String)}.
+ * via {@link CustomAuthorizerClaims#getAllClaims()}.
  * <p>
  * See <a href=
  * "http://docs.aws.amazon.com/apigateway/latest/developerguide/use-custom-authorizer.html#api-gateway-custom-authorizer-output">

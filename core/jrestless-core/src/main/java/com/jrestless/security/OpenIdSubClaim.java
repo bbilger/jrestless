@@ -32,6 +32,6 @@ interface OpenIdSubClaim extends Claims {
 	 * </dl>
 	 */
 	default String getSub() {
-		return (String) getClaim(CLAIM_SUB);
+		return (String) getAllClaims().get(CLAIM_SUB);
 	}
 }
