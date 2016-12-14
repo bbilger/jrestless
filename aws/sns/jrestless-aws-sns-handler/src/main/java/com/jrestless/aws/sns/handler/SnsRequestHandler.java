@@ -70,16 +70,16 @@ public abstract class SnsRequestHandler extends SimpleRequestHandler<SnsRecordAn
 
 	private final URI baseUri;
 
-	public SnsRequestHandler() {
+	protected SnsRequestHandler() {
 		this(URI.create("/"));
 	}
 
-	public SnsRequestHandler(URI baseUri) {
+	protected SnsRequestHandler(URI baseUri) {
 		this.baseUri = baseUri;
 	}
 
 	@Override
-	public final JRestlessContainerRequest createContainerRequest(
+	protected final JRestlessContainerRequest createContainerRequest(
 			@Nonnull SnsRecordAndLambdaContext snsRecordAndContext) {
 		requireNonNull(snsRecordAndContext);
 		InputStream entityStream = requireNonNull(createEntityStream(snsRecordAndContext));
@@ -99,7 +99,7 @@ public abstract class SnsRequestHandler extends SimpleRequestHandler<SnsRecordAn
 	 * @return the entity input stream
 	 */
 	@Nonnull
-	public InputStream createEntityStream(@Nonnull SnsRecordAndLambdaContext snsRecordAndContext) {
+	protected InputStream createEntityStream(@Nonnull SnsRecordAndLambdaContext snsRecordAndContext) {
 		String message = snsRecordAndContext.getSnsRecord().getSNS().getMessage();
 		if (message == null) {
 			return new ByteArrayInputStream(new byte[0]);
@@ -119,7 +119,7 @@ public abstract class SnsRequestHandler extends SimpleRequestHandler<SnsRecordAn
 	 * @return the request headers
 	 */
 	@Nonnull
-	public Map<String, List<String>> createHeaders(@Nonnull SnsRecordAndLambdaContext snsRecordAndContext) {
+	protected Map<String, List<String>> createHeaders(@Nonnull SnsRecordAndLambdaContext snsRecordAndContext) {
 		return Collections.singletonMap(HttpHeaders.CONTENT_TYPE,
 				Collections.singletonList(MediaType.APPLICATION_JSON));
 	}
@@ -134,7 +134,7 @@ public abstract class SnsRequestHandler extends SimpleRequestHandler<SnsRecordAn
 	 * @return the request's http method
 	 */
 	@Nonnull
-	public String createHttpMethod(@Nonnull SnsRecordAndLambdaContext snsRecordAndContext) {
+	protected String createHttpMethod(@Nonnull SnsRecordAndLambdaContext snsRecordAndContext) {
 		return HttpMethod.POST;
 	}
 
@@ -150,7 +150,7 @@ public abstract class SnsRequestHandler extends SimpleRequestHandler<SnsRecordAn
 	 * @return the request URI
 	 */
 	@Nonnull
-	public URI createRequestUri(@Nonnull SnsRecordAndLambdaContext snsRecordAndContext) {
+	protected URI createRequestUri(@Nonnull SnsRecordAndLambdaContext snsRecordAndContext) {
 		SNS sns = snsRecordAndContext.getSnsRecord().getSNS();
 		String subject = sns.getSubject();
 		String topicArn = sns.getTopicArn();
@@ -164,12 +164,12 @@ public abstract class SnsRequestHandler extends SimpleRequestHandler<SnsRecordAn
 	}
 
 	@Override
-	public final SimpleResponseWriter<Void> createResponseWriter(SnsRecordAndLambdaContext snsRecordAndContext) {
+	protected final SimpleResponseWriter<Void> createResponseWriter(SnsRecordAndLambdaContext snsRecordAndContext) {
 		return new ResponseWriter(snsRecordAndContext);
 	}
 
 	@Override
-	public void extendActualJerseyContainerRequest(ContainerRequest actualContainerRequest,
+	protected void extendActualJerseyContainerRequest(ContainerRequest actualContainerRequest,
 			JRestlessContainerRequest containerRequest, SnsRecordAndLambdaContext snsRecordAndContext) {
 		SNSRecord snsRecord = snsRecordAndContext.getSnsRecord();
 		Context lambdaContext = snsRecordAndContext.getLambdaContext();
@@ -219,7 +219,7 @@ public abstract class SnsRequestHandler extends SimpleRequestHandler<SnsRecordAn
 	}
 
 	@Override
-	public Void onRequestFailure(Exception e, SnsRecordAndLambdaContext request,
+	protected Void onRequestFailure(Exception e, SnsRecordAndLambdaContext request,
 			JRestlessContainerRequest containerRequest) {
 		LOG.error("request failed", e);
 		return null;

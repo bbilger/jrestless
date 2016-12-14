@@ -35,11 +35,11 @@ import com.jrestless.aws.service.io.ServiceResponse;
 public abstract class ServiceRequestObjectHandler extends ServiceRequestHandler
 		implements RequestHandler<DefaultServiceRequest, ServiceResponse> {
 
-	public ServiceRequestObjectHandler() {
+	protected ServiceRequestObjectHandler() {
 		super();
 	}
 
-	public ServiceRequestObjectHandler(URI baseUri) {
+	protected ServiceRequestObjectHandler(URI baseUri) {
 		super(baseUri);
 	}
 

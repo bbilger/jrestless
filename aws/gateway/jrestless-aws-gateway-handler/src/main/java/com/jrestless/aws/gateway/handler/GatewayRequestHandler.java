@@ -69,16 +69,16 @@ public abstract class GatewayRequestHandler
 
 	private final URI baseUri;
 
-	public GatewayRequestHandler() {
+	protected GatewayRequestHandler() {
 		this(URI.create("/"));
 	}
 
-	public GatewayRequestHandler(URI baseUri) {
+	protected GatewayRequestHandler(URI baseUri) {
 		this.baseUri = baseUri;
 	}
 
 	@Override
-	public JRestlessContainerRequest createContainerRequest(GatewayRequestAndLambdaContext requestAndLambdaContext) {
+	protected JRestlessContainerRequest createContainerRequest(GatewayRequestAndLambdaContext requestAndLambdaContext) {
 		requireNonNull(requestAndLambdaContext);
 		GatewayRequest request = requestAndLambdaContext.getGatewayRequest();
 		requireNonNull(request);
@@ -124,7 +124,7 @@ public abstract class GatewayRequestHandler
 	}
 
 	@Override
-	public void extendActualJerseyContainerRequest(ContainerRequest actualContainerRequest,
+	protected void extendActualJerseyContainerRequest(ContainerRequest actualContainerRequest,
 			JRestlessContainerRequest containerRequest, GatewayRequestAndLambdaContext requestAndLambdaContext) {
 		GatewayRequest request = requestAndLambdaContext.getGatewayRequest();
 		Context lambdaContext = requestAndLambdaContext.getLambdaContext();
@@ -148,13 +148,13 @@ public abstract class GatewayRequestHandler
 	}
 
 	@Override
-	public SimpleResponseWriter<GatewayResponse> createResponseWriter(
+	protected SimpleResponseWriter<GatewayResponse> createResponseWriter(
 			GatewayRequestAndLambdaContext requestAndContext) {
 		return new ResponseWriter();
 	}
 
 	@Override
-	public GatewayResponse onRequestFailure(Exception e, GatewayRequestAndLambdaContext request,
+	protected GatewayResponse onRequestFailure(Exception e, GatewayRequestAndLambdaContext request,
 			JRestlessContainerRequest containerRequest) {
 		LOG.error("request failed", e);
 		return new GatewayResponse(null, Collections.emptyMap(), Status.INTERNAL_SERVER_ERROR, false);

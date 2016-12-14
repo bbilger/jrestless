@@ -35,11 +35,11 @@ import com.jrestless.aws.gateway.io.GatewayResponse;
 public abstract class GatewayRequestObjectHandler extends GatewayRequestHandler
 		implements RequestHandler<DefaultGatewayRequest, GatewayResponse> {
 
-	public GatewayRequestObjectHandler() {
+	protected GatewayRequestObjectHandler() {
 		super();
 	}
 
-	public GatewayRequestObjectHandler(URI baseUri) {
+	protected GatewayRequestObjectHandler(URI baseUri) {
 		super(baseUri);
 	}
 

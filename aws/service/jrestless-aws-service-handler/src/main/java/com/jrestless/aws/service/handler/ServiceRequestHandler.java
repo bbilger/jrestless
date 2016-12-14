@@ -65,16 +65,16 @@ public abstract class ServiceRequestHandler
 
 	private final URI baseUri;
 
-	public ServiceRequestHandler() {
+	protected ServiceRequestHandler() {
 		this(URI.create("/"));
 	}
 
-	public ServiceRequestHandler(URI baseUri) {
+	protected ServiceRequestHandler(URI baseUri) {
 		this.baseUri = baseUri;
 	}
 
 	@Override
-	public JRestlessContainerRequest createContainerRequest(ServiceRequestAndLambdaContext requestAndLambdaContext) {
+	protected JRestlessContainerRequest createContainerRequest(ServiceRequestAndLambdaContext requestAndLambdaContext) {
 		requireNonNull(requestAndLambdaContext);
 		ServiceRequest request = requireNonNull(requestAndLambdaContext.getServiceRequest());
 		URI requestUri = requireNonNull(request.getRequestUri());
@@ -90,7 +90,7 @@ public abstract class ServiceRequestHandler
 	}
 
 	@Override
-	public void extendActualJerseyContainerRequest(ContainerRequest actualContainerRequest,
+	protected void extendActualJerseyContainerRequest(ContainerRequest actualContainerRequest,
 			JRestlessContainerRequest containerRequest, ServiceRequestAndLambdaContext requestAndLambdaContext) {
 		ServiceRequest request = requestAndLambdaContext.getServiceRequest();
 		Context lambdaContext = requestAndLambdaContext.getLambdaContext();
@@ -112,13 +112,13 @@ public abstract class ServiceRequestHandler
 	}
 
 	@Override
-	public SimpleResponseWriter<ServiceResponse> createResponseWriter(
+	protected SimpleResponseWriter<ServiceResponse> createResponseWriter(
 			ServiceRequestAndLambdaContext requestAndContext) {
 		return new ResponseWriter();
 	}
 
 	@Override
-	public ServiceResponse onRequestFailure(Exception e, ServiceRequestAndLambdaContext request,
+	protected ServiceResponse onRequestFailure(Exception e, ServiceRequestAndLambdaContext request,
 			JRestlessContainerRequest containerRequest) {
 		LOG.error("request failed", e);
 		return new DefaultServiceResponse(null, Collections.emptyMap(), Status.INTERNAL_SERVER_ERROR.getStatusCode(),

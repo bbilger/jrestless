@@ -34,11 +34,11 @@ import com.amazonaws.services.lambda.runtime.events.SNSEvent.SNSRecord;
  */
 public abstract class SnsRequestObjectHandler extends SnsRequestHandler implements RequestHandler<SNSEvent, Void> {
 
-	public SnsRequestObjectHandler() {
+	protected SnsRequestObjectHandler() {
 		super();
 	}
 
-	public SnsRequestObjectHandler(URI baseUri) {
+	protected SnsRequestObjectHandler(URI baseUri) {
 		super(baseUri);
 	}
 
