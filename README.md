@@ -47,7 +47,7 @@ The motivation for this project is to avoid a cloud vendor lock-in and to allow 
   - All AWS functions can inject `com.amazonaws.services.lambda.runtime.Context`.
   - _AWS Gateway Functions_ can also inject the raw request [GatewayRequest](https://github.com/bbilger/jrestless/blob/master/aws/gateway/jrestless-aws-gateway-core/src/main/java/com/jrestless/aws/gateway/io/GatewayRequest.java)
   - _AWS Service Functions_ can also inject the raw request [ServiceRequest](https://github.com/bbilger/jrestless/blob/master/aws/service/jrestless-aws-service-core/src/main/java/com/jrestless/aws/service/io/ServiceRequest.java)
-  - _AWS Service Function_ can also inject the raw request [SNSRecord](https://github.com/aws/aws-lambda-java-libs/blob/master/aws-lambda-java-events/src/main/java/com/amazonaws/services/lambda/runtime/events/SNSEvent.java#L225)
+  - _AWS SNS Functions_ can also inject the raw request [SNSRecord](https://github.com/aws/aws-lambda-java-libs/blob/master/aws-lambda-java-events/src/main/java/com/amazonaws/services/lambda/runtime/events/SNSEvent.java#L225)
 - It's worth mentioning that _AWS Gateway Functions_ is designed to be used with API Gateway's _proxy integration type_ for _Lambda Functions_. So there are no limitations on the status code, the headers and the body you return.
 
 ## Function Types
