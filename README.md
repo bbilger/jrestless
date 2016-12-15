@@ -1,6 +1,6 @@
 # JRestless
 
-JRestless allows you to create serverless (AWS Lambda) applications using JAX-RS.
+JRestless allows you to create serverless or rather AWS Lambda applications using JAX-RS.
 
 ![](jrestless_512_256.png)
 
@@ -40,11 +40,14 @@ The motivation for this project is to avoid a cloud vendor lock-in and to allow 
 ## Features
 
 - Almost all JAX-RS features can be used (JSON/XML/text/... requests/responses, container request/response filters, etc.).
-- Jersey extensions can be used. For example integration for Spring (an example can be found here: https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-spring)
+- Jersey extensions can be used. For example integration for **Spring** (an example can be found here: https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-spring)
+- _AWS Gateway Functions_ can also consume and produce **binary** data.
+- _AWS Gateway Functions_ use the data added to the request by authorizers (_Custom Authorizers_ or _Cognito User Pool Authorizers_) to create a Principal ([CustomAuthorizerPrincipal](https://github.com/bbilger/jrestless/blob/master/aws/core/jrestless-aws-core/src/main/java/com/jrestless/aws/security/CustomAuthorizerPrincipal.java) or [CognitoUserPoolAuthorizerPrincipal](https://github.com/bbilger/jrestless/blob/master/aws/core/jrestless-aws-core/src/main/java/com/jrestless/aws/security/CognitoUserPoolAuthorizerPrincipal.java)) within the SecurityContext containing all claims.
 - Injection of provider and/or function type specific values via `@javax.ws.rs.core.Context` into resources and endpoints:
   - All AWS functions can inject `com.amazonaws.services.lambda.runtime.Context`.
   - _AWS Gateway Functions_ can also inject the raw request [GatewayRequest](https://github.com/bbilger/jrestless/blob/master/aws/gateway/jrestless-aws-gateway-core/src/main/java/com/jrestless/aws/gateway/io/GatewayRequest.java)
   - _AWS Service Functions_ can also inject the raw request [ServiceRequest](https://github.com/bbilger/jrestless/blob/master/aws/service/jrestless-aws-service-core/src/main/java/com/jrestless/aws/service/io/ServiceRequest.java)
+  - _AWS Service Function_ can also inject the raw request [SNSRecord](https://github.com/aws/aws-lambda-java-libs/blob/master/aws-lambda-java-events/src/main/java/com/amazonaws/services/lambda/runtime/events/SNSEvent.java#L225)
 - It's worth mentioning that _AWS Gateway Functions_ is designed to be used with API Gateway's _proxy integration type_ for _Lambda Functions_. So there are no limitations on the status code, the headers and the body you return.
 
 ## Function Types
@@ -53,7 +56,7 @@ The motivation for this project is to avoid a cloud vendor lock-in and to allow 
 
 - _Gateway Functions_ are AWS Lambda functions that get invoked by AWS API Gateway. [Read More...](aws/gateway/jrestless-aws-gateway-handler)
 - _Service Functions_ are AWS Lambda functions that can either be invoked by other AWS Lambda functions or can be invoked directly through the AWS SDK. The point is that you don't use AWS API Gateway. You can abstract the fact that you invoke an AWS Lambda function away by using a special feign client ([jrestless-aws-service-feign-client](aws/service/jrestless-aws-service-feign-client)). [Read More...](aws/service/jrestless-aws-service-handler)
-- _SNS functions_ are planned for the next release.
+- _SNS functions_ are AWS Lambda function that get invoked by SNS. This allow asynchronous calls to other Lambda functions. So when one Lambda function publishes a message to one SNS topic, SNS can then invoke all (1-N) subscribed Lambda functions. [Read More...](aws/sns/jrestless-aws-sns-handler)
 
 Note: the framework is split up into multiple modules, so you choose which functionality you actually want to use. See [Modules](#modules)
 
@@ -113,7 +116,7 @@ repositories {
 }
 dependencies {
   compile(
-    'com.jrestless.aws:jrestless-aws-gateway-handler:0.3.0',
+    'com.jrestless.aws:jrestless-aws-gateway-handler:0.4.0',
     'org.glassfish.jersey.media:jersey-media-json-jackson:2.23'
   )
 }
@@ -225,21 +228,24 @@ All modules are available in jcenter.
 * **jrestless-aws-gateway-handler** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-gateway-handler/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-gateway-handler/_latestVersion)
   * Provides an AWS Lambda RequestHandler that delegates requests from AWS API Gateway to Jersey.
   * [Read More...](aws/gateway/jrestless-aws-gateway-handler)
-* **jrestless-aws-gateway-core** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-gateway-core/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-gateway-core/_latestVersion)
-  * Contains interfaces used by [jrestless-aws-gateway-handler](aws/gateway/jrestless-aws-gateway-handler) and might be of interest for local development, as well.
-  * [Read More...](aws/gateway/jrestless-aws-gateway-core)
 * **jrestless-aws-service-handler** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-handler/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-handler/_latestVersion)
   * Provides an AWS Lambda RequestHandler that delegates requests - in an HTTP format - to Jersey. This is intended but not limited to call one Lambda function from another.
   * [Read More...](aws/service/jrestless-aws-service-handler)
-* **jrestless-aws-service-core** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-core/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-core/_latestVersion)
-  * Contains interfaces and classes used by [jrestless-aws-service-handler](aws/service/jrestless-aws-service-handler), [jrestless-aws-service-feign-client](aws/service/jrestless-aws-service-feign-client) and might be of interest for local development, as well.
-  * [Read More...](aws/service/jrestless-aws-service-core)
+* **jrestless-aws-sns-handler** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-sns-handler/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-sns-handler/_latestVersion)
+  * Provides an AWS Lambda RequestHandler that delegates pushes from SNS to Jersey. This is intended to call a Lambda function asynchronously from another.
+  * [Read More...](aws/sns/jrestless-aws-sns-handler)
+* **jrestless-aws-core** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-core/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-core/_latestVersion)
+  * Contains interfaces and classes used by [jrestless-aws-gateway-handler](aws/gateway/jrestless-aws-gateway-handler), [jrestless-aws-service-handler](aws/service/jrestless-aws-service-handler), [jrestless-aws-sns-handler](aws/sns/jrestless-aws-sns-handler) and [jrestless-aws-service-feign-client](aws/service/jrestless-aws-service-feign-client), and might be of interest for local development, as well.
+  * [Read More...](aws/core/jrestless-aws-core)
 * **jrestless-aws-service-feign-client** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-service-feign-client/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-service-feign-client/_latestVersion)
   * Provides a [feign](https://github.com/OpenFeign/feign) client to call Lambda functions that use [jrestless-aws-service-handler](aws/service/jrestless-aws-service-handler) a.k.a. Lambda service functions. This allows to call Lambda service functions transparently through feign.
   * [Read More...](aws/service/jrestless-aws-service-feign-client)
 * **jrestless-core-container** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-core-container/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-core-container/_latestVersion)
   * Provides a generic (provider independent) Jersey container that handles requests in the form of POJOs.
   * [Read More...](core/jrestless-core-container)
+* **jrestless-aws-core-handler** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-aws-core-handler/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-aws-core-handler/_latestVersion)
+  * Common functionality shared across AWS handlers: [jrestless-aws-gateway-handler](aws/gateway/jrestless-aws-gateway-handler), [jrestless-aws-service-handler](aws/service/jrestless-aws-service-handler) and [jrestless-aws-sns-handler](aws/sns/jrestless-aws-sns-handler)
+  * [Read More...](aws/core/jrestless-aws-core-handler)
 * **jrestless-test** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-test/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-test/_latestVersion)
   * Provides common test functionality.
   * [Read More...](test/jrestless-test)
@@ -251,7 +257,7 @@ All modules are available in jcenter.
 * Java
   * [lambadaframework](https://github.com/lambadaframework/lambadaframework) provides similar functionality like JRestless. It implements some features of the JAX-RS standard and includes deployment functionality within the framework itself.
   * [ingenieux/lambada](https://github.com/ingenieux/lambada) Non-JAX-RS Java framework
-  * [aws-lambda-servlet](https://github.com/ingenieux/lambada) run JAX-RS applications - uses Jersey and pretends to run in a servlet container
+  * [aws-lambda-servlet](https://github.com/bleshik/aws-lambda-servlet) run JAX-RS applications - uses Jersey and pretends to run in a servlet container
 * JavaScript
   * [aws-serverless-express](https://github.com/awslabs/aws-serverless-express) - run [express](https://github.com/expressjs/express) applications
 * Python
@@ -271,17 +277,7 @@ All modules are available in jcenter.
   * Multiple headers with same name are not supported
 
 ## Release History
-* 0.3.0
-  * Add support for `AWS Lambda service functions`.
-  * Add support to call `AWS Lambda service functions` using [feign](https://github.com/OpenFeign/feign) and the AWS SDK - allowing you to call those functions transparently via REST without using API Gateway.
-* 0.2.0
-  * use the new `Lambda Function Proxy` and catch-all paths provided by API Gateway (this reduces the framework's complexity and limitations significantly especially since the generation of a swagger definition is not necessary anymore)
-* 0.1.0 (-SNAPSHOT)
-  * (never released since the new features `Lambda Function Proxy` and catch-all paths were released before)
-  * add support for dynamic response Content-Type
-  * add support for custom response headers
-* 0.0.1
-  * intial release
+[CHANGELOG](CHANGELOG.md)
 
 ## Meta
 
