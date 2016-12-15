@@ -70,7 +70,7 @@ JRestless does not depend on the [serverless framework](https://github.com/serve
 
 Install `serverless` (>= 1.0.2) as described in the docs https://serverless.com/framework/docs/guide/installing-serverless/
 
-Setup your AWS account as described in the docs https://serverless.com/framework/docs/providers/aws/setup/
+Setup your AWS account as described in the docs https://serverless.com/framework/docs/providers/aws/guide/credentials/
 
 Create a new function using `serverless`
 
