@@ -175,13 +175,18 @@ Create the request handler (`src/main/java/com/jrestless/aws/examples/RequestHan
 ```java
 package com.jrestless.aws.examples;
 
-import com.jrestless.aws.gateway.GatewayResourceConfig;
+import org.glassfish.jersey.server.ResourceConfig;
+
+import com.jrestless.aws.gateway.GatewayFeature;
 import com.jrestless.aws.gateway.handler.GatewayRequestObjectHandler;
 
 public class RequestHandler extends GatewayRequestObjectHandler {
   public RequestHandler() {
     // initialize the container with your resource configuration
-    init(new GatewayResourceConfig().packages("com.jrestless.aws.examples"));
+    ResourceConfig config = new ResourceConfig()
+      .register(GatewayFeature.class)
+      .packages("com.jrestless.aws.examples");
+    init(config);
     // start the container
     start();
   }

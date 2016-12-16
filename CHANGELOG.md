@@ -21,6 +21,7 @@
 
 - \*Impl classes have been renamed to Default\*.
 - The visibility of most methods in *Handler classes has been changed from _public_ to _protected_.
+- GatewayResourceConfig and ServiceResourceConfig have been removed. Use org.glassfish.jersey.server.ResourceConfig and register GatewayFeature, ServiceFeature or SnsFeature depending on the type of function you are using.
 
 # 0.3.0 (2016-10-17)
 
