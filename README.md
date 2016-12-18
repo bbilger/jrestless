@@ -39,10 +39,10 @@ The motivation for this project is to avoid a cloud vendor lock-in and to allow 
 
 ## Features
 
-- Almost all JAX-RS features can be used (JSON/XML/text/... requests/responses, container request/response filters, etc.).
-- Jersey extensions can be used. For example integration for **Spring** (an example can be found here: https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-spring)
-- _AWS Gateway Functions_ can also consume and produce **binary** data.
-- _AWS Gateway Functions_ use the data added to the request by authorizers (_Custom Authorizers_ or _Cognito User Pool Authorizers_) to create a Principal ([CustomAuthorizerPrincipal](https://github.com/bbilger/jrestless/blob/master/aws/core/jrestless-aws-core/src/main/java/com/jrestless/aws/security/CustomAuthorizerPrincipal.java) or [CognitoUserPoolAuthorizerPrincipal](https://github.com/bbilger/jrestless/blob/master/aws/core/jrestless-aws-core/src/main/java/com/jrestless/aws/security/CognitoUserPoolAuthorizerPrincipal.java)) within the SecurityContext containing all claims.
+- Almost all JAX-RS features can be used (JSON/XML/text/... requests/responses, container request/response filters, etc.). Example: [aws-gateway-showcase](https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-showcase)
+- Jersey extensions can be used. For example integration for **Spring**. Example: [aws-gateway-spring](https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-spring)
+- _AWS Gateway Functions_ can also consume and produce **binary** data. Example: [aws-gateway-binary](https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-binary)
+- _AWS Gateway Functions_ use the data added to the request by authorizers (_Custom Authorizers_ or _Cognito User Pool Authorizers_) to create a Principal ([CustomAuthorizerPrincipal](https://github.com/bbilger/jrestless/blob/master/aws/core/jrestless-aws-core/src/main/java/com/jrestless/aws/security/CustomAuthorizerPrincipal.java) or [CognitoUserPoolAuthorizerPrincipal](https://github.com/bbilger/jrestless/blob/master/aws/core/jrestless-aws-core/src/main/java/com/jrestless/aws/security/CognitoUserPoolAuthorizerPrincipal.java)) within the SecurityContext containing all claims. Examples: [aws-gateway-security-cognito-authorizer](https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-security-cognito-authorizer) and [aws-gateway-security-custom-authorizer](https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-security-custom-authorizer)
 - Injection of provider and/or function type specific values via `@javax.ws.rs.core.Context` into resources and endpoints:
   - All AWS functions can inject `com.amazonaws.services.lambda.runtime.Context`.
   - _AWS Gateway Functions_ can also inject the raw request [GatewayRequest](https://github.com/bbilger/jrestless/blob/master/aws/gateway/jrestless-aws-gateway-core/src/main/java/com/jrestless/aws/gateway/io/GatewayRequest.java)
@@ -54,9 +54,9 @@ The motivation for this project is to avoid a cloud vendor lock-in and to allow 
 
 ### AWS
 
-- _Gateway Functions_ are AWS Lambda functions that get invoked by AWS API Gateway. [Read More...](aws/gateway/jrestless-aws-gateway-handler)
-- _Service Functions_ are AWS Lambda functions that can either be invoked by other AWS Lambda functions or can be invoked directly through the AWS SDK. The point is that you don't use AWS API Gateway. You can abstract the fact that you invoke an AWS Lambda function away by using a special feign client ([jrestless-aws-service-feign-client](aws/service/jrestless-aws-service-feign-client)). [Read More...](aws/service/jrestless-aws-service-handler)
-- _SNS functions_ are AWS Lambda function that get invoked by SNS. This allow asynchronous calls to other Lambda functions. So when one Lambda function publishes a message to one SNS topic, SNS can then invoke all (1-N) subscribed Lambda functions. [Read More...](aws/sns/jrestless-aws-sns-handler)
+- _Gateway Functions_ are AWS Lambda functions that get invoked by AWS API Gateway. Usage example: [aws-gateway-usage-example](https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-usage-example). [Read More...](aws/gateway/jrestless-aws-gateway-handler).
+- _Service Functions_ are AWS Lambda functions that can either be invoked by other AWS Lambda functions or can be invoked directly through the AWS SDK. The point is that you don't use AWS API Gateway. You can abstract the fact that you invoke an AWS Lambda function away by using a special feign client ([jrestless-aws-service-feign-client](aws/service/jrestless-aws-service-feign-client)). Usage example: [aws-service-usage-example](https://github.com/bbilger/jrestless-examples/tree/master/aws/service/aws-service-usage-example). [Read More...](aws/service/jrestless-aws-service-handler).
+- _SNS functions_ are AWS Lambda function that get invoked by SNS. This allow asynchronous calls to other Lambda functions. So when one Lambda function publishes a message to one SNS topic, SNS can then invoke all (1-N) subscribed Lambda functions. Usage example: [aws-sns-usage-example](https://github.com/bbilger/jrestless-examples/tree/master/aws/sns/aws-sns-usage-example). [Read More...](aws/sns/jrestless-aws-sns-handler).
 
 Note: the framework is split up into multiple modules, so you choose which functionality you actually want to use. See [Modules](#modules)
 
