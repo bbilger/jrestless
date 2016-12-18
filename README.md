@@ -276,7 +276,6 @@ All modules are available in jcenter.
 * for all function types
   * stateless only (you could utilize some cache like Redis, though)
   * AWS Lambda functions have a maximum execution time of 5 minutes
-  * currently no support for binary data in requests/responses (binary data gets encoded to base64, however, in JSON responses)
 * _Gateway functions_
   * AWS API Gateway has a timeout of 30 seconds
   * Multiple headers with same name are not supported
