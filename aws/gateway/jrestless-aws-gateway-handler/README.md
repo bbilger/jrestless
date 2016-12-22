@@ -50,7 +50,7 @@ public class SampleResource {
 }
 ```
 
-The request schema (proxied through from API Gateway) is:
+## Request Schema 
 
 ```json
 {
@@ -136,6 +136,13 @@ The request schema (proxied through from API Gateway) is:
         "apiId": {
           "type": "string"
         }
+      },
+      "authorizer": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        },
+        "description": "empty for requests without authorizers; for custom authorizers this map will contain the principalId and all additional claims (from the context); for Cognito user pool authorizers it will contain all claims of the ID token"
       }
     },
     "resource": {
@@ -158,12 +165,16 @@ The request schema (proxied through from API Gateway) is:
     },
     "body": {
       "type": "string"
+    },
+    "isBase64Encoded": {
+      "type": "boolean",
+      "description": "binary requests get base64 encoded if the request's Content-Type header matches a configured binaryMediaType"
     }
   }
 }
 ```
 
-The response schema (required by AWS API Gateway) is:
+## Response Schema
 
 ```json
 {
@@ -181,6 +192,10 @@ The response schema (required by AWS API Gateway) is:
     },
     "statusCode": {
       "type": "integer"
+    },
+    "isBase64Encoded": {
+      "type": "boolean",
+      "description": "optional; if set to true and the request's accept header matches a configured binary media type, API Gateway will respond with the decoded binary"
     }
   }
 }
