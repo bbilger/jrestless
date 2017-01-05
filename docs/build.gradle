@@ -1,0 +1,24 @@
+plugins {
+	id 'org.asciidoctor.convert' version '1.5.3'
+}
+
+apply plugin: 'org.asciidoctor.convert'
+
+// for better integration into Eclipse
+sourceSets {
+	main {
+		java {
+			srcDirs = ['src/docs/asciidoc']
+		}
+	}
+}
+
+asciidoctorj {
+	version = '1.5.4'
+}
+
+asciidoctor {
+	attributes \
+		'imagesdir': 'images',
+		'toc': 'left'
+}

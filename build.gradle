@@ -176,6 +176,7 @@ dependencies {
 	compile project(":aws:service:jrestless-aws-service-feign-client")
 	compile project(":aws:sns:jrestless-aws-sns-handler")
 	compile project(":test:jrestless-test")
+	compile project(":docs")
 }
 
 task wrapper(type: Wrapper) {
