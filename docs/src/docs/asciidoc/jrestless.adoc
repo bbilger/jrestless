@@ -9,4 +9,4 @@ Björn Bilger
 
 == Introduction
 
-...
+include::introduction.adoc[]
