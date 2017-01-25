@@ -1,0 +1,4 @@
+= CORS
+
+TODO explain how to configure CORS in APIGW, serverless and show ContainerResponseFilter to add CORS headers
+mention problems with authorizers

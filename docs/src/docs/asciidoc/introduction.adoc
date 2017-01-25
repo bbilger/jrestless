@@ -1,4 +1,6 @@
-*EARLY DRAFT*
+= Introduction
+
+*Attention: this is just an early draft and may not be accurate, yet*
 
 _serverless_ is a hot topic right now as it simplifies application development tremendously. 
 It's the next evolutionary step after bundling applications or rather _microservices_ and (embedded) servers into (Docker) containers.

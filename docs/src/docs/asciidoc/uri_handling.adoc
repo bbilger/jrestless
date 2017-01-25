@@ -1,4 +1,9 @@
+= URI Handling
+
+TODO explain URI handling (baseUri <-> requestUri)
+
 == AWS
 
 === API Gateway
 
+TODO mention diffs between custom and non-custom domains...

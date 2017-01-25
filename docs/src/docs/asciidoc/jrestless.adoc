@@ -7,10 +7,8 @@ Björn Bilger
 :icons: font
 :nofooter:
 
-== Introduction
+include::introduction.adoc[leveloffset=+1]
 
-include::introduction.adoc[]
+include::uri_handling.adoc[leveloffset=+1]
 
-== URI Handling
-
-include::introduction.adoc[]
+include::cors.adoc[leveloffset=+1]

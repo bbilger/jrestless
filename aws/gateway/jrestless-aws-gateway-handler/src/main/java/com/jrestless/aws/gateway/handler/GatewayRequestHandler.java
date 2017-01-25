@@ -340,7 +340,7 @@ public abstract class GatewayRequestHandler
 		for (int i = 0; i < resourceSplits.length; i++) {
 			String resourceSplit = resourceSplits[i];
 			if (resourceSplit.startsWith("{")) {
-				String pathParamName = null;
+				String pathParamName;
 				if (resourceSplit.endsWith("+}")) {
 					pathParamName = resourceSplit.substring(1, resourceSplit.length() - 2);
 				} else if (resourceSplit.endsWith("}")) {
@@ -357,6 +357,7 @@ public abstract class GatewayRequestHandler
 				if (pathParamValue == null) {
 					LOG.warn("resource '{}': couldn't find value for path parameter '{}'", resource,
 							pathParamName);
+					return null;
 				}
 				resourceSplits[i] = pathParamValue;
 			}
