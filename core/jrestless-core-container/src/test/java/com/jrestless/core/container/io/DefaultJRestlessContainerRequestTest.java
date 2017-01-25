@@ -83,6 +83,42 @@ public class DefaultJRestlessContainerRequestTest {
 		assertEquals(1, request.getHeaders().size());
 	}
 
+	@Test(expected = NullPointerException.class)
+	public void construtor_NullRequestAndBaseUriPairGiven_ShouldThrowNpe() {
+		new DefaultJRestlessContainerRequest(null, "DELETE", new ByteArrayInputStream("123".getBytes()),
+				ImmutableMap.of("a", ImmutableList.of("a0", "a1")));
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void construtor_NullRequestUriInPairGiven_ShouldThrowNpe() {
+		new DefaultJRestlessContainerRequest(new RequestAndBaseUri(URI.create("baseUri"), null), "DELETE",
+				new ByteArrayInputStream("123".getBytes()), ImmutableMap.of("a", ImmutableList.of("a0", "a1")));
+	}
+
+	@Test
+	public void getBaseUri_BaseUriInPairGiven_ShouldReturnedPassedBaseUri() {
+		DefaultJRestlessContainerRequest req = new DefaultJRestlessContainerRequest(
+				new RequestAndBaseUri(URI.create("baseUri"), URI.create("requestUri")), "DELETE",
+				new ByteArrayInputStream("123".getBytes()), ImmutableMap.of("a", ImmutableList.of("a0", "a1")));
+		assertEquals(URI.create("baseUri"), req.getBaseUri());
+	}
+
+	@Test
+	public void getBaseUri_NullBaseUriInPairGiven_ShouldReturnedNullBaseUri() {
+		DefaultJRestlessContainerRequest req = new DefaultJRestlessContainerRequest(
+				new RequestAndBaseUri(null, URI.create("requestUri")), "DELETE",
+				new ByteArrayInputStream("123".getBytes()), ImmutableMap.of("a", ImmutableList.of("a0", "a1")));
+		assertEquals(null, req.getBaseUri());
+	}
+
+	@Test
+	public void getRequestUri_RequestUriInPairGiven_ShouldReturnedRequestUri() {
+		DefaultJRestlessContainerRequest req = new DefaultJRestlessContainerRequest(
+				new RequestAndBaseUri(null, URI.create("requestUri")), "DELETE",
+				new ByteArrayInputStream("123".getBytes()), ImmutableMap.of("a", ImmutableList.of("a0", "a1")));
+		assertEquals(URI.create("requestUri"), req.getRequestUri());
+	}
+
 	@Test
 	public void testEquals() {
 		new CopyConstructorEqualsTester(getConstructor())
