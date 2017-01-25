@@ -21,7 +21,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -55,11 +54,18 @@ import com.jrestless.aws.gateway.io.DefaultGatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayBinaryResponseCheckFilter;
 import com.jrestless.aws.gateway.io.GatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayResponse;
+import com.jrestless.aws.gateway.util.GatewayRequestBuilder;
 import com.jrestless.core.container.JRestlessHandlerContainer;
 import com.jrestless.core.container.handler.SimpleRequestHandler.SimpleResponseWriter;
 import com.jrestless.core.container.io.JRestlessContainerRequest;
+import com.jrestless.core.container.io.RequestAndBaseUri;
 
 public class GatewayRequestHandlerTest {
+
+	private static final String TEST_AWS_DOMAIN = "0123456789.execute-api.eu-central-1.amazonaws.com";
+	private static final String TEST_AWS_DOMAIN_WITH_SCHEME = "https://" + TEST_AWS_DOMAIN;
+	private static final String TEST_CUSTOM_DOMAIN = "api.example.com";
+	private static final String TEST_CUSTOM_DOMAIN_WITH_SCHEME = "https://" + TEST_CUSTOM_DOMAIN;
 
 	private JRestlessHandlerContainer<JRestlessContainerRequest> container;
 	private GatewayRequestHandlerImpl gatewayHandler;
@@ -68,7 +74,7 @@ public class GatewayRequestHandlerTest {
 	@Before
 	public void setup() {
 		container = mock(JRestlessHandlerContainer.class);
-		gatewayHandler = spy(new GatewayRequestHandlerImpl());
+		gatewayHandler = new GatewayRequestHandlerImpl();
 		gatewayHandler.init(container);
 		gatewayHandler.start();
 	}
@@ -282,6 +288,313 @@ public class GatewayRequestHandlerTest {
 		assertFalse(responseWriter.getResponse().isIsBase64Encoded());
 	}
 
+	@Test
+	public void getRequestAndBaseUri_CustomDomainWithBasePathGiven_ShouldAddBasePathAndStageToUri() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.basePath("base/stage")
+				.resource("/users")
+				.buildWrapped();
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/stage"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/stage/users"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_CustomDomainWithBasePathAndStageGiven_ShouldAddBasePathToUri() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.basePath("base")
+				.resource("/users")
+				.buildWrapped();
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/users"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_CustomDomainWithStageGiven_ShouldAddStageToUri() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.basePath("stage")
+				.resource("/users")
+				.buildWrapped();
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/stage"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/stage/users"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_CustomDomainGiven_ShouldNotAddContextStageToUri() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.requestContextStage("dev")
+				.resource("/users")
+				.buildWrapped();
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/users"), uris.getRequestUri());
+
+	}
+
+	@Test
+	public void getRequestAndBaseUri_AwsDomainWithStageGiven_ShouldAddStageToUri() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_AWS_DOMAIN)
+				.requestContextStage("dev")
+				.resource("/users")
+				.buildWrapped();
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create(TEST_AWS_DOMAIN_WITH_SCHEME + "/dev"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_AWS_DOMAIN_WITH_SCHEME + "/dev/users"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_AwsDomainWithoutStageGiven_ShouldSetBaseUriToDomainOnly() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_AWS_DOMAIN)
+				.resource("/users")
+				.buildWrapped();
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create(TEST_AWS_DOMAIN_WITH_SCHEME), uris.getBaseUri());
+		assertEquals(URI.create(TEST_AWS_DOMAIN_WITH_SCHEME + "/users"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_AwsDomainWithoutRequestContextGiven_ShouldSetBaseUriToDomainOnly() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_AWS_DOMAIN)
+				.resource("/users")
+				.buildWrapped();
+		when(requestAndLambdaContext.getGatewayRequest().getRequestContext()).thenReturn(null);
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create(TEST_AWS_DOMAIN_WITH_SCHEME), uris.getBaseUri());
+		assertEquals(URI.create(TEST_AWS_DOMAIN_WITH_SCHEME + "/users"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_NoDomainGiven_ShouldNotAddDomainSchemeOrPort() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.resource("/users")
+				.buildWrapped();
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create("/"), uris.getBaseUri());
+		assertEquals(URI.create("/users"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_PathParamGiven_ShouldResolveBasePath() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.basePath("base")
+				.resource("/users/{uid}")
+				.pathParams(ImmutableMap.of("uid", "1"))
+				.buildWrapped();
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/users/1"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_ProxyParamGiven_ShouldResolveBasePath() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.basePath("base")
+				.resource("/{proxy+}")
+				.pathParams(ImmutableMap.of("proxy", "users/1/contacts"))
+				.buildWrapped();
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/users/1/contacts"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_PathAndProxyParamGiven_ShouldResolveBasePath() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.basePath("base")
+				.resource("/users/{uid}/contacts/{proxy+}")
+				.pathParams(ImmutableMap.of("uid", "1", "proxy", "2"))
+				.buildWrapped();
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/users/1/contacts/2"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_ResourceWithRegexGiven_ShouldEscapeRegex() {
+		GatewayRequestAndLambdaContext validRequestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.basePath("base")
+				.resource("/a.c")
+				.buildWrapped();
+		RequestAndBaseUri validUris = gatewayHandler.getRequestAndBaseUri(validRequestAndLambdaContext);
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), validUris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/a.c"), validUris.getRequestUri());
+
+		GatewayRequestAndLambdaContext invalidRequestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.basePath("base")
+				.resource("/a.c")
+				.buildWrapped();
+		when(invalidRequestAndLambdaContext.getGatewayRequest().getPath()).thenReturn("/base/abc");
+
+		// we cannot match the basepath since "." has been escaped correctly
+		RequestAndBaseUri invalidUris = gatewayHandler.getRequestAndBaseUri(invalidRequestAndLambdaContext);
+		assertEquals(URI.create("/"), invalidUris.getBaseUri());
+		assertEquals(URI.create("/base/abc"), invalidUris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_UnescapedQueryParametersGiven_ShouldEscapeQueryParameters() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.basePath("base")
+				.resource("/{proxy+}")
+				.pathParams(Collections.singletonMap("proxy", "users"))
+				.queryParams(Collections.singletonMap("q", "foo bar"))
+				.buildWrapped();
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/users?q=foo+bar"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_TrailingSlashesGiven_ShouldMatchBasePath() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.basePath("base")
+				.resource("/ab")
+				.buildWrapped();
+		when(requestAndLambdaContext.getGatewayRequest().getPath()).thenReturn("/base/ab////");
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/ab////"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_PathContainsButNotMatchesResourceGiven_ShouldFallbackToBaseUri() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.basePath("base")
+				.resource("/ab")
+				.buildWrapped();
+		when(requestAndLambdaContext.getGatewayRequest().getPath()).thenReturn("/ab/a");
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create("/"), uris.getBaseUri());
+		assertEquals(URI.create("/ab/a"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_RootResourceAndBasePathGiven_ShouldDetectBaseUri() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.basePath("base")
+				.resource("/")
+				.buildWrapped();
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_RootResourceAndBasePathWithTrailingSlashesGiven_ShouldDetectBaseUriAndKeepSlashesOnRequestUri() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.basePath("base")
+				.resource("/")
+				.buildWrapped();
+		when(requestAndLambdaContext.getGatewayRequest().getPath()).thenReturn("/base//");
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base//"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_RootResourceWithTrailingSlashesGiven_ShouldKeepSlashesOnRequestUri() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.resource("/")
+				.buildWrapped();
+		when(requestAndLambdaContext.getGatewayRequest().getPath()).thenReturn("///");
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "///"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_InvalidResourceTemplateGiven_ShouldFallbackToRootUri() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.resource("/users/{uid}")
+				.pathParams(Collections.singletonMap("uid", "1"))
+				.buildWrapped();
+		when(requestAndLambdaContext.getGatewayRequest().getResource()).thenReturn("/users/{uid");
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create("/"), uris.getBaseUri());
+		assertEquals(URI.create("/users/1"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_TemplateResourceWithMissingPathParamGiven_ShouldFallbackToRootUri() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.resource("/users/{uid}")
+				.pathParams(Collections.singletonMap("uid", "1"))
+				.buildWrapped();
+		when(requestAndLambdaContext.getGatewayRequest().getPathParameters()).thenReturn(Collections.emptyMap());
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create("/"), uris.getBaseUri());
+		assertEquals(URI.create("/users/1"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_TemplateResourceWithNullPathParamsGiven_ShouldFallbackToRootUri() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.resource("/users/{uid}")
+				.pathParams(Collections.singletonMap("uid", "1"))
+				.buildWrapped();
+		when(requestAndLambdaContext.getGatewayRequest().getPathParameters()).thenReturn(null);
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create("/"), uris.getBaseUri());
+		assertEquals(URI.create("/users/1"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_NonTemplateResourceWithNullPathParamsGiven_ShouldNotFallbackToRootUri() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.resource("/users/1")
+				.buildWrapped();
+		when(requestAndLambdaContext.getGatewayRequest().getPathParameters()).thenReturn(null);
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/users/1"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_BlankResourceGiven_ShouldFallbackToRootUri() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain(TEST_CUSTOM_DOMAIN)
+				.resource("/users/1")
+				.buildWrapped();
+		when(requestAndLambdaContext.getGatewayRequest().getResource()).thenReturn(null);
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create("/"), uris.getBaseUri());
+		assertEquals(URI.create("/users/1"), uris.getRequestUri());
+	}
+
+	@Test
+	public void getRequestAndBaseUri_FailsToConstructBaseUri_ShouldFallbackToRootUri() {
+		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
+				.domain("{a}")
+				.resource("/users/1")
+				.buildWrapped();
+		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
+		assertEquals(URI.create("/"), uris.getBaseUri());
+		assertEquals(URI.create("/users/1"), uris.getRequestUri());
+	}
 	private GatewayRequestAndLambdaContext createMinimalRequest() {
 		DefaultGatewayRequest request = new DefaultGatewayRequest();
 		request.setPath("/");

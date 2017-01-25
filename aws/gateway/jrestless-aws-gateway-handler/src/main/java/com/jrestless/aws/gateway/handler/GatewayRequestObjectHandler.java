@@ -15,8 +15,6 @@
  */
 package com.jrestless.aws.gateway.handler;
 
-import java.net.URI;
-
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.jrestless.aws.gateway.io.DefaultGatewayRequest;
@@ -37,10 +35,6 @@ public abstract class GatewayRequestObjectHandler extends GatewayRequestHandler
 
 	protected GatewayRequestObjectHandler() {
 		super();
-	}
-
-	protected GatewayRequestObjectHandler(URI baseUri) {
-		super(baseUri);
 	}
 
 	@Override

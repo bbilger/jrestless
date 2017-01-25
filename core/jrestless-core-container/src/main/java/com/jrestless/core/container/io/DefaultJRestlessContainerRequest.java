@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Default implementation of {@link DefaultJRestlessContainerRequest}.
@@ -42,9 +43,14 @@ public class DefaultJRestlessContainerRequest implements JRestlessContainerReque
 	private InputStream entityStream;
 	private Map<String, List<String>> headers;
 
-	public DefaultJRestlessContainerRequest(@Nonnull URI baseUri, @Nonnull URI requestUri, @Nonnull String httpMethod,
+	public DefaultJRestlessContainerRequest(@Nonnull RequestAndBaseUri requestAndBaseUri, @Nonnull String httpMethod,
 			@Nonnull InputStream entityStream, @Nonnull Map<String, List<String>> headers) {
-		this.baseUri = requireNonNull(baseUri);
+		this(requestAndBaseUri.getBaseUri(), requestAndBaseUri.getRequestUri(), httpMethod, entityStream, headers);
+	}
+
+	public DefaultJRestlessContainerRequest(@Nullable URI baseUri, @Nonnull URI requestUri, @Nonnull String httpMethod,
+			@Nonnull InputStream entityStream, @Nonnull Map<String, List<String>> headers) {
+		this.baseUri = baseUri;
 		this.requestUri = requireNonNull(requestUri);
 		this.httpMethod = requireNonNull(httpMethod);
 		this.entityStream = requireNonNull(entityStream);

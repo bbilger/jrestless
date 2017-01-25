@@ -146,7 +146,7 @@ public class JRestlessHandlerContainer<RequestT extends JRestlessContainerReques
 	protected ContainerRequest createContainerRequest(@Nonnull RequestT request,
 			@Nonnull ContainerResponseWriter containerResponseWriter, @Nonnull SecurityContext securityContext) {
 		requireNonNull(request, "request may not be null");
-		URI baseUri = requireNonNull(request.getBaseUri(), "request.getBaseUri() may not be null");
+		URI baseUri = request.getBaseUri();
 		URI requestUri = requireNonNull(request.getRequestUri(), "request.getRequestUri() may not be null");
 		String httpMethod = requireNonNull(request.getHttpMethod(), "request.getHttpMethod() may not be null");
 		InputStream entityStream = requireNonNull(request.getEntityStream(),

@@ -107,7 +107,6 @@ public class DefaultJRestlessContainerRequestTest {
 		new ConstructorPreconditionsTester(getConstructor())
 			// baseUri
 			.addValidArgs(0, URI.create("/"))
-			.addInvalidNpeArg(0)
 			// requestUri
 			.addValidArgs(1, URI.create("/"))
 			.addInvalidNpeArg(1)

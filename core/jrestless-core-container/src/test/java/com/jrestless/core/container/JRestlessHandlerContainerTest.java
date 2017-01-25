@@ -44,8 +44,6 @@ import org.junit.Test;
 
 import com.jrestless.core.container.io.JRestlessContainerRequest;
 
-//@RunWith(PowerMockRunner.class)
-//@PrepareForTest(ApplicationHandler.class)
 public class JRestlessHandlerContainerTest {
 
 	private ApplicationHandler appHandler;
@@ -157,8 +155,7 @@ public class JRestlessHandlerContainerTest {
 		container.createContainerRequest(createAnyRequest(), mock(ContainerResponseWriter.class), null);
 	}
 
-	@Test(expected = NullPointerException.class)
-	public void createContainerRequest_NoRequestBaseUriGiven_ShouldThrowNpe() {
+	public void createContainerRequest_NoRequestBaseUriGiven_ShouldPass() {
 		JRestlessContainerRequest request = createAnyRequest();
 		when(request.getBaseUri()).thenReturn(null);
 		container.createContainerRequest(request, mock(ContainerResponseWriter.class), mock(SecurityContext.class));
