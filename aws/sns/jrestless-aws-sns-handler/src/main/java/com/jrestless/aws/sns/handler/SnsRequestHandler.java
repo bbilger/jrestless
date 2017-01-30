@@ -49,6 +49,7 @@ import com.jrestless.aws.sns.SnsFeature;
 import com.jrestless.core.container.handler.SimpleRequestHandler;
 import com.jrestless.core.container.io.DefaultJRestlessContainerRequest;
 import com.jrestless.core.container.io.JRestlessContainerRequest;
+import com.jrestless.core.container.io.RequestAndBaseUri;
 
 /**
  * Base AWS SNS request handler.
@@ -68,14 +69,9 @@ public abstract class SnsRequestHandler extends SimpleRequestHandler<SnsRecordAn
 
 	private static final Logger LOG = LoggerFactory.getLogger(SnsRequestHandler.class);
 
-	private final URI baseUri;
+	private static final URI BASE_ROOT_URI = URI.create("/");
 
 	protected SnsRequestHandler() {
-		this(URI.create("/"));
-	}
-
-	protected SnsRequestHandler(URI baseUri) {
-		this.baseUri = baseUri;
 	}
 
 	@Override
@@ -85,8 +81,8 @@ public abstract class SnsRequestHandler extends SimpleRequestHandler<SnsRecordAn
 		InputStream entityStream = requireNonNull(createEntityStream(snsRecordAndContext));
 		Map<String, List<String>> headers = requireNonNull(createHeaders(snsRecordAndContext));
 		String httpMethod = requireNonNull(createHttpMethod(snsRecordAndContext));
-		URI requestUri = requireNonNull(createRequestUri(snsRecordAndContext));
-		return new DefaultJRestlessContainerRequest(baseUri, requestUri, httpMethod, entityStream, headers);
+		RequestAndBaseUri requestAndBaseUri = getRequestAndBaseUri(snsRecordAndContext);
+		return new DefaultJRestlessContainerRequest(requestAndBaseUri, httpMethod, entityStream, headers);
 	}
 
 	/**
@@ -139,28 +135,34 @@ public abstract class SnsRequestHandler extends SimpleRequestHandler<SnsRecordAn
 	}
 
 	/**
-	 * Creates the request URI for the actual request made to the Jersey
-	 * container.
+	 * Creates the request and base URI for the actual request made to the
+	 * Jersey container.
 	 * <p>
-	 * The default implementation uses the topic name (the last part of the
-	 * topic arn) and concatenates the subject if one is set:
-	 * {@code topicName + "/" + subject}.
+	 * The default implementation constructs
+	 * <ol>
+	 * <li>the request URI by using the topic
+	 * name (the last part of the topic arn) and concatenates the subject if one
+	 * is set: {@code topicName + "/" + subject}
+	 * <li>the base URI is set to "/", always
+	 * </ol>
 	 *
 	 * @param snsRecordAndContext
-	 * @return the request URI
+	 * @return the request and base URI
 	 */
 	@Nonnull
-	protected URI createRequestUri(@Nonnull SnsRecordAndLambdaContext snsRecordAndContext) {
+	protected RequestAndBaseUri getRequestAndBaseUri(@Nonnull SnsRecordAndLambdaContext snsRecordAndContext) {
 		SNS sns = snsRecordAndContext.getSnsRecord().getSNS();
 		String subject = sns.getSubject();
 		String topicArn = sns.getTopicArn();
 		int lastColonIndex = topicArn.lastIndexOf(':');
 		String topicName = topicArn.substring(lastColonIndex + 1);
+		URI requestUri;
 		if (subject != null && !subject.trim().isEmpty()) {
-			return URI.create("/" + topicName + "/" + subject);
+			requestUri = URI.create("/" + topicName + "/" + subject);
 		} else {
-			return URI.create("/" + topicName);
+			requestUri = URI.create("/" + topicName);
 		}
+		return new RequestAndBaseUri(BASE_ROOT_URI, requestUri);
 	}
 
 	@Override

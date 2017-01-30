@@ -34,7 +34,6 @@ public abstract class GatewayRequestObjectHandler extends GatewayRequestHandler
 		implements RequestHandler<DefaultGatewayRequest, GatewayResponse> {
 
 	protected GatewayRequestObjectHandler() {
-		super();
 	}
 
 	@Override

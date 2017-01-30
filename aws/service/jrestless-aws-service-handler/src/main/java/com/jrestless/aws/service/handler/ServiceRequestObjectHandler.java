@@ -15,8 +15,6 @@
  */
 package com.jrestless.aws.service.handler;
 
-import java.net.URI;
-
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.jrestless.aws.service.io.DefaultServiceRequest;
@@ -36,11 +34,6 @@ public abstract class ServiceRequestObjectHandler extends ServiceRequestHandler
 		implements RequestHandler<DefaultServiceRequest, ServiceResponse> {
 
 	protected ServiceRequestObjectHandler() {
-		super();
-	}
-
-	protected ServiceRequestObjectHandler(URI baseUri) {
-		super(baseUri);
 	}
 
 	@Override

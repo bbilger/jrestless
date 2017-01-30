@@ -70,6 +70,7 @@ public abstract class GatewayRequestHandler
 
 	private static final Logger LOG = LoggerFactory.getLogger(GatewayRequestHandler.class);
 	private static final String AWS_DOMAIN = "amazonaws.com";
+	private static final URI BASE_ROOT_URI = URI.create("/");
 
 	protected GatewayRequestHandler() {
 	}
@@ -239,6 +240,7 @@ public abstract class GatewayRequestHandler
 	 * @param requestAndLambdaContext
 	 * @return the base and request URI for this request
 	 */
+	@Nonnull
 	protected RequestAndBaseUri getRequestAndBaseUri(@Nonnull GatewayRequestAndLambdaContext requestAndLambdaContext) {
 
 		GatewayRequest request = requestAndLambdaContext.getGatewayRequest();
@@ -254,10 +256,10 @@ public abstract class GatewayRequestHandler
 
 			if (!hostPresent) {
 				LOG.warn("no host header available; using baseUri=/ as fallback");
-				baseUriBuilder = UriBuilder.fromUri("/");
+				baseUriBuilder = UriBuilder.fromUri(BASE_ROOT_URI);
 			} else if (!validBasePath) {
 				LOG.warn("couldn't determine basePath; using baseUri=/ as fallback");
-				baseUriBuilder = UriBuilder.fromUri("/");
+				baseUriBuilder = UriBuilder.fromUri(BASE_ROOT_URI);
 			} else {
 				/*
 				 *  APIGW should not support anything but scheme=https and port=443
@@ -277,7 +279,7 @@ public abstract class GatewayRequestHandler
 			baseUri = baseUriBuilder.build();
 		} catch (RuntimeException e) {
 			LOG.error("baseUriCreationFailure; using baseUri=/ as fallback", e);
-			baseUri = URI.create("/");
+			baseUri = BASE_ROOT_URI;
 			baseUriWithoutBasePath = baseUri;
 		}
 

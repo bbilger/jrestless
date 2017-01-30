@@ -41,6 +41,7 @@ import com.jrestless.aws.AwsFeature;
 import com.jrestless.aws.sns.SnsFeature;
 import com.jrestless.core.container.JRestlessHandlerContainer;
 import com.jrestless.core.container.io.JRestlessContainerRequest;
+import com.jrestless.core.container.io.RequestAndBaseUri;
 
 public class SnsRequestHandlerTest {
 	private JRestlessHandlerContainer<JRestlessContainerRequest> container;
@@ -146,26 +147,32 @@ public class SnsRequestHandlerTest {
 	}
 
 	@Test
-	public void createRequestUri_TopicArnAndNoSubjectGiven_ShouldCreateUriUsingTopicName() {
+	public void getRequestAndBaseUri_TopicArnAndNoSubjectGiven_ShouldCreateUriUsingTopicName() {
 		SnsRecordAndLambdaContext reqAndContext = createMinimalRequest();
 		reqAndContext.getSnsRecord().getSNS().setTopicArn("a:b:c");
-		assertEquals(URI.create("/c"), new SnsRequestHandlerImpl().createRequestUri(reqAndContext));
+		RequestAndBaseUri actual = new SnsRequestHandlerImpl().getRequestAndBaseUri(reqAndContext);
+		assertEquals(URI.create("/c"), actual.getRequestUri());
+		assertEquals(URI.create("/"), actual.getBaseUri());
 	}
 
 	@Test
-	public void createRequestUri_TopicArnAndBlankSubjectGiven_ShouldCreateUriUsingTopicName() {
+	public void getRequestAndBaseUri_TopicArnAndBlankSubjectGiven_ShouldCreateUriUsingTopicName() {
 		SnsRecordAndLambdaContext reqAndContext = createMinimalRequest();
 		reqAndContext.getSnsRecord().getSNS().setTopicArn("a:b:c");
 		reqAndContext.getSnsRecord().getSNS().setSubject("  ");
-		assertEquals(URI.create("/c"), new SnsRequestHandlerImpl().createRequestUri(reqAndContext));
+		RequestAndBaseUri actual = new SnsRequestHandlerImpl().getRequestAndBaseUri(reqAndContext);
+		assertEquals(URI.create("/c"), actual.getRequestUri());
+		assertEquals(URI.create("/"), actual.getBaseUri());
 	}
 
 	@Test
-	public void createRequestUri_TopicArnAndSubjectGiven_ShouldCreateUriUsingTopicNameAndSubject() {
+	public void getRequestAndBaseUri_TopicArnAndSubjectGiven_ShouldCreateUriUsingTopicNameAndSubject() {
 		SnsRecordAndLambdaContext reqAndContext = createMinimalRequest();
 		reqAndContext.getSnsRecord().getSNS().setTopicArn("a:b:c");
 		reqAndContext.getSnsRecord().getSNS().setSubject("someSubject");
-		assertEquals(URI.create("/c/someSubject"), new SnsRequestHandlerImpl().createRequestUri(reqAndContext));
+		RequestAndBaseUri actual = new SnsRequestHandlerImpl().getRequestAndBaseUri(reqAndContext);
+		assertEquals(URI.create("/c/someSubject"), actual.getRequestUri());
+		assertEquals(URI.create("/"), actual.getBaseUri());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -198,8 +205,10 @@ public class SnsRequestHandlerTest {
 		String httpMethod = "someHttpMethod";
 		doReturn(httpMethod).when(snsHandler).createHttpMethod(reqAndContext);
 
+		URI baseUri = URI.create("/");
 		URI requestUri = URI.create("someRequestUri");
-		doReturn(requestUri).when(snsHandler).createRequestUri(reqAndContext);
+		RequestAndBaseUri requestAndBaseUri = new RequestAndBaseUri(baseUri, requestUri);
+		doReturn(requestAndBaseUri).when(snsHandler).getRequestAndBaseUri(reqAndContext);
 
 		ArgumentCaptor<JRestlessContainerRequest> containerRequestCaptor = ArgumentCaptor
 				.forClass(JRestlessContainerRequest.class);
@@ -214,6 +223,7 @@ public class SnsRequestHandlerTest {
 		assertNotSame(headers, containerRequest.getHeaders());
 		assertEquals(httpMethod, containerRequest.getHttpMethod());
 		assertEquals(requestUri, containerRequest.getRequestUri());
+		assertEquals(baseUri, containerRequest.getBaseUri());
 	}
 
 	private SnsRecordAndLambdaContext createMinimalRequest() {

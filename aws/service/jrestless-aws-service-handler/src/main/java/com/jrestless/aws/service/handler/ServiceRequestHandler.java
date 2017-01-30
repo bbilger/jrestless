@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 
@@ -45,6 +46,7 @@ import com.jrestless.aws.service.io.ServiceResponse;
 import com.jrestless.core.container.handler.SimpleRequestHandler;
 import com.jrestless.core.container.io.DefaultJRestlessContainerRequest;
 import com.jrestless.core.container.io.JRestlessContainerRequest;
+import com.jrestless.core.container.io.RequestAndBaseUri;
 
 /**
  * Base request handler.
@@ -63,21 +65,15 @@ public abstract class ServiceRequestHandler
 
 	private static final Logger LOG = LoggerFactory.getLogger(ServiceRequestHandler.class);
 
-	private final URI baseUri;
+	private static final URI BASE_ROOT_URI = URI.create("/");
 
 	protected ServiceRequestHandler() {
-		this(URI.create("/"));
-	}
-
-	protected ServiceRequestHandler(URI baseUri) {
-		this.baseUri = baseUri;
 	}
 
 	@Override
 	protected JRestlessContainerRequest createContainerRequest(ServiceRequestAndLambdaContext requestAndLambdaContext) {
 		requireNonNull(requestAndLambdaContext);
 		ServiceRequest request = requireNonNull(requestAndLambdaContext.getServiceRequest());
-		URI requestUri = requireNonNull(request.getRequestUri());
 		String body = request.getBody();
 		InputStream entityStream;
 		if (body != null) {
@@ -85,7 +81,8 @@ public abstract class ServiceRequestHandler
 		} else {
 			entityStream = new ByteArrayInputStream(new byte[0]);
 		}
-		return new DefaultJRestlessContainerRequest(baseUri, requestUri, request.getHttpMethod(), entityStream,
+		RequestAndBaseUri requestAndBaseUri = getRequestAndBaseUri(requestAndLambdaContext);
+		return new DefaultJRestlessContainerRequest(requestAndBaseUri, request.getHttpMethod(), entityStream,
 				request.getHeaders());
 	}
 
@@ -109,6 +106,13 @@ public abstract class ServiceRequestHandler
 				LOG.error("AwsFeature has not been registered. Context injection won't work.");
 			}
 		});
+	}
+
+	@Nonnull
+	protected RequestAndBaseUri getRequestAndBaseUri(@Nonnull ServiceRequestAndLambdaContext requestAndLambdaContext) {
+		ServiceRequest request = requestAndLambdaContext.getServiceRequest();
+		URI requestUri = requireNonNull(request.getRequestUri());
+		return new RequestAndBaseUri(BASE_ROOT_URI, requestUri);
 	}
 
 	@Override
