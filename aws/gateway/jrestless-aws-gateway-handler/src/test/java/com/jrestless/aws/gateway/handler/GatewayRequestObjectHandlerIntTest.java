@@ -35,6 +35,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Base64;
@@ -42,13 +43,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import javax.activation.DataSource;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -61,9 +62,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.hk2.utilities.Binder;
-import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.EncodingFilter;
@@ -79,19 +80,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.jrestless.aws.gateway.GatewayFeature;
 import com.jrestless.aws.gateway.io.DefaultGatewayRequest;
-import com.jrestless.aws.gateway.io.DefaultGatewayRequestContext;
 import com.jrestless.aws.gateway.io.GatewayBinaryResponseCheckFilter;
 import com.jrestless.aws.gateway.io.GatewayIdentity;
 import com.jrestless.aws.gateway.io.GatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayRequestContext;
 import com.jrestless.aws.gateway.io.GatewayResponse;
+import com.jrestless.aws.gateway.util.DefaultGatewayRequestBuilder;
 import com.jrestless.aws.security.CognitoUserPoolAuthorizerPrincipal;
 import com.jrestless.aws.security.CustomAuthorizerPrincipal;
 import com.jrestless.core.container.dpi.InstanceBinder;
 
 public class GatewayRequestObjectHandlerIntTest {
-
-	private static final Logger LOGGER = Logger.getLogger(GatewayRequestObjectHandlerIntTest.class.getName());
 
 	private GatewayRequestObjectHandlerImpl handler;
 	private TestService testService;
@@ -99,27 +98,29 @@ public class GatewayRequestObjectHandlerIntTest {
 
 	@Before
 	public void setup() {
-		ResourceConfig config = new ResourceConfig();
-		config.register(GatewayFeature.class);
 		testService = mock(TestService.class);
+		handler = createAndStartHandler(new ResourceConfig(), testService);
+	}
+
+	private GatewayRequestObjectHandlerImpl createAndStartHandler(ResourceConfig config, TestService testService) {
+		config.register(GatewayFeature.class);
 		Binder binder = new InstanceBinder.Builder().addInstance(testService, TestService.class).build();
 		config.register(binder);
 		config.register(TestResource.class);
 		config.register(EncodingFilter.class);
 		config.register(GZipEncoder.class);
-		config.register(new LoggingFeature(LOGGER, LoggingFeature.Verbosity.PAYLOAD_ANY));
-		handler = spy(new GatewayRequestObjectHandlerImpl());
+		GatewayRequestObjectHandlerImpl handler = new GatewayRequestObjectHandlerImpl();
 		handler.init(config);
 		handler.start();
+		return handler;
 	}
 
 	@Test
 	public void testLambdaContextInjection() {
-		DefaultGatewayRequest request = new DefaultGatewayRequest();
-		DefaultGatewayRequestContext requestContext = new DefaultGatewayRequestContext();
-		request.setRequestContext(requestContext);
-		request.setHttpMethod("DELETE");
-		request.setPath("/");
+		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+				.httpMethod("DELETE")
+				.resource("/")
+				.build();
 		handler.handleRequest(request, context);
 		verify(testService).injectLambdaContext(context);
 	}
@@ -128,9 +129,9 @@ public class GatewayRequestObjectHandlerIntTest {
 	public void testLambdaContextMemberInjection() {
 		when(context.getAwsRequestId()).thenReturn("0", "1");
 		for (int i = 0; i <= 1; i++) {
-			DefaultGatewayRequest request = new DefaultGatewayRequest();
-			request.setHttpMethod("GET");
-			request.setPath("/inject-lambda-context-member" + i);
+			DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+					.httpMethod("GET")
+					.resource("/inject-lambda-context-member" + i).build();
 			handler.handleRequest(request, context);
 			verify(testService).injectedStringArg("" + i);
 		}
@@ -138,31 +139,35 @@ public class GatewayRequestObjectHandlerIntTest {
 
 	@Test
 	public void testGatewayRequestInjection() {
-		DefaultGatewayRequest request = new DefaultGatewayRequest();
-		request.setHttpMethod("PUT");
-		request.setPath("/inject-gateway-request");
+		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+				.httpMethod("PUT")
+				.resource("/inject-gateway-request")
+				.build();
 		handler.handleRequest(request, context);
 		verify(testService).injectGatewayRequest(same(request));
 	}
 
 	@Test
 	public void testGatewayRequestMemberInjection() {
-		DefaultGatewayRequest request0 = new DefaultGatewayRequest();
-		request0.setHttpMethod("GET");
 		String path0 = "/inject-gateway-request-member0";
-		request0.setPath(path0);
-		DefaultGatewayRequest request1 = new DefaultGatewayRequest();
-		request1.setHttpMethod("GET");
+		DefaultGatewayRequest request0 = new DefaultGatewayRequestBuilder()
+				.httpMethod("GET")
+				.resource(path0)
+				.build();
 		String path1 = "/inject-gateway-request-member1";
-		request1.setPath(path1);
+		DefaultGatewayRequest request1 = new DefaultGatewayRequestBuilder()
+				.httpMethod("GET")
+				.resource(path1)
+				.build();
 		testProxy(request0, request1, path0, path1);
 	}
 
 	@Test
 	public void testContainerFailureCreates500() {
+		GatewayRequestObjectHandlerImpl throwingHandler = spy(createAndStartHandler(new ResourceConfig(), testService));
 		DefaultGatewayRequest request = new DefaultGatewayRequest();
-		doThrow(new RuntimeException()).when(handler).createContainerRequest(any());
-		GatewayResponse response = handler.handleRequest(request, context);
+		doThrow(new RuntimeException()).when(throwingHandler).createContainerRequest(any());
+		GatewayResponse response = throwingHandler.handleRequest(request, context);
 		assertEquals(new GatewayResponse(null, new HashMap<>(), Status.INTERNAL_SERVER_ERROR, false), response);
 	}
 
@@ -172,11 +177,13 @@ public class GatewayRequestObjectHandlerIntTest {
 		Map<String, String> requestHeaders = ImmutableMap.of(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON,
 				HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
 		String requestBody = mapper.writeValueAsString(new Entity("123"));
-		DefaultGatewayRequest request = new DefaultGatewayRequest();
-		request.setHttpMethod("POST");
-		request.setBody(requestBody);
-		request.setPath("/round-trip");
-		request.setHeaders(requestHeaders);
+
+		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+				.httpMethod("POST")
+				.resource("/round-trip")
+				.body(requestBody)
+				.headers(requestHeaders)
+				.build();
 		GatewayResponse response = handler.handleRequest(request, context);
 		/*
 		 * check for the vary header is only necessary because we registered
@@ -223,10 +230,12 @@ public class GatewayRequestObjectHandlerIntTest {
 
 	@Test
 	public void testBase64EncodingWithContentEncoding() throws IOException {
-		DefaultGatewayRequest request = new DefaultGatewayRequest();
-		request.setHttpMethod("GET");
-		request.setPath("/test-string");
-		request.setHeaders(ImmutableMap.of(HttpHeaders.ACCEPT_ENCODING, "gzip"));
+		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+				.httpMethod("GET")
+				.resource("/test-string")
+				.headers(ImmutableMap.of(HttpHeaders.ACCEPT_ENCODING, "gzip"))
+				.build();
+
 		GatewayResponse response = handler.handleRequest(request, context);
 		assertTrue(response.isIsBase64Encoded());
 		byte[] bytes = Base64.getDecoder().decode(response.getBody());
@@ -245,10 +254,11 @@ public class GatewayRequestObjectHandlerIntTest {
 	    return buffer.toByteArray();
 	}
 
-	private void testBase64Encoding(String path) {
-		DefaultGatewayRequest request = new DefaultGatewayRequest();
-		request.setHttpMethod("GET");
-		request.setPath(path);
+	private void testBase64Encoding(String resoruce) {
+		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+				.httpMethod("GET")
+				.resource(resoruce)
+				.build();
 		GatewayResponse response = handler.handleRequest(request, context);
 		assertTrue(response.isIsBase64Encoded());
 		assertEquals(Base64.getEncoder().encodeToString("test".getBytes()), response.getBody());
@@ -257,22 +267,25 @@ public class GatewayRequestObjectHandlerIntTest {
 
 	@Test
 	public void testBase64Decoding() {
-		DefaultGatewayRequest request = new DefaultGatewayRequest();
-		request.setHttpMethod("PUT");
-		request.setPath("/binary-data");
-		request.setIsBase64Encoded(true);
-		request.setBody(new String(Base64.getEncoder().encode("test".getBytes()), StandardCharsets.UTF_8));
+		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+				.httpMethod("PUT")
+				.resource("/binary-data")
+				.body(new String(Base64.getEncoder().encode("test".getBytes()), StandardCharsets.UTF_8))
+				.base64Encoded(true)
+				.build();
 		handler.handleRequest(request, context);
 		verify(testService).binaryData("test".getBytes());
 	}
 
 	@Test
 	public void testEncodedBase64Decoding() throws IOException {
-		DefaultGatewayRequest request = new DefaultGatewayRequest();
-		request.setHttpMethod("PUT");
-		request.setPath("/binary-data");
-		request.setIsBase64Encoded(true);
-		request.setHeaders(Collections.singletonMap(HttpHeaders.CONTENT_ENCODING, "gzip"));
+		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+				.httpMethod("PUT")
+				.resource("/binary-data")
+				.body(new String(Base64.getEncoder().encode("test".getBytes()), StandardCharsets.UTF_8))
+				.base64Encoded(true)
+				.headers(Collections.singletonMap(HttpHeaders.CONTENT_ENCODING, "gzip"))
+				.build();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try (GZIPOutputStream zipOut = new GZIPOutputStream(baos, true)) {
 			zipOut.write("test".getBytes());
@@ -321,17 +334,79 @@ public class GatewayRequestObjectHandlerIntTest {
 	}
 
 	private Principal testPrincipal(Map<String, Object> authorizerData) {
-		DefaultGatewayRequestContext requestContext = new DefaultGatewayRequestContext();
-		requestContext.setAuthorizer(authorizerData);
-		DefaultGatewayRequest request = new DefaultGatewayRequest();
-		request.setHttpMethod("GET");
-		request.setPath("/security-context");
-		request.setRequestContext(requestContext);
+		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+				.httpMethod("GET")
+				.resource("/security-context")
+				.authorizerData(authorizerData)
+				.build();
 		ArgumentCaptor<SecurityContext> securityContextCapture = ArgumentCaptor.forClass(SecurityContext.class);
 		handler.handleRequest(request, context);
 		verify(testService).injectSecurityContext(securityContextCapture.capture());
 		SecurityContext sc = securityContextCapture.getValue();
 		return sc.getUserPrincipal();
+	}
+
+	@Test
+	public void testBaseUriWithoutHost() {
+		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+				.httpMethod("GET")
+				.resource("/uris")
+				.build();
+		handler.handleRequest(request, context);
+		verify(testService).baseUri(URI.create("/"));
+		verify(testService).requestUri(URI.create("/uris"));
+	}
+
+	@Test
+	public void testBaseUriWithHost() {
+		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+				.httpMethod("GET")
+				.resource("/uris")
+				.domain("api.example.com")
+				.build();
+		handler.handleRequest(request, context);
+		verify(testService).baseUri(URI.create("https://api.example.com/"));
+		verify(testService).requestUri(URI.create("https://api.example.com/uris"));
+	}
+
+	@Test
+	public void testAppPathWithoutHost() {
+		GatewayRequestObjectHandlerImpl handlerWithAppPath = createAndStartHandler(new ApiResourceConfig(),
+				testService);
+		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+				.httpMethod("GET")
+				.resource("/api/uris") // = path
+				.build();
+		handlerWithAppPath.handleRequest(request, context);
+		verify(testService).baseUri(URI.create("/api/"));
+		verify(testService).requestUri(URI.create("/api/uris"));
+	}
+
+	@Test
+	public void testAppPathWithHost() {
+		GatewayRequestObjectHandlerImpl handlerWithAppPath = createAndStartHandler(new ApiResourceConfig(),
+				testService);
+		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+				.httpMethod("GET")
+				.resource("/api/uris") // = path
+				.domain("api.example.com")
+				.build();
+		handlerWithAppPath.handleRequest(request, context);
+		verify(testService).baseUri(URI.create("https://api.example.com/api/"));
+		verify(testService).requestUri(URI.create("https://api.example.com/api/uris"));
+	}
+
+	@Test
+	public void testBasePathWithBasePathWithHost() {
+		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+				.httpMethod("GET")
+				.resource("/uris")
+				.path("/api/uris")
+				.domain("api.example.com")
+				.build();
+		System.out.println(handler.handleRequest(request, context));
+		verify(testService).baseUri(URI.create("https://api.example.com/api/"));
+		verify(testService).requestUri(URI.create("https://api.example.com/api/uris"));
 	}
 
 	@Path("/")
@@ -344,11 +419,13 @@ public class GatewayRequestObjectHandlerIntTest {
 		@javax.ws.rs.core.Context
 		private GatewayRequest gatewayRequestMember;
 
-		private TestService service;
+		private final TestService service;
+		private final UriInfo uriInfo;
 
 		@Inject
-		public TestResource(TestService service) {
+		public TestResource(TestService service, UriInfo uriInfo) {
 			this.service = service;
+			this.uriInfo = uriInfo;
 		}
 
 		@DELETE
@@ -471,6 +548,13 @@ public class GatewayRequestObjectHandlerIntTest {
 		public void getSc(@javax.ws.rs.core.Context SecurityContext securityContext) {
 			service.injectSecurityContext(securityContext);
 		}
+
+		@Path("uris")
+		@GET
+		public void getBaseUri() {
+			service.baseUri(uriInfo.getBaseUri());
+			service.requestUri(uriInfo.getRequestUri());
+		}
 	}
 
 	public static interface TestService {
@@ -481,6 +565,8 @@ public class GatewayRequestObjectHandlerIntTest {
 		void injectGatewayIdentity(GatewayIdentity identity);
 		void binaryData(byte[] data);
 		void injectSecurityContext(SecurityContext sc);
+		void baseUri(URI baseUri);
+		void requestUri(URI baseUri);
 	}
 
 	public static class Entity {
@@ -517,5 +603,9 @@ public class GatewayRequestObjectHandlerIntTest {
 	}
 
 	public static class GatewayRequestObjectHandlerImpl extends GatewayRequestObjectHandler {
+	}
+
+	@ApplicationPath("api")
+	public static class ApiResourceConfig extends ResourceConfig {
 	}
 }

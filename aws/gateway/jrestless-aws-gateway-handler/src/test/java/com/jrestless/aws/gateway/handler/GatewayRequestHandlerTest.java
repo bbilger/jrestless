@@ -296,7 +296,7 @@ public class GatewayRequestHandlerTest {
 				.resource("/users")
 				.buildWrapped();
 		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
-		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/stage"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/stage/"), uris.getBaseUri());
 		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/stage/users"), uris.getRequestUri());
 	}
 
@@ -308,7 +308,7 @@ public class GatewayRequestHandlerTest {
 				.resource("/users")
 				.buildWrapped();
 		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
-		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/"), uris.getBaseUri());
 		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/users"), uris.getRequestUri());
 	}
 
@@ -320,7 +320,7 @@ public class GatewayRequestHandlerTest {
 				.resource("/users")
 				.buildWrapped();
 		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
-		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/stage"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/stage/"), uris.getBaseUri());
 		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/stage/users"), uris.getRequestUri());
 	}
 
@@ -332,7 +332,7 @@ public class GatewayRequestHandlerTest {
 				.resource("/users")
 				.buildWrapped();
 		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
-		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/"), uris.getBaseUri());
 		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/users"), uris.getRequestUri());
 
 	}
@@ -345,7 +345,7 @@ public class GatewayRequestHandlerTest {
 				.resource("/users")
 				.buildWrapped();
 		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
-		assertEquals(URI.create(TEST_AWS_DOMAIN_WITH_SCHEME + "/dev"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_AWS_DOMAIN_WITH_SCHEME + "/dev/"), uris.getBaseUri());
 		assertEquals(URI.create(TEST_AWS_DOMAIN_WITH_SCHEME + "/dev/users"), uris.getRequestUri());
 	}
 
@@ -356,7 +356,7 @@ public class GatewayRequestHandlerTest {
 				.resource("/users")
 				.buildWrapped();
 		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
-		assertEquals(URI.create(TEST_AWS_DOMAIN_WITH_SCHEME), uris.getBaseUri());
+		assertEquals(URI.create(TEST_AWS_DOMAIN_WITH_SCHEME + "/"), uris.getBaseUri());
 		assertEquals(URI.create(TEST_AWS_DOMAIN_WITH_SCHEME + "/users"), uris.getRequestUri());
 	}
 
@@ -368,7 +368,7 @@ public class GatewayRequestHandlerTest {
 				.buildWrapped();
 		when(requestAndLambdaContext.getGatewayRequest().getRequestContext()).thenReturn(null);
 		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
-		assertEquals(URI.create(TEST_AWS_DOMAIN_WITH_SCHEME), uris.getBaseUri());
+		assertEquals(URI.create(TEST_AWS_DOMAIN_WITH_SCHEME + "/"), uris.getBaseUri());
 		assertEquals(URI.create(TEST_AWS_DOMAIN_WITH_SCHEME + "/users"), uris.getRequestUri());
 	}
 
@@ -391,7 +391,7 @@ public class GatewayRequestHandlerTest {
 				.pathParams(ImmutableMap.of("uid", "1"))
 				.buildWrapped();
 		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
-		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/"), uris.getBaseUri());
 		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/users/1"), uris.getRequestUri());
 	}
 
@@ -404,7 +404,7 @@ public class GatewayRequestHandlerTest {
 				.pathParams(ImmutableMap.of("proxy", "users/1/contacts"))
 				.buildWrapped();
 		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
-		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/"), uris.getBaseUri());
 		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/users/1/contacts"), uris.getRequestUri());
 	}
 
@@ -417,7 +417,7 @@ public class GatewayRequestHandlerTest {
 				.pathParams(ImmutableMap.of("uid", "1", "proxy", "2"))
 				.buildWrapped();
 		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
-		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/"), uris.getBaseUri());
 		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/users/1/contacts/2"), uris.getRequestUri());
 	}
 
@@ -429,15 +429,15 @@ public class GatewayRequestHandlerTest {
 				.resource("/a.c")
 				.buildWrapped();
 		RequestAndBaseUri validUris = gatewayHandler.getRequestAndBaseUri(validRequestAndLambdaContext);
-		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), validUris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/"), validUris.getBaseUri());
 		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/a.c"), validUris.getRequestUri());
 
 		GatewayRequestAndLambdaContext invalidRequestAndLambdaContext = new GatewayRequestBuilder()
 				.domain(TEST_CUSTOM_DOMAIN)
 				.basePath("base")
 				.resource("/a.c")
+				.path("/base/abc")
 				.buildWrapped();
-		when(invalidRequestAndLambdaContext.getGatewayRequest().getPath()).thenReturn("/base/abc");
 
 		// we cannot match the basepath since "." has been escaped correctly
 		RequestAndBaseUri invalidUris = gatewayHandler.getRequestAndBaseUri(invalidRequestAndLambdaContext);
@@ -455,7 +455,7 @@ public class GatewayRequestHandlerTest {
 				.queryParams(Collections.singletonMap("q", "foo bar"))
 				.buildWrapped();
 		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
-		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/"), uris.getBaseUri());
 		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/users?q=foo+bar"), uris.getRequestUri());
 	}
 
@@ -465,10 +465,10 @@ public class GatewayRequestHandlerTest {
 				.domain(TEST_CUSTOM_DOMAIN)
 				.basePath("base")
 				.resource("/ab")
+				.path("/base/ab////")
 				.buildWrapped();
-		when(requestAndLambdaContext.getGatewayRequest().getPath()).thenReturn("/base/ab////");
 		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
-		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/"), uris.getBaseUri());
 		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/ab////"), uris.getRequestUri());
 	}
 
@@ -478,8 +478,8 @@ public class GatewayRequestHandlerTest {
 				.domain(TEST_CUSTOM_DOMAIN)
 				.basePath("base")
 				.resource("/ab")
+				.path("/ab/a")
 				.buildWrapped();
-		when(requestAndLambdaContext.getGatewayRequest().getPath()).thenReturn("/ab/a");
 		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
 		assertEquals(URI.create("/"), uris.getBaseUri());
 		assertEquals(URI.create("/ab/a"), uris.getRequestUri());
@@ -493,7 +493,7 @@ public class GatewayRequestHandlerTest {
 				.resource("/")
 				.buildWrapped();
 		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
-		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/"), uris.getBaseUri());
 		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), uris.getRequestUri());
 	}
 
@@ -503,10 +503,10 @@ public class GatewayRequestHandlerTest {
 				.domain(TEST_CUSTOM_DOMAIN)
 				.basePath("base")
 				.resource("/")
+				.path("/base//")
 				.buildWrapped();
-		when(requestAndLambdaContext.getGatewayRequest().getPath()).thenReturn("/base//");
 		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
-		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base"), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base/"), uris.getBaseUri());
 		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/base//"), uris.getRequestUri());
 	}
 
@@ -515,10 +515,10 @@ public class GatewayRequestHandlerTest {
 		GatewayRequestAndLambdaContext requestAndLambdaContext = new GatewayRequestBuilder()
 				.domain(TEST_CUSTOM_DOMAIN)
 				.resource("/")
+				.path("///")
 				.buildWrapped();
-		when(requestAndLambdaContext.getGatewayRequest().getPath()).thenReturn("///");
 		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
-		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/"), uris.getBaseUri());
 		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "///"), uris.getRequestUri());
 	}
 
@@ -569,7 +569,7 @@ public class GatewayRequestHandlerTest {
 				.buildWrapped();
 		when(requestAndLambdaContext.getGatewayRequest().getPathParameters()).thenReturn(null);
 		RequestAndBaseUri uris = gatewayHandler.getRequestAndBaseUri(requestAndLambdaContext);
-		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME), uris.getBaseUri());
+		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/"), uris.getBaseUri());
 		assertEquals(URI.create(TEST_CUSTOM_DOMAIN_WITH_SCHEME + "/users/1"), uris.getRequestUri());
 	}
 

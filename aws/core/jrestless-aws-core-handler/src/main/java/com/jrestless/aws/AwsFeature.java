@@ -28,6 +28,7 @@ import org.glassfish.jersey.internal.util.collection.Ref;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.jrestless.core.container.dpi.AbstractReferencingBinder;
+import com.jrestless.core.filter.ApplicationPathFilter;
 
 /**
  * Binds AWS specific values.
@@ -55,6 +56,7 @@ public class AwsFeature implements Feature {
 
 	@Override
 	public boolean configure(FeatureContext context) {
+		context.register(ApplicationPathFilter.class);
 		context.register(new Binder());
 		return true;
 	}

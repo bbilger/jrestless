@@ -275,6 +275,8 @@ public abstract class GatewayRequestHandler
 			baseUriWithoutBasePath = baseUriBuilder.build();
 			if (hostPresent && validBasePath) {
 				baseUriBuilder.path(basePath);
+				// the base URI must end with a trailing slash
+				baseUriBuilder.path("/");
 			}
 			baseUri = baseUriBuilder.build();
 		} catch (RuntimeException e) {
