@@ -79,6 +79,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.jrestless.aws.gateway.GatewayFeature;
+import com.jrestless.aws.gateway.filter.DynamicProxyBasePathFilter;
 import com.jrestless.aws.gateway.io.DefaultGatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayBinaryResponseCheckFilter;
 import com.jrestless.aws.gateway.io.GatewayIdentity;
@@ -404,9 +405,60 @@ public class GatewayRequestObjectHandlerIntTest {
 				.path("/api/uris")
 				.domain("api.example.com")
 				.build();
-		System.out.println(handler.handleRequest(request, context));
+		handler.handleRequest(request, context);
 		verify(testService).baseUri(URI.create("https://api.example.com/api/"));
 		verify(testService).requestUri(URI.create("https://api.example.com/api/uris"));
+	}
+
+	@Test
+	public void testProxyBasePathingWithoutDomainWithoutPathBasePath() {
+		ResourceConfig config = new ResourceConfig();
+		config.register(DynamicProxyBasePathFilter.class);
+		GatewayRequestObjectHandlerImpl handlerWithProxyFilter = createAndStartHandler(config,
+				testService);
+		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+				.httpMethod("GET")
+				.resource("/a/{proxy+}")
+				.pathParams(Collections.singletonMap("proxy", "uris"))
+				.build();
+		handlerWithProxyFilter.handleRequest(request, context);
+		verify(testService).baseUri(URI.create("/a/"));
+		verify(testService).requestUri(URI.create("/a/uris"));
+	}
+
+	@Test
+	public void testProxyBasePathingWithDomainWithoutPathBasePath() {
+		ResourceConfig config = new ResourceConfig();
+		config.register(DynamicProxyBasePathFilter.class);
+		GatewayRequestObjectHandlerImpl handlerWithProxyFilter = createAndStartHandler(config,
+				testService);
+		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+				.httpMethod("GET")
+				.resource("/a/{proxy+}")
+				.pathParams(Collections.singletonMap("proxy", "uris"))
+				.domain("api.example.com")
+				.build();
+		handlerWithProxyFilter.handleRequest(request, context);
+		verify(testService).baseUri(URI.create("https://api.example.com/a/"));
+		verify(testService).requestUri(URI.create("https://api.example.com/a/uris"));
+	}
+
+	@Test
+	public void testProxyBasePathingWithDomainWithPathBasePath() {
+		ResourceConfig config = new ResourceConfig();
+		config.register(DynamicProxyBasePathFilter.class);
+		GatewayRequestObjectHandlerImpl handlerWithProxyFilter = createAndStartHandler(config,
+				testService);
+		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+				.httpMethod("GET")
+				.resource("/p/{proxy+}")
+				.pathParams(Collections.singletonMap("proxy", "uris"))
+				.path("/a/p/uris")
+				.domain("api.example.com")
+				.build();
+		handlerWithProxyFilter.handleRequest(request, context);
+		verify(testService).baseUri(URI.create("https://api.example.com/a/p/"));
+		verify(testService).requestUri(URI.create("https://api.example.com/a/p/uris"));
 	}
 
 	@Path("/")
