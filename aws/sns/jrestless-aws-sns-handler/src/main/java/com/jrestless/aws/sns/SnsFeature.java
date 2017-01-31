@@ -15,66 +15,26 @@
  */
 package com.jrestless.aws.sns;
 
-import java.lang.reflect.Type;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
-import org.glassfish.hk2.api.TypeLiteral;
-import org.glassfish.jersey.internal.inject.ReferencingFactory;
-import org.glassfish.jersey.internal.util.collection.Ref;
-
-import com.amazonaws.services.lambda.runtime.events.SNSEvent.SNSRecord;
 import com.jrestless.aws.AwsFeature;
-import com.jrestless.core.container.dpi.AbstractReferencingBinder;
 
 /**
- * Binds SNS specific values.
+ * Registers optional SNS function features.
  *
- * <table border="1" summary="injected objects">
- * <tr>
- * <th>injectable object
- * <th>proxiable
- * <th>scope
- * </tr>
- *
- * <tr>
- * <td>{@link SNSRecord}
- * <td>true
- * <td>request
- * </tr>
- * </table>
- *
- * Registers {@link AwsFeature}.
+ * <ol>
+ * <li>{@link AwsFeature}
+ * </ol>
  *
  * @author Bjoern Bilger
  *
  */
 public class SnsFeature implements Feature {
 
-	public static final Type SNS_RECORD_TYPE = (new TypeLiteral<Ref<SNSRecord>>() { }).getType();
-
 	@Override
 	public boolean configure(FeatureContext context) {
-		context.register(new Binder());
 		context.register(AwsFeature.class);
 		return true;
-	}
-
-	private static class Binder extends AbstractReferencingBinder {
-		@Override
-		protected void configure() {
-			bindReferencingFactory(SNSRecord.class, ReferencingSnsRecordFactory.class,
-					new TypeLiteral<Ref<SNSRecord>>() { });
-		}
-	}
-
-	private static class ReferencingSnsRecordFactory extends ReferencingFactory<SNSRecord> {
-		@Inject
-		ReferencingSnsRecordFactory(final Provider<Ref<SNSRecord>> referenceFactory) {
-			super(referenceFactory);
-		}
 	}
 }

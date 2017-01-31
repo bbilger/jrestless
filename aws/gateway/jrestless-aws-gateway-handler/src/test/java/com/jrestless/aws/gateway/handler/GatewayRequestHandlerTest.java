@@ -28,6 +28,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ import java.util.function.Consumer;
 import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.RequestScopedInitializer;
@@ -48,8 +50,7 @@ import org.mockito.ArgumentCaptor;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.jrestless.aws.AwsFeature;
-import com.jrestless.aws.gateway.GatewayFeature;
+import com.jrestless.aws.AbstractLambdaContextReferencingBinder;
 import com.jrestless.aws.gateway.io.DefaultGatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayBinaryResponseCheckFilter;
 import com.jrestless.aws.gateway.io.GatewayRequest;
@@ -61,6 +62,8 @@ import com.jrestless.core.container.io.JRestlessContainerRequest;
 import com.jrestless.core.container.io.RequestAndBaseUri;
 
 public class GatewayRequestHandlerTest {
+
+	private static final Type GATEWAY_REQUEST_TYPE = (new TypeLiteral<Ref<GatewayRequest>>() { }).getType();
 
 	private static final String TEST_AWS_DOMAIN = "0123456789.execute-api.eu-central-1.amazonaws.com";
 	private static final String TEST_AWS_DOMAIN_WITH_SCHEME = "https://" + TEST_AWS_DOMAIN;
@@ -93,8 +96,8 @@ public class GatewayRequestHandlerTest {
 		Ref<Context> contextRef = mock(Ref.class);
 
 		ServiceLocator serviceLocator = mock(ServiceLocator.class);
-		when(serviceLocator.getService(GatewayFeature.GATEWAY_REQUEST_TYPE)).thenReturn(gatewayRequestRef);
-		when(serviceLocator.getService(AwsFeature.CONTEXT_TYPE)).thenReturn(contextRef);
+		when(serviceLocator.getService(GATEWAY_REQUEST_TYPE)).thenReturn(gatewayRequestRef);
+		when(serviceLocator.getService(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE)).thenReturn(contextRef);
 
 		requestScopedInitializer.initialize(serviceLocator);
 

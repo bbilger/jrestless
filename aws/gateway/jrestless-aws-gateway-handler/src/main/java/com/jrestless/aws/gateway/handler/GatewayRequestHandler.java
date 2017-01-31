@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -30,19 +31,23 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
 
+import org.glassfish.hk2.api.TypeLiteral;
+import org.glassfish.hk2.utilities.Binder;
+import org.glassfish.jersey.internal.inject.ReferencingFactory;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.jrestless.aws.AwsFeature;
-import com.jrestless.aws.gateway.GatewayFeature;
+import com.jrestless.aws.AbstractLambdaContextReferencingBinder;
 import com.jrestless.aws.gateway.io.GatewayBinaryReadInterceptor;
 import com.jrestless.aws.gateway.io.GatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayRequestContext;
@@ -71,6 +76,7 @@ public abstract class GatewayRequestHandler
 	private static final Logger LOG = LoggerFactory.getLogger(GatewayRequestHandler.class);
 	private static final String AWS_DOMAIN = "amazonaws.com";
 	private static final URI BASE_ROOT_URI = URI.create("/");
+	private static final Type GATEWAY_REQUEST_TYPE = (new TypeLiteral<Ref<GatewayRequest>>() { }).getType();
 
 	protected GatewayRequestHandler() {
 	}
@@ -100,13 +106,14 @@ public abstract class GatewayRequestHandler
 		Context lambdaContext = requestAndLambdaContext.getLambdaContext();
 		actualContainerRequest.setRequestScopedInitializer(locator -> {
 			Ref<GatewayRequest> gatewayRequestRef = locator
-					.<Ref<GatewayRequest>>getService(GatewayFeature.GATEWAY_REQUEST_TYPE);
+					.<Ref<GatewayRequest>>getService(GATEWAY_REQUEST_TYPE);
 			if (gatewayRequestRef != null) {
 				gatewayRequestRef.set(request);
 			} else {
 				LOG.error("GatewayFeature has not been registered. GatewayRequest injection won't work.");
 			}
-			Ref<Context> contextRef = locator.<Ref<Context>>getService(AwsFeature.CONTEXT_TYPE);
+			Ref<Context> contextRef = locator
+					.<Ref<Context>>getService(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE);
 			if (contextRef != null) {
 				contextRef.set(lambdaContext);
 			} else {
@@ -482,6 +489,11 @@ public abstract class GatewayRequestHandler
 		}
 	}
 
+	@Override
+	protected final Binder createBinder() {
+		return new GatewayBinder();
+	}
+
 	protected static class ResponseWriter implements SimpleResponseWriter<GatewayResponse> {
 		private GatewayResponse response;
 
@@ -510,6 +522,22 @@ public abstract class GatewayRequestHandler
 		@Override
 		public GatewayResponse getResponse() {
 			return response;
+		}
+	}
+
+	private static class GatewayBinder extends AbstractLambdaContextReferencingBinder {
+		@Override
+		public void configure() {
+			bindReferencingLambdaContextFactory();
+			bindReferencingFactory(GatewayRequest.class, ReferencingGatewayRequestFactory.class,
+					new TypeLiteral<Ref<GatewayRequest>>() { });
+		}
+	}
+
+	private static class ReferencingGatewayRequestFactory extends ReferencingFactory<GatewayRequest> {
+		@Inject
+		ReferencingGatewayRequestFactory(final Provider<Ref<GatewayRequest>> referenceFactory) {
+			super(referenceFactory);
 		}
 	}
 }

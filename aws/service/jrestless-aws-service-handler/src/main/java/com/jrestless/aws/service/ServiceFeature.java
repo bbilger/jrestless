@@ -15,66 +15,26 @@
  */
 package com.jrestless.aws.service;
 
-import java.lang.reflect.Type;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
-import org.glassfish.hk2.api.TypeLiteral;
-import org.glassfish.jersey.internal.inject.ReferencingFactory;
-import org.glassfish.jersey.internal.util.collection.Ref;
-
 import com.jrestless.aws.AwsFeature;
-import com.jrestless.aws.service.io.ServiceRequest;
-import com.jrestless.core.container.dpi.AbstractReferencingBinder;
 
 /**
- * Binds Service specific values.
+ * Registers optional service function features.
  *
- * <table border="1" summary="injected objects">
- * <tr>
- * <th>injectable object
- * <th>proxiable
- * <th>scope
- * </tr>
- *
- * <tr>
- * <td>{@link ServiceRequest}
- * <td>true
- * <td>request
- * </tr>
- * </table>
- *
- * Registers {@link AwsFeature}.
+ * <ol>
+ * <li>{@link AwsFeature}
+ * </ol>
  *
  * @author Bjoern Bilger
  *
  */
 public class ServiceFeature implements Feature {
 
-	public static final Type SERVICE_REQUEST_TYPE = (new TypeLiteral<Ref<ServiceRequest>>() { }).getType();
-
 	@Override
 	public boolean configure(FeatureContext context) {
-		context.register(new Binder());
 		context.register(AwsFeature.class);
 		return true;
-	}
-
-	private static class Binder extends AbstractReferencingBinder {
-		@Override
-		protected void configure() {
-			bindReferencingFactory(ServiceRequest.class, ReferencingServiceRequestFactory.class,
-					new TypeLiteral<Ref<ServiceRequest>>() { });
-		}
-	}
-
-	private static class ReferencingServiceRequestFactory extends ReferencingFactory<ServiceRequest> {
-		@Inject
-		ReferencingServiceRequestFactory(final Provider<Ref<ServiceRequest>> referenceFactory) {
-			super(referenceFactory);
-		}
 	}
 }

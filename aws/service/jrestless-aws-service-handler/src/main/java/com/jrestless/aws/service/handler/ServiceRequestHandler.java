@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -29,17 +30,21 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 
+import org.glassfish.hk2.api.TypeLiteral;
+import org.glassfish.hk2.utilities.Binder;
+import org.glassfish.jersey.internal.inject.ReferencingFactory;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.jrestless.aws.AwsFeature;
-import com.jrestless.aws.service.ServiceFeature;
+import com.jrestless.aws.AbstractLambdaContextReferencingBinder;
 import com.jrestless.aws.service.io.DefaultServiceResponse;
 import com.jrestless.aws.service.io.ServiceRequest;
 import com.jrestless.aws.service.io.ServiceResponse;
@@ -67,6 +72,8 @@ public abstract class ServiceRequestHandler
 
 	private static final URI BASE_ROOT_URI = URI.create("/");
 
+	private static final Type SERVICE_REQUEST_TYPE = (new TypeLiteral<Ref<ServiceRequest>>() { }).getType();
+
 	protected ServiceRequestHandler() {
 	}
 
@@ -93,13 +100,14 @@ public abstract class ServiceRequestHandler
 		Context lambdaContext = requestAndLambdaContext.getLambdaContext();
 		actualContainerRequest.setRequestScopedInitializer(locator -> {
 			Ref<ServiceRequest> serviceRequestRef = locator
-					.<Ref<ServiceRequest>>getService(ServiceFeature.SERVICE_REQUEST_TYPE);
+					.<Ref<ServiceRequest>>getService(SERVICE_REQUEST_TYPE);
 			if (serviceRequestRef != null) {
 				serviceRequestRef.set(request);
 			} else {
 				LOG.error("ServiceFeature has not been registered. ServiceRequest injection won't work.");
 			}
-			Ref<Context> contextRef = locator.<Ref<Context>>getService(AwsFeature.CONTEXT_TYPE);
+			Ref<Context> contextRef = locator
+					.<Ref<Context>>getService(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE);
 			if (contextRef != null) {
 				contextRef.set(lambdaContext);
 			} else {
@@ -129,6 +137,11 @@ public abstract class ServiceRequestHandler
 				Status.INTERNAL_SERVER_ERROR.getReasonPhrase());
 	}
 
+	@Override
+	protected final Binder createBinder() {
+		return new ServiceRequestBinder();
+	}
+
 	protected static class ResponseWriter implements SimpleResponseWriter<ServiceResponse> {
 		private ServiceResponse response;
 
@@ -152,6 +165,22 @@ public abstract class ServiceRequestHandler
 		@Override
 		public ServiceResponse getResponse() {
 			return response;
+		}
+	}
+
+	private static class ServiceRequestBinder extends AbstractLambdaContextReferencingBinder {
+		@Override
+		protected void configure() {
+			bindReferencingLambdaContextFactory();
+			bindReferencingFactory(ServiceRequest.class, ReferencingServiceRequestFactory.class,
+					new TypeLiteral<Ref<ServiceRequest>>() { });
+		}
+	}
+
+	private static class ReferencingServiceRequestFactory extends ReferencingFactory<ServiceRequest> {
+		@Inject
+		ReferencingServiceRequestFactory(final Provider<Ref<ServiceRequest>> referenceFactory) {
+			super(referenceFactory);
 		}
 	}
 }

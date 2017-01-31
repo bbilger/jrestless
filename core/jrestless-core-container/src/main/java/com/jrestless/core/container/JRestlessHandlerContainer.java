@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.Response.Status;
@@ -71,10 +72,10 @@ public class JRestlessHandlerContainer<RequestT extends JRestlessContainerReques
 	 *
 	 * @param application
 	 *            JAX-RS / Jersey application to be deployed on the JRestless
-	 *            container.
+	 *            container
 	 */
-	public JRestlessHandlerContainer(Application application) {
-		this(new ApplicationHandler(application));
+	public JRestlessHandlerContainer(@Nonnull Application application) {
+		this(new ApplicationHandler(requireNonNull(application)));
 	}
 
 	/**
@@ -82,15 +83,29 @@ public class JRestlessHandlerContainer<RequestT extends JRestlessContainerReques
 	 *
 	 * @param application
 	 *            JAX-RS / Jersey application to be deployed on the JRestless
-	 *            container.
+	 *            container
+	 * @param binder
+	 *            the binder
+	 */
+	public JRestlessHandlerContainer(@Nonnull Application application, @Nullable Binder binder) {
+		this(new ApplicationHandler(requireNonNull(application), binder));
+	}
+
+	/**
+	 * Creates a new JRestless container.
+	 *
+	 * @param application
+	 *            JAX-RS / Jersey application to be deployed on the JRestless
+	 *            container
 	 * @param customBinder
 	 *            additional custom bindings used during {@link ServiceLocator}
-	 *            creation.
+	 *            creation
 	 * @param parentLocator
-	 *            parent HK2 service locator.
+	 *            parent HK2 service locator
 	 */
-	public JRestlessHandlerContainer(Application application, Binder customBinder, ServiceLocator parentLocator) {
-		this(new ApplicationHandler(application, customBinder, parentLocator));
+	public JRestlessHandlerContainer(@Nonnull Application application, @Nullable Binder customBinder,
+			@Nullable ServiceLocator parentLocator) {
+		this(new ApplicationHandler(requireNonNull(application), customBinder, parentLocator));
 	}
 
 	protected JRestlessHandlerContainer(@Nonnull ApplicationHandler applicationHandler) {

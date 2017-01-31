@@ -15,64 +15,22 @@
  */
 package com.jrestless.aws;
 
-import java.lang.reflect.Type;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
-import org.glassfish.hk2.api.TypeLiteral;
-import org.glassfish.jersey.internal.inject.ReferencingFactory;
-import org.glassfish.jersey.internal.util.collection.Ref;
-
-import com.amazonaws.services.lambda.runtime.Context;
-import com.jrestless.core.container.dpi.AbstractReferencingBinder;
 import com.jrestless.core.filter.ApplicationPathFilter;
 
 /**
- * Binds AWS specific values.
- *
- * <table border="1" summary="injected objects">
- * <tr>
- * <th>injectable object
- * <th>proxiable
- * <th>scope
- * </tr>
- *
- * <tr>
- * <td>{@link Context}
- * <td>true
- * <td>request
- * </tr>
- * </table>
+ * Registers common but optional features.
  *
  * @author Bjoern Bilger
  *
  */
 public class AwsFeature implements Feature {
 
-	public static final Type CONTEXT_TYPE = (new TypeLiteral<Ref<Context>>() { }).getType();
-
 	@Override
 	public boolean configure(FeatureContext context) {
 		context.register(ApplicationPathFilter.class);
-		context.register(new Binder());
 		return true;
 	}
-
-	private static class Binder extends AbstractReferencingBinder {
-		@Override
-		protected void configure() {
-			bindReferencingFactory(Context.class, ReferencingContextFactory.class, new TypeLiteral<Ref<Context>>() { });
-		}
-	}
-
-	private static class ReferencingContextFactory extends ReferencingFactory<Context> {
-		@Inject
-		ReferencingContextFactory(Provider<Ref<Context>> referenceFactory) {
-			super(referenceFactory);
-		}
-	}
-
 }

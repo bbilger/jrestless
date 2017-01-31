@@ -54,12 +54,12 @@ public class SimpleRequestHandlerTest {
 
 	@Test(expected = NullPointerException.class)
 	public void init1_NullAppGiven_ShouldThrowNpe() {
-		new SimpleRequestHandlerImpl().init((Application) null, null, mock(ServiceLocator.class));
+		new SimpleRequestHandlerImpl().init((Application) null, mock(ServiceLocator.class));
 	}
 
-	@Test(expected = NullPointerException.class)
-	public void init1_NullServiceLocatorGiven_ShouldThrowNpe() {
-		new SimpleRequestHandlerImpl().init(mock(Application.class), null, null);
+	@Test
+	public void init1_NullServiceLocatorGiven_ShouldNotThrowNpe() {
+		new SimpleRequestHandlerImpl().init(mock(Application.class), null);
 	}
 
 	@Test(expected = NullPointerException.class)

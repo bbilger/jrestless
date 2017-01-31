@@ -28,7 +28,7 @@ import org.junit.Test;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.jrestless.core.container.dpi.InstanceBinder;
 
-public class AwsFeatureIntTest extends JerseyTest {
+public class AbstractLambdaContextReferencingBinderIntTest extends JerseyTest {
 
 	private TestService testService;
 	private LambdaContextProvider lambdaContextProvider;
@@ -36,7 +36,12 @@ public class AwsFeatureIntTest extends JerseyTest {
 	@Override
 	protected Application configure() {
 		ResourceConfig application = new ResourceConfig();
-		application.register(AwsFeature.class);
+		application.register(new AbstractLambdaContextReferencingBinder() {
+			@Override
+			protected void configure() {
+				bindReferencingLambdaContextFactory();
+			}
+		});
 		testService = mock(TestService.class);
 
 		lambdaContextProvider = mock(LambdaContextProvider.class);
@@ -133,7 +138,8 @@ public class AwsFeatureIntTest extends JerseyTest {
 
 		@Override
 		public void filter(ContainerRequestContext requestContext) throws IOException {
-			serviceLocator.<Ref<Context>>getService(AwsFeature.CONTEXT_TYPE).set(lambdaContextProvider.getLambdaContext());
+			serviceLocator.<Ref<Context>>getService(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE)
+					.set(lambdaContextProvider.getLambdaContext());
 		}
 
 	}

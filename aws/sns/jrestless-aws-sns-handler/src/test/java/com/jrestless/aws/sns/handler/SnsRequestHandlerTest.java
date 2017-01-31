@@ -15,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -27,6 +28,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.StatusType;
 
 import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.RequestScopedInitializer;
@@ -37,13 +39,15 @@ import org.mockito.ArgumentCaptor;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.events.SNSEvent.SNS;
 import com.amazonaws.services.lambda.runtime.events.SNSEvent.SNSRecord;
-import com.jrestless.aws.AwsFeature;
-import com.jrestless.aws.sns.SnsFeature;
+import com.jrestless.aws.AbstractLambdaContextReferencingBinder;
 import com.jrestless.core.container.JRestlessHandlerContainer;
 import com.jrestless.core.container.io.JRestlessContainerRequest;
 import com.jrestless.core.container.io.RequestAndBaseUri;
 
 public class SnsRequestHandlerTest {
+
+	public static final Type SNS_RECORD_TYPE = (new TypeLiteral<Ref<SNSRecord>>() { }).getType();
+
 	private JRestlessHandlerContainer<JRestlessContainerRequest> container;
 	private SnsRequestHandlerImpl snsHandler;
 
@@ -72,8 +76,8 @@ public class SnsRequestHandlerTest {
 		Ref<Context> contextRef = mock(Ref.class);
 
 		ServiceLocator serviceLocator = mock(ServiceLocator.class);
-		when(serviceLocator.getService(SnsFeature.SNS_RECORD_TYPE)).thenReturn(snsRef);
-		when(serviceLocator.getService(AwsFeature.CONTEXT_TYPE)).thenReturn(contextRef);
+		when(serviceLocator.getService(SNS_RECORD_TYPE)).thenReturn(snsRef);
+		when(serviceLocator.getService(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE)).thenReturn(contextRef);
 
 		requestScopedInitializer.initialize(serviceLocator);
 

@@ -57,23 +57,25 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	 */
 	public final void init(@Nonnull Application application) {
 		requireNonNull(application);
-		init(new JRestlessHandlerContainer<>(application));
+		init(new JRestlessHandlerContainer<>(application, createBinder()));
 	}
 
 	/**
-	 * Initializes the container using the given application, binder and locator.
+	 * Initializes the container using the given application.
 	 * <p>
 	 * May be called once, only.
 	 *
 	 * @param application
+	 * @param parent
 	 */
-	public final void init(@Nonnull Application application, @Nullable Binder customBinder,
-			@Nonnull ServiceLocator parent) {
+	public final void init(@Nonnull Application application, @Nullable ServiceLocator parent) {
 		requireNonNull(application);
-		requireNonNull(parent);
-		init(new JRestlessHandlerContainer<>(application, customBinder, parent));
+		init(new JRestlessHandlerContainer<>(application, createBinder(), parent));
 	}
 
+	protected Binder createBinder() {
+		return null;
+	}
 
 	/**
 	 * Initializes the container using the given application, binder and locator.

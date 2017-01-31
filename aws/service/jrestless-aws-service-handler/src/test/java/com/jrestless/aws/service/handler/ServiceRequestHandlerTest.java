@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.RequestScopedInitializer;
@@ -30,14 +32,15 @@ import org.mockito.ArgumentCaptor;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.jrestless.aws.AwsFeature;
-import com.jrestless.aws.service.ServiceFeature;
+import com.jrestless.aws.AbstractLambdaContextReferencingBinder;
 import com.jrestless.aws.service.io.DefaultServiceRequest;
 import com.jrestless.aws.service.io.ServiceRequest;
 import com.jrestless.core.container.JRestlessHandlerContainer;
 import com.jrestless.core.container.io.JRestlessContainerRequest;
 
 public class ServiceRequestHandlerTest {
+
+	private static final Type SERVICE_REQUEST_TYPE = (new TypeLiteral<Ref<ServiceRequest>>() { }).getType();
 
 	private JRestlessHandlerContainer<JRestlessContainerRequest> container;
 	private ServiceRequestHandlerImpl serviceHandler;
@@ -63,8 +66,8 @@ public class ServiceRequestHandlerTest {
 		Ref<Context> contextRef = mock(Ref.class);
 
 		ServiceLocator serviceLocator = mock(ServiceLocator.class);
-		when(serviceLocator.getService(ServiceFeature.SERVICE_REQUEST_TYPE)).thenReturn(serviceRequestRef);
-		when(serviceLocator.getService(AwsFeature.CONTEXT_TYPE)).thenReturn(contextRef);
+		when(serviceLocator.getService(SERVICE_REQUEST_TYPE)).thenReturn(serviceRequestRef);
+		when(serviceLocator.getService(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE)).thenReturn(contextRef);
 
 		requestScopedInitializer.initialize(serviceLocator);
 

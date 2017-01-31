@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -30,12 +31,17 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 
+import org.glassfish.hk2.api.TypeLiteral;
+import org.glassfish.hk2.utilities.Binder;
+import org.glassfish.jersey.internal.inject.ReferencingFactory;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.slf4j.Logger;
@@ -44,8 +50,7 @@ import org.slf4j.LoggerFactory;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.events.SNSEvent.SNS;
 import com.amazonaws.services.lambda.runtime.events.SNSEvent.SNSRecord;
-import com.jrestless.aws.AwsFeature;
-import com.jrestless.aws.sns.SnsFeature;
+import com.jrestless.aws.AbstractLambdaContextReferencingBinder;
 import com.jrestless.core.container.handler.SimpleRequestHandler;
 import com.jrestless.core.container.io.DefaultJRestlessContainerRequest;
 import com.jrestless.core.container.io.JRestlessContainerRequest;
@@ -70,6 +75,8 @@ public abstract class SnsRequestHandler extends SimpleRequestHandler<SnsRecordAn
 	private static final Logger LOG = LoggerFactory.getLogger(SnsRequestHandler.class);
 
 	private static final URI BASE_ROOT_URI = URI.create("/");
+
+	private static final Type SNS_RECORD_TYPE = (new TypeLiteral<Ref<SNSRecord>>() { }).getType();
 
 	protected SnsRequestHandler() {
 	}
@@ -176,13 +183,14 @@ public abstract class SnsRequestHandler extends SimpleRequestHandler<SnsRecordAn
 		SNSRecord snsRecord = snsRecordAndContext.getSnsRecord();
 		Context lambdaContext = snsRecordAndContext.getLambdaContext();
 		actualContainerRequest.setRequestScopedInitializer(locator -> {
-			Ref<SNSRecord> snsRecordRef = locator.<Ref<SNSRecord>>getService(SnsFeature.SNS_RECORD_TYPE);
+			Ref<SNSRecord> snsRecordRef = locator.<Ref<SNSRecord>>getService(SNS_RECORD_TYPE);
 			if (snsRecordRef != null) {
 				snsRecordRef.set(snsRecord);
 			} else {
 				LOG.error("SnsFeature has not been registered. SNSRecord injection won't work.");
 			}
-			Ref<Context> contextRef = locator.<Ref<Context>>getService(AwsFeature.CONTEXT_TYPE);
+			Ref<Context> contextRef = locator
+					.<Ref<Context>>getService(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE);
 			if (contextRef != null) {
 				contextRef.set(lambdaContext);
 			} else {
@@ -227,6 +235,11 @@ public abstract class SnsRequestHandler extends SimpleRequestHandler<SnsRecordAn
 		return null;
 	}
 
+	@Override
+	protected final Binder createBinder() {
+		return new SnsRecordBinder();
+	}
+
 	private class ResponseWriter implements SimpleResponseWriter<Void> {
 		private final SnsRecordAndLambdaContext snsRecordAndContext;
 
@@ -249,6 +262,22 @@ public abstract class SnsRequestHandler extends SimpleRequestHandler<SnsRecordAn
 		@Override
 		public Void getResponse() {
 			return null;
+		}
+	}
+
+	private static class SnsRecordBinder extends AbstractLambdaContextReferencingBinder {
+		@Override
+		protected void configure() {
+			bindReferencingLambdaContextFactory();
+			bindReferencingFactory(SNSRecord.class, ReferencingSnsRecordFactory.class,
+					new TypeLiteral<Ref<SNSRecord>>() { });
+		}
+	}
+
+	private static class ReferencingSnsRecordFactory extends ReferencingFactory<SNSRecord> {
+		@Inject
+		ReferencingSnsRecordFactory(final Provider<Ref<SNSRecord>> referenceFactory) {
+			super(referenceFactory);
 		}
 	}
 }
