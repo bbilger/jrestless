@@ -480,15 +480,6 @@ public abstract class GatewayRequestHandler
 		return s == null || s.trim().isEmpty();
 	}
 
-	public static class QueryParameterEncodingException extends RuntimeException {
-
-		private static final long serialVersionUID = -7545175514996382745L;
-
-		QueryParameterEncodingException(Exception cause) {
-			super(cause);
-		}
-	}
-
 	@Override
 	protected final Binder createBinder() {
 		return new GatewayBinder();
