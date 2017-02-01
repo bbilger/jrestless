@@ -137,7 +137,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	 * End-User's preferred e-mail address. Its value MUST conform to the
 	 * <a href=
 	 * "http://openid.net/specs/openid-connect-core-1_0.html#RFC5322">RFC
-	 * 5322</a> &#91;RFC5322&#93; addr-spec syntax. The RP MUST NOT rely upon this value
+	 * 5322</a> [RFC5322] addr-spec syntax. The RP MUST NOT rely upon this value
 	 * being unique, as discussed in Section <a href=
 	 * "http://openid.net/specs/openid-connect-core-1_0.html#ClaimStability">5.7</a>.
 	 */
@@ -172,7 +172,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	/**
 	 * End-User's birthday, represented as an <a href=
 	 * "http://openid.net/specs/openid-connect-core-1_0.html#ISO8601-2004">ISO
-	 * 8601:2004</a> &#91;ISO8601‑2004&#93; YYYY-MM-DD format. The year MAY be 0000,
+	 * 8601:2004</a> [ISO8601-2004] YYYY-MM-DD format. The year MAY be 0000,
 	 * indicating that it is omitted. To represent only the year, YYYY format is
 	 * allowed. Note that depending on the underlying platform's date related
 	 * function, providing just year can result in varying month and day, so the
@@ -185,7 +185,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 
 	/**
 	 * String from zoneinfo <a href=
-	 * "http://openid.net/specs/openid-connect-core-1_0.html#zoneinfo">&#91;zoneinfo&#93;</a>
+	 * "http://openid.net/specs/openid-connect-core-1_0.html#zoneinfo">[zoneinfo]</a>
 	 * time zone database representing the End-User's time zone. For example,
 	 * Europe/Paris or America/Los_Angeles.
 	 */
@@ -196,11 +196,11 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	/**
 	 * End-User's locale, represented as a <a href=
 	 * "http://openid.net/specs/openid-connect-core-1_0.html#RFC5646">BCP47</a>
-	 * &#91;RFC5646&#93; language tag. This is typically an <a href=
+	 * [RFC5646] language tag. This is typically an <a href=
 	 * "http://openid.net/specs/openid-connect-core-1_0.html#ISO639-1">ISO 639-1
-	 * Alpha-2</a> &#91;ISO639‑1&#93; language code in lowercase and an <a href=
+	 * Alpha-2</a> [ISO639-1] language code in lowercase and an <a href=
 	 * "http://openid.net/specs/openid-connect-core-1_0.html#ISO3166-1">ISO
-	 * 3166-1 Alpha-2</a> &#91;ISO3166‑1&#93; country code in uppercase, separated by a
+	 * 3166-1 Alpha-2</a> [ISO3166-1] country code in uppercase, separated by a
 	 * dash. For example, en-US or fr-CA. As a compatibility note, some
 	 * implementations have used an underscore as the separator rather than a
 	 * dash, for example, en_US; Relying Parties MAY choose to accept this
@@ -213,11 +213,11 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	/**
 	 * End-User's preferred telephone number. <a href=
 	 * "http://openid.net/specs/openid-connect-core-1_0.html#E.164">E.164</a>
-	 * &#91;E.164&#93; is RECOMMENDED as the format of this Claim, for example, +1 (425)
+	 * [E.164] is RECOMMENDED as the format of this Claim, for example, +1 (425)
 	 * 555-1212 or +56 (2) 687 2400. If the phone number contains an extension,
 	 * it is RECOMMENDED that the extension be represented using the <a href=
 	 * "http://openid.net/specs/openid-connect-core-1_0.html#RFC3966">RFC
-	 * 3966</a> &#91;RFC3966&#93; extension syntax, for example, +1 (604)
+	 * 3966</a> [RFC3966] extension syntax, for example, +1 (604)
 	 * 555-1234;ext=5678.
 	 */
 	default String getPhoneNumber() {
@@ -243,7 +243,7 @@ public interface OpenIdStandardClaims extends Claims, OpenIdSubClaim {
 	/**
 	 * End-User's preferred postal address. The value of the address member is a
 	 * JSON <a href=
-	 * "http://openid.net/specs/openid-connect-core-1_0.html#RFC4627">&#91;RFC4627&#93;</a>
+	 * "http://openid.net/specs/openid-connect-core-1_0.html#RFC4627">[RFC4627]</a>
 	 * structure containing some or all of the members defined in Section 5.1.1.
 	 */
 	OpenIdAddressClaims getAddress();
