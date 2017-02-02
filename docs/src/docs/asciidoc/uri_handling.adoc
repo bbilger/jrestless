@@ -1,9 +1,212 @@
 = URI Handling
 
-TODO explain URI handling (baseUri <-> requestUri)
+In JAX-RS there are two important URIs:
+
+. the base URI
+. the request URI
+
+The base URI defines where the web service is deployed at and
+the request URI is the URI that was used to hit a resource.
+
+The resource path that's actually relevant from a developer perspective can
+be defined as:
+
+```
+resourcePath = baseUri - requestUri
+```
+
+Let's use an example to explain the effect.
+
+[source,java]
+----
+@GET
+@Path("/users")
+public Response getUsersLatest() {
+  return ...;
+}
+@GET
+@Path("/v1/users")
+public Response getUsersV1() {
+  return ...;
+}
+// ...
+----
+
+[cols="4*", options="header"]
+|===
+|base URI
+|request URI
+|hit getUsersLatest
+|hit getUsersV1
+
+|https://example.com/
+|https://example.com/users
+|yes
+|no
+
+|https://example.com/
+|https://example.com/v1/users
+|no
+|yes
+
+|https://example.com/v1
+|https://example.com/v1/users
+|yes
+|no
+
+|https://example.com/v1
+|https://example.com/v1/v1/users
+|no
+|yes
+|===
 
 == AWS
 
 === API Gateway
 
-TODO mention diffs between custom and non-custom domains...
+In order to explain URI handling in JRestless for Gateway functions,
+let's assume we have following example given.
+
+The following API is defined in API Gateway:
+
+[source]
+----
+/
+  /users
+    ANY
+    /{proxy+}
+      ANY
+----
+
+The API is deployed to a stage called "dev" and is then available at
+https://APIID.execute-api.REGION.amazonaws.com/dev.
+
+The API is backed by the following JAX-RS resources:
+
+[source,java]
+----
+@GET
+@Path("/users")
+public Response getUsers(@Context UriInfo uriInfo,
+                         @HeaderParam("Host") String host,
+                         @Context GatewayRequest gatewayRequest) {
+  LOG.info("baseUri: " + uriInfo.getBaseUri());
+  LOG.info("requestUri: " + uriInfo.getRequestUri());
+  LOG.info("host: " + host);
+  LOG.info("path: " + gatewayRequest.getPath());
+  LOG.info("resource: " + gatewayRequest.getResource());
+  LOG.info("stage: " + gatewayRequest.getRequestContext().getStage());
+  return ...;
+}
+----
+
+==== amazonaws.com
+
+Invoking the endpoints will result in the following log output
+
+[source,bash]
+----
+curl https://APIID.execute-api.REGION.amazonaws.com/dev/users
+# baseUri:    https://APIID.execute-api.REGION.amazonaws.com/dev/
+# requestUri: https://APIID.execute-api.REGION.amazonaws.com/dev/users
+# host:       APIID.execute-api.REGION.amazonaws.com
+# path:       /users
+# resource:   /users
+# stage:      dev
+----
+
+Since JRestless detected that it's getting invoked from an "amazonaws.com" domain,
+it constructs the URIs as follows:
+
+```
+baseUri = "https://" + host + "/" + stage + "/"
+requestUri = "https://" + host + "/" + stage + "/" + path
+```
+
+==== Custom Domain
+
+Things get a little more complicated if a resource gets invoked from a custom domain.
+
+There are two configuration parameters in the API Mappings section on the Custom Domain Names tab.
+
+. Base Path
+. Stage
+
+Let's say we have a custom domain "api.example.com" and want to invoke our resources.
+
+So now let's see how JRestless behaves with different Base Path and Stage configurations.
+
+====
+
+[source,bash]
+----
+# Base Path:  (none)
+# Stage:      dev
+curl https://api.examples.com/users
+# baseUri:    https://api.example.com/
+# requestUri: https://api.example.com/users
+# host:       api.examples.com
+# path:       /users
+# resource:   /users
+# stage:      dev
+----
+
+Since no Base Path is defined and it's mapped directly to the dev Stage,
+the path matches with the resource and the URIs are constructed as follows:
+
+```
+baseUri = "https://" + host + "/"
+requestUri = "https://" + host + "/" + path
+```
+====
+
+====
+[source,bash]
+----
+# Base Path:  v1
+# Stage:      dev
+curl https://api.examples.com/v1/users
+# baseUri:    https://api.example.com/v1/
+# requestUri: https://api.example.com/v1/users
+# host:       api.examples.com
+# path:       /v1/users
+# resource:   /users
+# stage:      dev
+----
+
+The resource and the path differ exactly by the set base path
+if a base path is configured and it's mapped directly to a stage.
+So the URIs will be constructed as follows:
+
+```
+basePath = path - resolve(resource)
+baseUri = "https://" + host + "/" + basePath + "/"
+requestUri = "https://" + host + "/" + path
+```
+====
+
+
+====
+
+[source,bash]
+----
+# Base Path:  v1
+# Stage:      (none)
+curl https://api.examples.com/v1/dev/users
+# baseUri:    https://api.example.com/v1/
+# requestUri: https://api.example.com/v1/users
+# host:       api.examples.com
+# path:       /v1/dev/users
+# resource:   /users
+# stage:      dev
+----
+
+The resource and the path by the set base path and the stage (unset but part of the invcation URL).
+So the URIs will be constructed as follows:
+
+```
+basePath = path - resolve(resource)
+baseUri = "https://" + host + "/" + basePath + "/"
+requestUri = "https://" + host + "/" + path
+```
+====
