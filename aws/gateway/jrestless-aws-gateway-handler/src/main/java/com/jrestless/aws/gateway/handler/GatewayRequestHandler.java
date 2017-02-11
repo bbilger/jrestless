@@ -95,6 +95,8 @@ public abstract class GatewayRequestHandler
 			entityStream = new ByteArrayInputStream(new byte[0]);
 		}
 		RequestAndBaseUri requestAndBaseUri = getRequestAndBaseUri(requestAndLambdaContext);
+		LOG.trace("passing baseUri='{}' and requestUri='{}' to the container", requestAndBaseUri.getBaseUri(),
+				requestAndBaseUri.getRequestUri());
 		return new DefaultJRestlessContainerRequest(requestAndBaseUri, request.getHttpMethod(), entityStream,
 				HeaderUtils.expandHeaders(request.getHeaders()));
 	}
