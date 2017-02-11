@@ -287,6 +287,7 @@ public final class CorsFilter implements ContainerRequestFilter, ContainerRespon
 		try {
 			return new URI(uri);
 		} catch (URISyntaxException e) {
+			LOG.trace("invalid uri", e);
 			return null;
 		}
 	}

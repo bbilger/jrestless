@@ -50,11 +50,22 @@ public class DefaultSameOriginPolicy implements SameOriginPolicy {
 		target.append(host);
 
 		int port = requestUri.getPort();
-		if (port != -1 && ("http".equals(scheme) && port != DEFAULT_HTTP_PORT
-				|| "https".equals(scheme) && port != DEFAULT_HTTPS_PORT)) {
+		if (port != -1 && !isDefaultPort(scheme, port)) {
 			target.append(":");
 			target.append(port);
 		}
 		return origin.equalsIgnoreCase(target.toString());
+	}
+
+	private static boolean isDefaultPort(String scheme, int port) {
+		return isDefaultHttpPort(scheme, port) || isDefaultHttpsPort(scheme, port);
+	}
+
+	private static boolean isDefaultHttpPort(String scheme, int port) {
+		return "http".equals(scheme) && port == DEFAULT_HTTP_PORT;
+	}
+
+	private static boolean isDefaultHttpsPort(String scheme, int port) {
+		return "https".equals(scheme) && port == DEFAULT_HTTPS_PORT;
 	}
 }
