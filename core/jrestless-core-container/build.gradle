@@ -18,3 +18,9 @@ dependencies {
 		libraries.jersey_test_grizzly
 	)
 }
+
+test {
+	systemProperties = [
+		'sun.net.http.allowRestrictedHeaders': 'true'
+	]
+}
