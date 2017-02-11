@@ -37,7 +37,7 @@ import javax.ws.rs.core.UriInfo;
  *
  */
 @PreMatching
-public class ApplicationPathFilter implements ContainerRequestFilter {
+public final class ApplicationPathFilter implements ContainerRequestFilter {
 
 	private final String applicationPath;
 
