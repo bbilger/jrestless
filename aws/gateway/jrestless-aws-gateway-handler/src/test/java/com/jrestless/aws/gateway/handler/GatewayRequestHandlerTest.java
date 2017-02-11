@@ -52,7 +52,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.jrestless.aws.AbstractLambdaContextReferencingBinder;
 import com.jrestless.aws.gateway.io.DefaultGatewayRequest;
-import com.jrestless.aws.gateway.io.GatewayBinaryResponseCheckFilter;
+import com.jrestless.aws.gateway.io.GatewayBinaryResponseFilter;
 import com.jrestless.aws.gateway.io.GatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayResponse;
 import com.jrestless.aws.gateway.util.GatewayRequestBuilder;
@@ -249,7 +249,7 @@ public class GatewayRequestHandlerTest {
 	public void testResponseWriterFiltersInternalBinaryHeader() throws IOException {
 		Map<String, List<String>> headers = new HashMap<>();
 		headers.put("a_k", Collections.singletonList("a_v"));
-		headers.put(GatewayBinaryResponseCheckFilter.HEADER_BINARY_RESPONSE, Collections.singletonList("true"));
+		headers.put(GatewayBinaryResponseFilter.HEADER_BINARY_RESPONSE, Collections.singletonList("true"));
 		headers.put("b_k", Collections.singletonList("b_v"));
 		SimpleResponseWriter<GatewayResponse> responseWriter = gatewayHandler.createResponseWriter(null);
 		responseWriter.writeResponse(Status.OK, headers, new ByteArrayOutputStream());
@@ -259,7 +259,7 @@ public class GatewayRequestHandlerTest {
 	@Test
 	public void testResponseWriterSetsBase64EncodedFlagIfExactlyOneBinaryHeaderSetToTrue() throws IOException {
 		Map<String, List<String>> headers = new HashMap<>();
-		headers.put(GatewayBinaryResponseCheckFilter.HEADER_BINARY_RESPONSE, Collections.singletonList("true"));
+		headers.put(GatewayBinaryResponseFilter.HEADER_BINARY_RESPONSE, Collections.singletonList("true"));
 		SimpleResponseWriter<GatewayResponse> responseWriter = gatewayHandler.createResponseWriter(null);
 		responseWriter.writeResponse(Status.OK, headers, new ByteArrayOutputStream());
 		assertTrue(responseWriter.getResponse().isIsBase64Encoded());
@@ -268,7 +268,7 @@ public class GatewayRequestHandlerTest {
 	@Test
 	public void testResponseWriterDoesntSetBase64EncodedFlagIfMultipleBinaryHeadersSet() throws IOException {
 		Map<String, List<String>> headers = new HashMap<>();
-		headers.put(GatewayBinaryResponseCheckFilter.HEADER_BINARY_RESPONSE, ImmutableList.of("true", "true"));
+		headers.put(GatewayBinaryResponseFilter.HEADER_BINARY_RESPONSE, ImmutableList.of("true", "true"));
 		SimpleResponseWriter<GatewayResponse> responseWriter = gatewayHandler.createResponseWriter(null);
 		responseWriter.writeResponse(Status.OK, headers, new ByteArrayOutputStream());
 		assertFalse(responseWriter.getResponse().isIsBase64Encoded());
@@ -285,7 +285,7 @@ public class GatewayRequestHandlerTest {
 	@Test
 	public void testResponseWriterDoesntSetBase64EncodedFlagIfBinaryHeaderSetToFalse() throws IOException {
 		Map<String, List<String>> headers = new HashMap<>();
-		headers.put(GatewayBinaryResponseCheckFilter.HEADER_BINARY_RESPONSE, Collections.singletonList("false"));
+		headers.put(GatewayBinaryResponseFilter.HEADER_BINARY_RESPONSE, Collections.singletonList("false"));
 		SimpleResponseWriter<GatewayResponse> responseWriter = gatewayHandler.createResponseWriter(null);
 		responseWriter.writeResponse(Status.OK, headers, new ByteArrayOutputStream());
 		assertFalse(responseWriter.getResponse().isIsBase64Encoded());

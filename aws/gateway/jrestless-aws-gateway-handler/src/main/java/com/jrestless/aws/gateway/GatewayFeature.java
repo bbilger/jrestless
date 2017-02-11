@@ -20,7 +20,7 @@ import javax.ws.rs.core.FeatureContext;
 
 import com.jrestless.aws.AwsFeature;
 import com.jrestless.aws.gateway.io.GatewayBinaryReadInterceptor;
-import com.jrestless.aws.gateway.io.GatewayBinaryResponseCheckFilter;
+import com.jrestless.aws.gateway.io.GatewayBinaryResponseFilter;
 import com.jrestless.aws.gateway.io.GatewayBinaryWriteInterceptor;
 import com.jrestless.aws.gateway.security.CognitoUserPoolAuthorizerFilter;
 import com.jrestless.aws.gateway.security.CustomAuthorizerFilter;
@@ -31,7 +31,7 @@ import com.jrestless.aws.gateway.security.CustomAuthorizerFilter;
  * <ul>
  * <li>{@link AwsFeature}
  * <li>{@link GatewayBinaryReadInterceptor}
- * <li>{@link GatewayBinaryResponseCheckFilter}
+ * <li>{@link GatewayBinaryResponseFilter}
  * <li>{@link GatewayBinaryWriteInterceptor}
  * <li>{@link CustomAuthorizerFilter}
  * <li>{@link CognitoUserPoolAuthorizerFilter}
@@ -45,7 +45,7 @@ public class GatewayFeature implements Feature {
 	@Override
 	public boolean configure(FeatureContext context) {
 		context.register(GatewayBinaryReadInterceptor.class);
-		context.register(GatewayBinaryResponseCheckFilter.class);
+		context.register(GatewayBinaryResponseFilter.class);
 		context.register(GatewayBinaryWriteInterceptor.class);
 		context.register(CustomAuthorizerFilter.class);
 		context.register(CognitoUserPoolAuthorizerFilter.class);

@@ -81,7 +81,7 @@ import com.google.common.collect.ImmutableMap;
 import com.jrestless.aws.gateway.GatewayFeature;
 import com.jrestless.aws.gateway.filter.DynamicProxyBasePathFilter;
 import com.jrestless.aws.gateway.io.DefaultGatewayRequest;
-import com.jrestless.aws.gateway.io.GatewayBinaryResponseCheckFilter;
+import com.jrestless.aws.gateway.io.GatewayBinaryResponseFilter;
 import com.jrestless.aws.gateway.io.GatewayIdentity;
 import com.jrestless.aws.gateway.io.GatewayRequest;
 import com.jrestless.aws.gateway.io.GatewayRequestContext;
@@ -230,10 +230,10 @@ public class GatewayRequestObjectHandlerIntTest {
 	}
 
 	@Test
-	public void testBase64EncodingWithContentEncoding() throws IOException {
+	public void testBinaryBase64EncodingWithContentEncoding() throws IOException {
 		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
 				.httpMethod("GET")
-				.resource("/test-string")
+				.resource("/byte-array")
 				.headers(ImmutableMap.of(HttpHeaders.ACCEPT_ENCODING, "gzip"))
 				.build();
 
@@ -242,6 +242,21 @@ public class GatewayRequestObjectHandlerIntTest {
 		byte[] bytes = Base64.getDecoder().decode(response.getBody());
 		InputStream unzipStream = new GZIPInputStream(new ByteArrayInputStream(bytes));
 		assertEquals("test", new String(toBytes(unzipStream)));
+		assertNotNull(response.getHeaders().get(HttpHeaders.CONTENT_ENCODING));
+	}
+
+	@Test
+	public void testNonBinaryNonBase64EncodingWithContentEncoding() throws IOException {
+		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+				.httpMethod("GET")
+				.resource("/test-string")
+				.headers(ImmutableMap.of(HttpHeaders.ACCEPT_ENCODING, "gzip"))
+				.build();
+
+		GatewayResponse response = handler.handleRequest(request, context);
+		assertFalse(response.isIsBase64Encoded());
+		assertEquals("test", new String(response.getBody()));
+		assertNull(response.getHeaders().get(HttpHeaders.CONTENT_ENCODING));
 	}
 
 	private byte[] toBytes(InputStream is) throws IOException {
@@ -263,7 +278,7 @@ public class GatewayRequestObjectHandlerIntTest {
 		GatewayResponse response = handler.handleRequest(request, context);
 		assertTrue(response.isIsBase64Encoded());
 		assertEquals(Base64.getEncoder().encodeToString("test".getBytes()), response.getBody());
-		assertFalse(response.getHeaders().containsKey(GatewayBinaryResponseCheckFilter.HEADER_BINARY_RESPONSE));
+		assertFalse(response.getHeaders().containsKey(GatewayBinaryResponseFilter.HEADER_BINARY_RESPONSE));
 	}
 
 	@Test

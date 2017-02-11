@@ -26,7 +26,7 @@ import javax.ws.rs.ext.WriterInterceptorContext;
 
 /**
  * Write interceptor that encodes the response in base64 if the first
- * {@link GatewayBinaryResponseCheckFilter#HEADER_BINARY_RESPONSE
+ * {@link GatewayBinaryResponseFilter#HEADER_BINARY_RESPONSE
  * X-JRestlessAwsApiGatewayBinaryResponse header} is set to true.
  * <p>
  * The set priority makes sure that the interceptor is called after any other
@@ -51,7 +51,7 @@ public class GatewayBinaryWriteInterceptor implements WriterInterceptor {
 
 	@Override
 	public void aroundWriteTo(WriterInterceptorContext context) throws IOException {
-		Object headerValue = context.getHeaders().getFirst(GatewayBinaryResponseCheckFilter.HEADER_BINARY_RESPONSE);
+		Object headerValue = context.getHeaders().getFirst(GatewayBinaryResponseFilter.HEADER_BINARY_RESPONSE);
 		if (Boolean.TRUE.equals(headerValue)) {
 			context.setOutputStream(Base64.getEncoder().wrap(context.getOutputStream()));
 		}

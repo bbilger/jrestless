@@ -15,7 +15,7 @@
  */
 package com.jrestless.aws.gateway.handler;
 
-import static com.jrestless.aws.gateway.io.GatewayBinaryResponseCheckFilter.HEADER_BINARY_RESPONSE;
+import static com.jrestless.aws.gateway.io.GatewayBinaryResponseFilter.HEADER_BINARY_RESPONSE;
 import static java.util.Objects.requireNonNull;
 
 import java.io.ByteArrayInputStream;
