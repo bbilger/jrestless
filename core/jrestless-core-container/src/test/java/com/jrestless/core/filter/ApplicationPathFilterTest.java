@@ -12,13 +12,12 @@ import java.net.URI;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.junit.Test;
-
-import com.jrestless.core.filter.ApplicationPathFilter;
 
 public class ApplicationPathFilterTest {
 
@@ -28,18 +27,18 @@ public class ApplicationPathFilterTest {
 
 	@Test
 	public void filter_NoAppPathGiven_ShouldAccessRequestContext() throws IOException {
-		new ApplicationPathFilter(new ApplicationWithoutPath()).filter(null);
+		createApplicationPathFilter(new ApplicationWithoutPath()).filter(null);
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void filter_AppPathGiven_ShouldAccessRequestContext() throws IOException {
-		new ApplicationPathFilter(new ApplicationPathTest()).filter(null);
+		createApplicationPathFilter(new ApplicationPathTest()).filter(null);
 	}
 
 	@Test
 	public void filter_EmptyAppPathGiven_ShouldNotUpdateBaseUri() throws IOException {
 		ContainerRequestContext reqContext = mockRequestContext(EXISTING_BASE_URI, REQUEST_URI);
-		new ApplicationPathFilter(new ApplicationPathEmpty()).filter(reqContext);
+		createApplicationPathFilter(new ApplicationPathEmpty()).filter(reqContext);
 		verify(reqContext, never()).setRequestUri(any(), any());
 		verify(reqContext, never()).setRequestUri(any());
 	}
@@ -47,7 +46,7 @@ public class ApplicationPathFilterTest {
 	@Test
 	public void filter_NoAppPathGiven_ShouldNotUpdateBaseUri() throws IOException {
 		ContainerRequestContext reqContext = mockRequestContext(EXISTING_BASE_URI, REQUEST_URI);
-		new ApplicationPathFilter(new ApplicationWithoutPath()).filter(reqContext);
+		createApplicationPathFilter(new ApplicationWithoutPath()).filter(reqContext);
 		verify(reqContext, never()).setRequestUri(any(), any());
 		verify(reqContext, never()).setRequestUri(any());
 	}
@@ -55,7 +54,7 @@ public class ApplicationPathFilterTest {
 	@Test
 	public void filter_NoAppPathRootGiven_ShouldNotUpdateBaseUri() throws IOException {
 		ContainerRequestContext reqContext = mockRequestContext(EXISTING_BASE_URI, REQUEST_URI);
-		new ApplicationPathFilter(new ApplicationPathRoot()).filter(reqContext);
+		createApplicationPathFilter(new ApplicationPathRoot()).filter(reqContext);
 		verify(reqContext, never()).setRequestUri(any(), any());
 		verify(reqContext, never()).setRequestUri(any());
 	}
@@ -63,7 +62,7 @@ public class ApplicationPathFilterTest {
 	@Test
 	public void filter_NullAppConfigGiven_ShouldNotUpdateBaseUri() throws IOException {
 		ContainerRequestContext reqContext = mockRequestContext(EXISTING_BASE_URI, REQUEST_URI);
-		new ApplicationPathFilter(null).filter(reqContext);
+		createApplicationPathFilter(null).filter(reqContext);
 		verify(reqContext, never()).setRequestUri(any(), any());
 		verify(reqContext, never()).setRequestUri(any());
 	}
@@ -71,7 +70,7 @@ public class ApplicationPathFilterTest {
 	@Test
 	public void filter_AppPathGiven_ShouldUpdateBaseUri() throws IOException {
 		ContainerRequestContext reqContext = mockRequestContext(EXISTING_BASE_URI, REQUEST_URI);
-		new ApplicationPathFilter(new ApplicationPathTest()).filter(reqContext);
+		createApplicationPathFilter(new ApplicationPathTest()).filter(reqContext);
 		verify(reqContext, times(1)).setRequestUri(TEST_UPDATED_BASE_URI, REQUEST_URI);
 		verify(reqContext, never()).setRequestUri(any());
 	}
@@ -79,7 +78,7 @@ public class ApplicationPathFilterTest {
 	@Test
 	public void filter_AppPathWithSlashGiven_ShouldUpdateBaseUriWithoutSlashes() throws IOException {
 		ContainerRequestContext reqContext = mockRequestContext(EXISTING_BASE_URI, REQUEST_URI);
-		new ApplicationPathFilter(new ApplicationPathTestWithLeadingAndTrailingSlashes()).filter(reqContext);
+		createApplicationPathFilter(new ApplicationPathTestWithLeadingAndTrailingSlashes()).filter(reqContext);
 		verify(reqContext, times(1)).setRequestUri(TEST_UPDATED_BASE_URI, REQUEST_URI);
 		verify(reqContext, never()).setRequestUri(any());
 	}
@@ -87,7 +86,7 @@ public class ApplicationPathFilterTest {
 	@Test
 	public void filter_AppPathWithSlashAsteriskGiven_ShouldUpdateBaseUriWithoutSlashesAsterisk() throws IOException {
 		ContainerRequestContext reqContext = mockRequestContext(EXISTING_BASE_URI, REQUEST_URI);
-		new ApplicationPathFilter(new ApplicationPathTestSlashAsterisk()).filter(reqContext);
+		createApplicationPathFilter(new ApplicationPathTestSlashAsterisk()).filter(reqContext);
 		verify(reqContext, times(1)).setRequestUri(TEST_UPDATED_BASE_URI, REQUEST_URI);
 		verify(reqContext, never()).setRequestUri(any());
 	}
@@ -95,7 +94,7 @@ public class ApplicationPathFilterTest {
 	@Test
 	public void filter_AppPathWithMultiplePathsGiven_ShouldUpdateBaseUriWithAllPaths() throws IOException {
 		ContainerRequestContext reqContext = mockRequestContext(EXISTING_BASE_URI, REQUEST_URI);
-		new ApplicationPathFilter(new ApplicationPath1AndPath2()).filter(reqContext);
+		createApplicationPathFilter(new ApplicationPath1AndPath2()).filter(reqContext);
 		verify(reqContext, times(1)).setRequestUri(URI.create("existing-base-uri/path1/path2/"), REQUEST_URI);
 		verify(reqContext, never()).setRequestUri(any());
 	}
@@ -109,6 +108,12 @@ public class ApplicationPathFilterTest {
 		when(reqContext.getUriInfo()).thenReturn(uriInfo);
 
 		return reqContext;
+	}
+
+	private static ContainerRequestFilter createApplicationPathFilter(Application app) {
+		ApplicationPathFilter filter = new ApplicationPathFilter();
+		filter.setApplication(app);
+		return filter;
 	}
 
 	private static class ApplicationWithoutPath extends Application {

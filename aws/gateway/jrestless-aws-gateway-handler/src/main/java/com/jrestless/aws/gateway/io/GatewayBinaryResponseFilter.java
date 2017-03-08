@@ -21,12 +21,12 @@ import java.io.InputStream;
 
 import javax.activation.DataSource;
 import javax.annotation.Priority;
-import javax.inject.Inject;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Configuration;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.StreamingOutput;
 
@@ -67,12 +67,16 @@ public class GatewayBinaryResponseFilter implements ContainerResponseFilter {
 
 	static final int PRIORITY_OFFSET = 100;
 
-	private final boolean binaryCompressionOnly;
+	private Configuration configuration;
 
-	@Inject
-	GatewayBinaryResponseFilter(Configuration configuration) {
+	@Context
+	void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
+	}
+
+	private boolean isBinaryCompressionOnly() {
 		Object binaryCompressionOnlyProp = configuration.getProperty(BINARY_COMPRESSION_ONLY_PROPERTY);
-		binaryCompressionOnly = binaryCompressionOnlyProp == null
+		return binaryCompressionOnlyProp == null
 				|| PropertiesHelper.isProperty(binaryCompressionOnlyProp);
 	}
 
@@ -89,6 +93,7 @@ public class GatewayBinaryResponseFilter implements ContainerResponseFilter {
 		 * "Content-Encoding" header is available (and thus will be compressed)
 		 * and binaryCompressionOnly is disabled
 		 */
+		boolean binaryCompressionOnly = isBinaryCompressionOnly();
 		if (binaryResponse || compressedResponse && !binaryCompressionOnly) {
 			responseContext.getHeaders().putSingle(HEADER_BINARY_RESPONSE, true);
 		}

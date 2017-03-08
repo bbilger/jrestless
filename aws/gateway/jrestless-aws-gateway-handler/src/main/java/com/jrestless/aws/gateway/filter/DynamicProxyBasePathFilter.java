@@ -18,10 +18,10 @@ package com.jrestless.aws.gateway.filter;
 import java.io.IOException;
 import java.net.URI;
 
-import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
 import com.jrestless.aws.gateway.io.GatewayRequest;
@@ -63,10 +63,10 @@ public class DynamicProxyBasePathFilter implements ContainerRequestFilter {
 	private static final String PROXY_END = "+}";
 
 	// request-scoped proxy
-	private final GatewayRequest gatwayRequest;
+	private GatewayRequest gatwayRequest;
 
-	@Inject
-	DynamicProxyBasePathFilter(GatewayRequest gatwayRequest) {
+	@Context
+	void setGatewayRequest(GatewayRequest gatwayRequest) {
 		this.gatwayRequest = gatwayRequest;
 	}
 

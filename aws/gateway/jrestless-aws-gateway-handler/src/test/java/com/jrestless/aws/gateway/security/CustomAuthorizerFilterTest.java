@@ -20,7 +20,9 @@ public class CustomAuthorizerFilterTest extends AuthorizerFilterTest {
 
 	@Override
 	AuthorizerFilter createCognitoAuthorizerFilter(GatewayRequest gatewayRequest) {
-		return new CustomAuthorizerFilter(gatewayRequest);
+		CustomAuthorizerFilter filter = new CustomAuthorizerFilter();
+		filter.setGatewayRequest(gatewayRequest);
+		return filter;
 	}
 
 	@Test

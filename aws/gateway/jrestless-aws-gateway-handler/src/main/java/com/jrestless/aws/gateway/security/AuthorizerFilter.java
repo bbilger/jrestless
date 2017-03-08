@@ -17,7 +17,6 @@ package com.jrestless.aws.gateway.security;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -29,11 +28,7 @@ import com.jrestless.aws.gateway.io.GatewayRequestContext;
 
 abstract class AuthorizerFilter implements ContainerRequestFilter {
 
-	private final GatewayRequest gatewayRequest;
-
-	AuthorizerFilter(@Nonnull GatewayRequest gatewayRequest) {
-		this.gatewayRequest = Objects.requireNonNull(gatewayRequest);
-	}
+	protected abstract GatewayRequest getGatewayRequest();
 
 	@Override
 	public final void filter(ContainerRequestContext requestContext) throws IOException {
@@ -47,7 +42,7 @@ abstract class AuthorizerFilter implements ContainerRequestFilter {
 	}
 
 	private Map<String, Object> getAuthorizerData() {
-		GatewayRequestContext gatewayRequestContext = gatewayRequest.getRequestContext();
+		GatewayRequestContext gatewayRequestContext = getGatewayRequest().getRequestContext();
 		if (gatewayRequestContext == null) {
 			return null;
 		}

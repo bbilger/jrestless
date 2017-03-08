@@ -81,7 +81,10 @@ public class DynamicProxyBasePathFilterTest {
 	}
 
 	private DynamicProxyBasePathFilter createFilter(String resource) {
-		return new DynamicProxyBasePathFilter(createGatewayRequest(resource));
+		DynamicProxyBasePathFilter filter = new DynamicProxyBasePathFilter();
+		filter.setGatewayRequest(createGatewayRequest(resource));
+		return filter;
+
 	}
 
 	private static GatewayRequest createGatewayRequest(String resource) {

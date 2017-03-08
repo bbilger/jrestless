@@ -18,12 +18,12 @@ package com.jrestless.core.filter;
 import java.io.IOException;
 import java.net.URI;
 
-import javax.inject.Inject;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
@@ -39,15 +39,16 @@ import javax.ws.rs.core.UriInfo;
 @PreMatching
 public final class ApplicationPathFilter implements ContainerRequestFilter {
 
-	private final String applicationPath;
+	private Application applicationConfig;
 
-	@Inject
-	ApplicationPathFilter(Application applicationConfig) {
-		this.applicationPath = getApplicationPath(applicationConfig);
+	@Context
+	void setApplication(Application applicationConfig) {
+		this.applicationConfig = applicationConfig;
 	}
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
+		String applicationPath = getApplicationPath();
 		if (applicationPath != null) {
 			UriInfo requestUriInfo = requestContext.getUriInfo();
 			UriBuilder baseUriBuilder = requestUriInfo.getBaseUriBuilder();
@@ -58,6 +59,10 @@ public final class ApplicationPathFilter implements ContainerRequestFilter {
 			URI requestUri = requestUriInfo.getRequestUri();
 			requestContext.setRequestUri(updatedBaseUri, requestUri);
 		}
+	}
+
+	private String getApplicationPath() {
+		return getApplicationPath(applicationConfig);
 	}
 
 	private static String getApplicationPath(Application applicationConfig) {

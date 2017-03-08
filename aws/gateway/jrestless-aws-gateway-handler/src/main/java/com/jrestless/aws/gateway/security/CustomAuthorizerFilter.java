@@ -19,8 +19,8 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Priority;
-import javax.inject.Inject;
 import javax.ws.rs.Priorities;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 
 import org.slf4j.Logger;
@@ -49,9 +49,16 @@ public class CustomAuthorizerFilter extends AuthorizerFilter {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CognitoUserPoolAuthorizerFilter.class);
 
-	@Inject
-	public CustomAuthorizerFilter(GatewayRequest gatewayRequest) {
-		super(gatewayRequest);
+	private GatewayRequest gatewayRequest;
+
+	@Context
+	void setGatewayRequest(GatewayRequest gatewayRequest) {
+		this.gatewayRequest = gatewayRequest;
+	}
+
+	@Override
+	protected GatewayRequest getGatewayRequest() {
+		return gatewayRequest;
 	}
 
 	/**

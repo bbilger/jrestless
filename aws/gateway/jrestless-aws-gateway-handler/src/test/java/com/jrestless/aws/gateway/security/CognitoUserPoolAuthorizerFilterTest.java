@@ -28,7 +28,9 @@ public class CognitoUserPoolAuthorizerFilterTest extends AuthorizerFilterTest {
 
 	@Override
 	AuthorizerFilter createCognitoAuthorizerFilter(GatewayRequest gatewayRequest) {
-		return new CognitoUserPoolAuthorizerFilter(gatewayRequest);
+		CognitoUserPoolAuthorizerFilter filter = new CognitoUserPoolAuthorizerFilter();
+		filter.setGatewayRequest(gatewayRequest);
+		return filter;
 	}
 
 	@Test

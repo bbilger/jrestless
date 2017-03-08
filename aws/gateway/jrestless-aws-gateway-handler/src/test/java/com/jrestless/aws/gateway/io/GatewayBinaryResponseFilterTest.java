@@ -149,6 +149,8 @@ public class GatewayBinaryResponseFilterTest {
 		Configuration config = mock(Configuration.class);
 		when(config.getProperty(GatewayBinaryResponseFilter.BINARY_COMPRESSION_ONLY_PROPERTY))
 				.thenReturn(binaryCompressionOnly);
-		return new GatewayBinaryResponseFilter(config);
+		GatewayBinaryResponseFilter filter = new GatewayBinaryResponseFilter();
+		filter.setConfiguration(config);
+		return filter;
 	}
 }
