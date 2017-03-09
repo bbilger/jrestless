@@ -291,10 +291,11 @@ Distributed under Apache 2.0 license. See [License](https://github.com/bbilger/j
 
 ### SonarQube Metrics
 
-[![Coverage](https://img.shields.io/sonar/http/sonarqube.com/jrestless/coverage.svg?maxAge=60&style=flat-square&label=SonarQube%20Coverage)](https://sonarqube.com/component_measures/domain/Coverage?id=jrestless)
-[![Bugs](https://img.shields.io/sonar/http/sonarqube.com/jrestless/bugs.svg?maxAge=60&style=flat-square&label=SonarQube%20Bugs)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=BUG)
-[![Vulnerabilities](https://img.shields.io/sonar/http/sonarqube.com/jrestless/vulnerabilities.svg?maxAge=60&style=flat-square&label=SonarQube%20Vulnerabilities)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=VULNERABILITY)
-[![Tests](https://img.shields.io/sonar/http/sonarqube.com/jrestless/tests.svg?maxAge=60&style=flat-square&label=SonarQube%20Tests)](https://sonarqube.com/component_measures/metric/tests/list?id=jrestless)
-[![Duplicated Blocks](https://img.shields.io/sonar/http/sonarqube.com/jrestless/duplicated_blocks.svg?maxAge=60&style=flat-square&label=SonarQube%20Duplicated%20Blocks)](https://sonarqube.com/component_measures/metric/duplicated_blocks/list?id=jrestless)
-[![Technical Debt](https://img.shields.io/sonar/http/sonarqube.com/jrestless/tech_debt.svg?maxAge=60&style=flat-square&label=SonarQube Technical Debt)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|facetMode=effort|types=CODE_SMELL)
-[![Code Smells](https://img.shields.io/sonar/http/sonarqube.com/jrestless/code_smells.svg?maxAge=60&style=flat-square&label=SonarQube%20Code%20Smells)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=CODE_SMELL)
+[![Quality Gate](https://sonarqube.com/api/badges/gate?key=jrestless)](https://sonarqube.com/dashboard?id=jrestless)
+[![Coverage](https://sonarqube.com/api/badges/measure?key=jrestless&metric=coverage&template=FLAT)](https://sonarqube.com/component_measures/domain/Coverage?id=jrestless)
+[![Bugs](https://sonarqube.com/api/badges/measure?key=jrestless&metric=bugs&template=FLAT)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=BUG)
+[![Vulnerabilities](https://sonarqube.com/api/badges/measure?key=jrestless&metric=vulnerabilities&template=FLAT)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=VULNERABILITY)
+[![Tests](https://sonarqube.com/api/badges/measure?key=jrestless&metric=tests&template=FLAT)](https://sonarqube.com/component_measures/metric/tests/list?id=jrestless)
+[![Duplicated Blocks](https://sonarqube.com/api/badges/measure?key=jrestless&metric=duplicated_lines_density&template=FLAT)](https://sonarqube.com/component_measures/metric/duplicated_blocks/list?id=jrestless)
+[![Technical Debt](https://sonarqube.com/api/badges/measure?key=jrestless&metric=sqale_debt_ratio&template=FLAT)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|facetMode=effort|types=CODE_SMELL)
+[![Code Smells](https://sonarqube.com/api/badges/measure?key=jrestless&metric=code_smells&template=FLAT)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=CODE_SMELL)
