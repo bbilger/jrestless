@@ -31,6 +31,7 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,6 +64,8 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
 import org.glassfish.hk2.utilities.Binder;
 import org.glassfish.jersey.message.GZipEncoder;
@@ -110,6 +113,9 @@ public class GatewayRequestObjectHandlerIntTest {
 		config.register(TestResource.class);
 		config.register(EncodingFilter.class);
 		config.register(GZipEncoder.class);
+		config.register(SomeCheckedAppExceptionMapper.class);
+		config.register(SomeUncheckedAppExceptionMapper.class);
+		config.register(GlobalExceptionMapper.class);
 		GatewayRequestObjectHandlerImpl handler = new GatewayRequestObjectHandlerImpl();
 		handler.init(config);
 		handler.start();
@@ -476,6 +482,37 @@ public class GatewayRequestObjectHandlerIntTest {
 		verify(testService).requestUri(URI.create("https://api.example.com/a/p/uris"));
 	}
 
+	@Test
+	public void testSpecificCheckedException() {
+		testException("/specific-checked-exception", SomeCheckedAppExceptionMapper.class);
+	}
+
+	@Test
+	public void testSpecificUncheckedException() {
+		testException("/specific-unchecked-exception", SomeUncheckedAppExceptionMapper.class);
+	}
+
+	@Test
+	public void testUnspecificCheckedException() {
+		testException("/unspecific-checked-exception", GlobalExceptionMapper.class);
+	}
+
+	@Test
+	public void testUnspecificUncheckedException() {
+		testException("/unspecific-unchecked-exception", GlobalExceptionMapper.class);
+	}
+
+	private void testException(String resource, Class<? extends ExceptionMapper<?>> exceptionMapper) {
+		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+				.httpMethod("GET")
+				.resource(resource)
+				.build();
+
+		GatewayResponse response = handler.handleRequest(request, context);
+		assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatusCode());
+		assertEquals(exceptionMapper.getSimpleName(), response.getBody());
+	}
+
 	@Path("/")
 	@Singleton // singleton in order to test proxies
 	public static class TestResource {
@@ -622,6 +659,30 @@ public class GatewayRequestObjectHandlerIntTest {
 			service.baseUri(uriInfo.getBaseUri());
 			service.requestUri(uriInfo.getRequestUri());
 		}
+
+		@Path("specific-checked-exception")
+		@GET
+		public void throwSpecificCheckedException() throws SomeCheckedAppException {
+			throw new SomeCheckedAppException();
+		}
+
+		@Path("specific-unchecked-exception")
+		@GET
+		public void throwSpecificUncheckedException() {
+			throw new SomeUncheckedAppException();
+		}
+
+		@Path("unspecific-checked-exception")
+		@GET
+		public void throwUnspecificCheckedException() throws FileNotFoundException {
+			throw new FileNotFoundException();
+		}
+
+		@Path("unspecific-unchecked-exception")
+		@GET
+		public void throwUnspecificUncheckedException() {
+			throw new RuntimeException();
+		}
 	}
 
 	public static interface TestService {
@@ -674,5 +735,40 @@ public class GatewayRequestObjectHandlerIntTest {
 
 	@ApplicationPath("api")
 	public static class ApiResourceConfig extends ResourceConfig {
+	}
+
+	public static class SomeCheckedAppException extends Exception {
+		private static final long serialVersionUID = 1L;
+	}
+
+	@Provider
+	public static class SomeCheckedAppExceptionMapper implements ExceptionMapper<SomeCheckedAppException> {
+		@Override
+		public Response toResponse(SomeCheckedAppException exception) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR)
+					.entity(SomeCheckedAppExceptionMapper.class.getSimpleName()).build();
+		}
+	}
+
+	public static class SomeUncheckedAppException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+	}
+
+	@Provider
+	public static class SomeUncheckedAppExceptionMapper implements ExceptionMapper<SomeUncheckedAppException> {
+		@Override
+		public Response toResponse(SomeUncheckedAppException exception) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR)
+					.entity(SomeUncheckedAppExceptionMapper.class.getSimpleName()).build();
+		}
+	}
+
+	@Provider
+	public static class GlobalExceptionMapper implements ExceptionMapper<Exception> {
+		@Override
+		public Response toResponse(Exception exception) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(GlobalExceptionMapper.class.getSimpleName())
+					.build();
+		}
 	}
 }
