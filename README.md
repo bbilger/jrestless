@@ -116,7 +116,7 @@ repositories {
 }
 dependencies {
   compile(
-    'com.jrestless.aws:jrestless-aws-gateway-handler:0.4.0',
+    'com.jrestless.aws:jrestless-aws-gateway-handler:0.5.0',
     'org.glassfish.jersey.media:jersey-media-json-jackson:2.23'
   )
 }
