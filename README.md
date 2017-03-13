@@ -10,6 +10,16 @@ JRestless allows you to create serverless or rather AWS Lambda applications usin
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/bbilger/jrestless.svg?maxAge=60&style=flat-square)](https://github.com/bbilger/jrestless/issues?q=is%3Aissue+is%3Aclosed)
 [![License](https://img.shields.io/github/license/bbilger/jrestless.svg?maxAge=60&style=flat-square)](https://github.com/bbilger/jrestless/blob/master/LICENSE)
 
+SonarQube:
+[![SonarQube - Quality Gate](https://sonarqube.com/api/badges/gate?key=jrestless)](https://sonarqube.com/dashboard?id=jrestless)
+[![SonarQube - Coverage](https://sonarqube.com/api/badges/measure?key=jrestless&metric=coverage&template=FLAT)](https://sonarqube.com/component_measures/domain/Coverage?id=jrestless)
+[![SonarQube - Bugs](https://sonarqube.com/api/badges/measure?key=jrestless&metric=bugs&template=FLAT)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=BUG)
+[![SonarQube - Vulnerabilities](https://sonarqube.com/api/badges/measure?key=jrestless&metric=vulnerabilities&template=FLAT)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=VULNERABILITY)
+[![SonarQube - Tests](https://sonarqube.com/api/badges/measure?key=jrestless&metric=tests&template=FLAT)](https://sonarqube.com/component_measures/metric/tests/list?id=jrestless)
+[![SonarQube - Duplicated Blocks](https://sonarqube.com/api/badges/measure?key=jrestless&metric=duplicated_lines_density&template=FLAT)](https://sonarqube.com/component_measures/metric/duplicated_blocks/list?id=jrestless)
+[![SonarQube - Technical Debt](https://sonarqube.com/api/badges/measure?key=jrestless&metric=sqale_debt_ratio&template=FLAT)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|facetMode=effort|types=CODE_SMELL)
+[![SonarQube - Code Smells](https://sonarqube.com/api/badges/measure?key=jrestless&metric=code_smells&template=FLAT)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=CODE_SMELL)
+
 
 * [Description](#description)
 * [Motivation](#motivation)
@@ -23,7 +33,6 @@ JRestless allows you to create serverless or rather AWS Lambda applications usin
 * [Limitations](#limitations)
 * [Meta](#meta)
   * [License](#license)
-  * [SonarQube Metrics](#sonarqube-metrics)
 
 ## Description
 
@@ -292,14 +301,3 @@ All modules are available in jcenter.
 ### License
 
 Distributed under Apache 2.0 license. See [License](https://github.com/bbilger/jrestless/blob/master/LICENSE) for more information.
-
-### SonarQube Metrics
-
-[![Quality Gate](https://sonarqube.com/api/badges/gate?key=jrestless)](https://sonarqube.com/dashboard?id=jrestless)
-[![Coverage](https://sonarqube.com/api/badges/measure?key=jrestless&metric=coverage&template=FLAT)](https://sonarqube.com/component_measures/domain/Coverage?id=jrestless)
-[![Bugs](https://sonarqube.com/api/badges/measure?key=jrestless&metric=bugs&template=FLAT)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=BUG)
-[![Vulnerabilities](https://sonarqube.com/api/badges/measure?key=jrestless&metric=vulnerabilities&template=FLAT)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=VULNERABILITY)
-[![Tests](https://sonarqube.com/api/badges/measure?key=jrestless&metric=tests&template=FLAT)](https://sonarqube.com/component_measures/metric/tests/list?id=jrestless)
-[![Duplicated Blocks](https://sonarqube.com/api/badges/measure?key=jrestless&metric=duplicated_lines_density&template=FLAT)](https://sonarqube.com/component_measures/metric/duplicated_blocks/list?id=jrestless)
-[![Technical Debt](https://sonarqube.com/api/badges/measure?key=jrestless&metric=sqale_debt_ratio&template=FLAT)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|facetMode=effort|types=CODE_SMELL)
-[![Code Smells](https://sonarqube.com/api/badges/measure?key=jrestless&metric=code_smells&template=FLAT)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=CODE_SMELL)
