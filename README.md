@@ -20,6 +20,7 @@ SonarQube:
 [![SonarQube - Technical Debt](https://sonarqube.com/api/badges/measure?key=jrestless&metric=sqale_debt_ratio&template=FLAT)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|facetMode=effort|types=CODE_SMELL)
 [![SonarQube - Code Smells](https://sonarqube.com/api/badges/measure?key=jrestless&metric=code_smells&template=FLAT)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=CODE_SMELL)
 
+## Table of Contents
 
 * [Description](#description)
 * [Motivation](#motivation)
