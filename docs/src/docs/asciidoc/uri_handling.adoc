@@ -210,3 +210,94 @@ baseUri = "https://" + host + "/" + basePath + "/"
 requestUri = "https://" + host + "/" + path
 ```
 ====
+
+==== Static Application Path
+
+In some situations - especially when deploying an API to a non-custom domain (amazonaws.com) - it might be helpful to define an application path.
+
+Let's take the following example:
+
+[source,java]
+----
+@Path("/")
+public class Resource {
+  @GET
+  @Path("/users")
+  public Response getUsers() {
+    return ...;
+  }
+}
+----
+
+If we want to version our API, we could update the code as follows:
+
+[source,java]
+----
+@Path("/v1")
+public class Resource {
+  @GET
+  @Path("/users")
+  public Response getUsers() {
+    return ...;
+  }
+}
+----
+
+An alternative approach is to keep the code as it is and annotate our resource config with `@ApplicationPath("v1")` which basically adds the application path to the base URI. 
+
+[source,java]
+----
+@ApplicationPath("v1")
+public class CustomResourceConfig extends ResourceConfig {
+}
+public class RequestHandler extends GatewayRequestObjectHandler {
+  public RequestHandler() {
+    ResourceConfig config = new CustomResourceConfig();
+    config.register(GatewayFeature.class);
+    ...
+    init(config);
+    start();
+  }
+}
+@Path("/")
+public class Resource {
+  @GET
+  @Path("/users")
+  public Response getUsers() {
+    return ...;
+  }
+}
+----
+
+Note: The filter that adds support for the `@ApplicationPath` annotation is `com.jrestless.core.filter.ApplicationPathFilter`. It get's registered through `GatewayFeature` but it can be registered manually, too, if you don't want to use the feature.
+
+
+
+==== Dynamic Application Path
+
+In addition to setting a static application path, JRestless comes with a filter that supports dynamic application paths: `com.jrestless.aws.gateway.filter.DynamicProxyBasePathFilter`. This filter, however, must be registered explicitly since it does not get registered by `GatewayFeature`.
+
+Let's take the following example:
+
+[source,java]
+----
+@GET
+@Path("/users")
+public Response getUsersLatest() {
+  return ...;
+}
+@GET
+@Path("/v1/users")
+public Response getUsersV1() {
+  return ...;
+}
+// ...
+----
+
+When you define `ANY /{proxy+}` as API Gateway mapping, then both endpoints will be accessible. If you, however, define `ANY /v1/{proxy+}` as API Gateway mapping, the `/users` endpoint becomes inaccessible.
+
+The `DynamicProxyBasePathFilter` circumvents exactly this situation since it adds `v1` (everything before `/{proxy+}`) to the base URI and so `/users` becomes accessible at `/v1/users` (`#getUsersLatest()`) and `/v1/users` becomes accessible at `/v1/v1/users` (`#getUsersV1()`).
+
+While this example is a little hypothetical, it might be useful if you have split your API across multiple functions and want to bump the version of your complete API while you actually updated the code of one function/domain, only and want to keep the code of the other functions/domains untouched.
+
+It must be said, however, that this is mainly useful when using non-custom domains, only.
