@@ -40,9 +40,13 @@ The motivation for this project is to avoid a cloud vendor lock-in and to allow 
 ## Features
 
 - Almost all JAX-RS features can be used (JSON/XML/text/... requests/responses, container request/response filters, etc.). Example: [aws-gateway-showcase](https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-showcase)
-- Jersey extensions can be used. For example integration for **Spring**. Example: [aws-gateway-spring](https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-spring)
+- Jersey extensions can be used. For example:
+  - **Spring**: [aws-gateway-spring](https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-spring)
+  - **CDI**: [aws-gateway-cdi](https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-cdi)
+  - **Guice**: [aws-gateway-guice](https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-guice)
 - _AWS Gateway Functions_ can also consume and produce **binary** data. Example: [aws-gateway-binary](https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-binary)
 - _AWS Gateway Functions_ use the data added to the request by authorizers (_Custom Authorizers_ or _Cognito User Pool Authorizers_) to create a Principal ([CustomAuthorizerPrincipal](https://github.com/bbilger/jrestless/blob/master/aws/core/jrestless-aws-core/src/main/java/com/jrestless/aws/security/CustomAuthorizerPrincipal.java) or [CognitoUserPoolAuthorizerPrincipal](https://github.com/bbilger/jrestless/blob/master/aws/core/jrestless-aws-core/src/main/java/com/jrestless/aws/security/CognitoUserPoolAuthorizerPrincipal.java)) within the SecurityContext containing all claims. Examples: [aws-gateway-security-cognito-authorizer](https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-security-cognito-authorizer) and [aws-gateway-security-custom-authorizer](https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-security-custom-authorizer)
+- _AWS Gateway Functions_ can use a CORS filter. Example: [aws-gateway-cors](https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-cors-frontend)
 - Injection of provider and/or function type specific values via `@javax.ws.rs.core.Context` into resources and endpoints:
   - All AWS functions can inject `com.amazonaws.services.lambda.runtime.Context`.
   - _AWS Gateway Functions_ can also inject the raw request [GatewayRequest](https://github.com/bbilger/jrestless/blob/master/aws/gateway/jrestless-aws-gateway-core/src/main/java/com/jrestless/aws/gateway/io/GatewayRequest.java)
