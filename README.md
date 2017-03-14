@@ -156,8 +156,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 @Path("/sample")
 public class SampleResource {
@@ -167,7 +165,7 @@ public class SampleResource {
   public Response getHealthStatus() {
     return Response.ok(new HealthStatusResponse("up and running")).build();
   }
-  public static class HealthStatusResponse {
+  static class HealthStatusResponse {
     private final String statusMessage;
     HealthStatusResponse(String statusMessage) {
       this.statusMessage = statusMessage;
