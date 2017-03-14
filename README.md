@@ -92,7 +92,7 @@ Create a new function using `serverless`
 mkdir aws-gateway-usage-example
 cd aws-gateway-usage-example
 serverless create --template aws-java-gradle --name aws-gateway-usage-example
-rm -rf src/main/java/hello # remove the classes created by the template
+rm -rf src/main/java # remove the classes created by the template
 mkdir -p src/main/java/com/jrestless/aws/examples # create the package structure
 ```
 Replace `serverless.yml` with the following contents:
@@ -163,21 +163,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class SampleResource {
   @GET
   @Path("/health")
-  @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-  public Response getHealth() {
-    return Response.ok(new HealthStatusDto("up and running")).build();
+  @Produces({ MediaType.APPLICATION_JSON })
+  public Response getHealthStatus() {
+    return Response.ok(new HealthStatusResponse("up and running")).build();
   }
-  @XmlRootElement // for JAXB
-  public static class HealthStatusDto {
-    private String statusMessage;
-    @SuppressWarnings("unused")
-    private HealthStatusDto() {
-      // for JAXB
-    }
-    HealthStatusDto(String statusMessage) {
+  public static class HealthStatusResponse {
+    private final String statusMessage;
+    HealthStatusResponse(String statusMessage) {
       this.statusMessage = statusMessage;
     }
-    @XmlElement // for JAXB
     public String getStatusMessage() {
       return statusMessage;
     }
@@ -232,11 +226,6 @@ Hit the endpoint:
 ```sh
 curl -H 'Accept: application/json' 'https://<SOMEID>.execute-api.eu-central-1.amazonaws.com/dev/sample/health'
 # {"statusMessage":"up and running"}
-```
-
-```sh
-curl -H 'Accept: application/xml' 'https://<SOMEID>.execute-api.eu-central-1.amazonaws.com/dev/sample/health'
-# <?xml version="1.0" encoding="UTF-8" standalone="yes"?><healthStatusDto><statusMessage>up and running</statusMessage></healthStatusDto>
 ```
 
 ## Modules
