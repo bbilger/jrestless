@@ -10,7 +10,7 @@ dependencies {
 		libraries.mockito_core,
 		libraries.slf4j_simple,
 		libraries.jersey_media_json_jackson,
-		'org.skyscreamer:jsonassert:1.3.0',
+		libraries.jsonassert,
 		libraries.jersey_test_core,
 		libraries.jersey_test_grizzly
 	)

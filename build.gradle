@@ -62,11 +62,14 @@ subprojects {
 			exclude module: "aws-java-sdk-dynamodb"
 		},
 		aws_lambda_events_joda_time: 'joda-time:joda-time:2.8.1',
+		aws_java_sdk_lambda: 'com.amazonaws:aws-java-sdk-lambda:1.11.41',
+		feign_core: 'io.github.openfeign:feign-core:9.3.1',
 		slf4j_api: 'org.slf4j:slf4j-api:1.7.21',
 		slf4j_simple: 'org.slf4j:slf4j-simple:1.7.21',
 		junit: 'junit:junit:4.12',
 		mockito_core: 'org.mockito:mockito-core:2.2.0',
-		guava_testlib: 'com.google.guava:guava-testlib:18.0'
+		guava_testlib: 'com.google.guava:guava-testlib:18.0',
+		jsonassert: 'org.skyscreamer:jsonassert:1.3.0'
 	]
 
 	checkstyle {

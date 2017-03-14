@@ -4,8 +4,8 @@ version = "${globaleModuleVersion}"
 dependencies {
 	compile project(':aws:core:jrestless-aws-core')
 	compile(
-		'io.github.openfeign:feign-core:9.3.1',
-		'com.amazonaws:aws-java-sdk-lambda:1.11.41'
+		libraries.feign_core,
+		libraries.aws_java_sdk_lambda
 		
 	)
 	testCompile project(':test:jrestless-test')
