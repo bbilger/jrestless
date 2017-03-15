@@ -5,7 +5,9 @@
 This module provides an AWS Lambda RequestHandler that delegates requests from AWS API Gateway to Jersey.
 
 ```java
-import com.jrestless.aws.gateway.GatewayResourceConfig;
+import org.glassfish.jersey.server.ResourceConfig;
+
+import com.jrestless.aws.gateway.GatewayFeature;
 import com.jrestless.aws.gateway.handler.GatewayRequestObjectHandler;
 
 // this is your AWS Lambda function
@@ -15,7 +17,10 @@ public class RequestHandler extends GatewayRequestObjectHandler {
      * This will start a Jersey container that delegates all requests proxied through from AWS API Gateway
      * to this Lambda function to your JAX-RS resources.
      */
-    init(new GatewayResourceConfig().packages("<your package name containing JAX-RS resources>"));
+     ResourceConfig config = new ResourceConfig()
+      .register(GatewayFeature.class)
+      .packages("<your package name containing JAX-RS resources>");
+    init(config);
     start();
   }
 }

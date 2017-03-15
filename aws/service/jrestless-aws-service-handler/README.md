@@ -8,7 +8,9 @@ Check [jrestless-aws-service-feign-client](../jrestless-aws-service-feign-client
 
 
 ```java
-import com.jrestless.aws.service.ServiceResourceConfig;
+import org.glassfish.jersey.server.ResourceConfig;
+
+import com.jrestless.aws.service.ServiceFeature;
 import com.jrestless.aws.service.handler.ServiceRequestObjectHandler;
 
 // this is your AWS Lambda function
@@ -18,6 +20,9 @@ public class RequestHandler extends ServiceRequestObjectHandler {
      * This will start a Jersey container that delegates all requests
      * to this Lambda function to your JAX-RS resources.
      */
+     ResourceConfig config = new ResourceConfig()
+      .register(ServiceFeature.class)
+      .packages("<your package name containing JAX-RS resources>");
     init(new ServiceResourceConfig().packages("<your package name containing JAX-RS resources>"));
     start();
   }
