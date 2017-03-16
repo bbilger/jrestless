@@ -1,3 +1,20 @@
+# 0.5.0 (2017-03-12)
+
+## New Features
+
+- baseUri and requestUri are handled correctly, now: https://github.com/bbilger/jrestless/blob/master/docs/src/docs/asciidoc/uri_handling.adoc
+- support for @ApplicationPath was added
+- usage of *Features (e.g. GatewayFeature) is optional, now but highly recommended since a couple of useful filters are registered
+- a CORSFilter has been added: [example](https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-cors-frontend)
+- gzip encoding will be applied for binary responses only
+- Jersey's CDI exstenion can be used (#32)
+
+## Breaking changes
+
+breaking changes
+- *TYPES are not exposed in the *Features anymore => define them yourself
+- SimpleRequestHandler#init(Application, Binder, ServiceLocator) has been removed => use #init(Application, ServiceLocator) and override #createBinder
+
 # 0.4.0 (2016-12-14)
 
 ## New Features
