@@ -146,7 +146,7 @@ build.dependsOn buildZip
 
 ```
 
-Create a new JAX-RS resource and a JAXB DTO (`src/main/java/com/jrestless/aws/examples/SampleResource.java`):
+Create a new JAX-RS resource and a response object (`src/main/java/com/jrestless/aws/examples/SampleResource.java`):
 
 ```java
 package com.jrestless.aws.examples;
