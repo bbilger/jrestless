@@ -139,11 +139,14 @@ public class AwsSecurityContextFilter implements ContainerRequestFilter {
 		for (AbstractSecurityContextFactory factory : securityContextFactories) {
 			boolean applicable = factory.isApplicable();
 			boolean allowed = getAllowedAuthenticationSchemes().contains(factory.getAuthenticationScheme());
-			if (applicable && allowed) {
-				selectedFactory = factory;
-				break;
-			} else if (applicable && !allowed) {
-				LOG.debug("found matching but disallowed authentication scheme {}", factory.getAuthenticationScheme());
+			if (applicable) {
+				if (allowed) {
+					selectedFactory = factory;
+					break;
+				} else {
+					LOG.debug("found matching but disallowed authentication scheme {}",
+							factory.getAuthenticationScheme());
+				}
 			}
 		}
 
