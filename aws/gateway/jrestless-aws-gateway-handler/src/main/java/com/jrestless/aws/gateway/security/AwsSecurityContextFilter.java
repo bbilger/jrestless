@@ -142,8 +142,7 @@ public class AwsSecurityContextFilter implements ContainerRequestFilter {
 			if (applicable && allowed) {
 				selectedFactory = factory;
 				break;
-			}
-			if (applicable && !allowed) {
+			} else if (applicable && !allowed) {
 				LOG.debug("found matching but disallowed authentication scheme {}", factory.getAuthenticationScheme());
 			}
 		}
