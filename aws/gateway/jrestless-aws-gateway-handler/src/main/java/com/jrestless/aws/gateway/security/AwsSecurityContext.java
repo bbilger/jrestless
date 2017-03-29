@@ -17,14 +17,15 @@ package com.jrestless.aws.gateway.security;
 
 import java.security.Principal;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.core.SecurityContext;
 
-class AuthorizerSecurityContext implements SecurityContext {
+class AwsSecurityContext implements SecurityContext {
 
 	private final String authenticationScheme;
 	private final Principal principal;
 
-	AuthorizerSecurityContext(String authenticationScheme, Principal principal) {
+	AwsSecurityContext(@Nullable String authenticationScheme, @Nullable Principal principal) {
 		this.authenticationScheme = authenticationScheme;
 		this.principal = principal;
 	}
@@ -41,6 +42,7 @@ class AuthorizerSecurityContext implements SecurityContext {
 
 	@Override
 	public boolean isSecure() {
+		// always true since API Gateway can be invoked via HTTPS, only
 		return true;
 	}
 

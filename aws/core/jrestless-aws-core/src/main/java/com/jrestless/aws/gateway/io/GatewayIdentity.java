@@ -18,8 +18,6 @@ package com.jrestless.aws.gateway.io;
 /**
  * The identity of the request passed through from AWS API Gateway to the Lambda
  * function.
- * <p>
- * It can be injected into resources via {@code @Context}.
  *
  * @author Bjoern Bilger
  *
@@ -57,6 +55,9 @@ public interface GatewayIdentity {
 	 * Gateway.
 	 */
 	String getSourceIp();
+
+	// undocumented
+	String getAccessKey();
 
 	/**
 	 * The Amazon Cognito authentication type of the caller making the request.

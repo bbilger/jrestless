@@ -22,8 +22,7 @@ import com.jrestless.aws.AwsFeature;
 import com.jrestless.aws.gateway.io.GatewayBinaryReadInterceptor;
 import com.jrestless.aws.gateway.io.GatewayBinaryResponseFilter;
 import com.jrestless.aws.gateway.io.GatewayBinaryWriteInterceptor;
-import com.jrestless.aws.gateway.security.CognitoUserPoolAuthorizerFilter;
-import com.jrestless.aws.gateway.security.CustomAuthorizerFilter;
+import com.jrestless.aws.gateway.security.AwsSecurityContextFilter;
 
 /**
  * Registers optional Gateway specific features.
@@ -33,8 +32,7 @@ import com.jrestless.aws.gateway.security.CustomAuthorizerFilter;
  * <li>{@link GatewayBinaryReadInterceptor}
  * <li>{@link GatewayBinaryResponseFilter}
  * <li>{@link GatewayBinaryWriteInterceptor}
- * <li>{@link CustomAuthorizerFilter}
- * <li>{@link CognitoUserPoolAuthorizerFilter}
+ * <li>{@link AwsSecurityContextFilter}
  * </ul>
  *
  * @author Bjoern Bilger
@@ -47,8 +45,7 @@ public class GatewayFeature implements Feature {
 		context.register(GatewayBinaryReadInterceptor.class);
 		context.register(GatewayBinaryResponseFilter.class);
 		context.register(GatewayBinaryWriteInterceptor.class);
-		context.register(CustomAuthorizerFilter.class);
-		context.register(CognitoUserPoolAuthorizerFilter.class);
+		context.register(AwsSecurityContextFilter.class);
 		context.register(AwsFeature.class);
 		return true;
 	}

@@ -34,6 +34,7 @@ public final class DefaultGatewayIdentity implements GatewayIdentity {
 	private String caller;
 	private String apiKey;
 	private String sourceIp;
+	private String accessKey;
 	private String cognitoAuthenticationType;
 	private String cognitoAuthenticationProvider;
 	private String userArn;
@@ -47,7 +48,7 @@ public final class DefaultGatewayIdentity implements GatewayIdentity {
 	// for unit testing, only
 	// CHECKSTYLE:OFF
 	DefaultGatewayIdentity(String cognitoIdentityPoolId, String accountId, String cognitoIdentityId, String caller,
-			String apiKey, String sourceIp, String cognitoAuthenticationType, String cognitoAuthenticationProvider,
+			String apiKey, String sourceIp, String accessKey, String cognitoAuthenticationType, String cognitoAuthenticationProvider,
 			String userArn, String userAgent, String user) {
 		setCognitoIdentityPoolId(cognitoIdentityPoolId);
 		setAccountId(accountId);
@@ -55,6 +56,7 @@ public final class DefaultGatewayIdentity implements GatewayIdentity {
 		setCaller(caller);
 		setApiKey(apiKey);
 		setSourceIp(sourceIp);
+		setAccessKey(accessKey);
 		setCognitoAuthenticationType(cognitoAuthenticationType);
 		setCognitoAuthenticationProvider(cognitoAuthenticationProvider);
 		setUserArn(userArn);
@@ -119,6 +121,15 @@ public final class DefaultGatewayIdentity implements GatewayIdentity {
 	}
 
 	@Override
+	public String getAccessKey() {
+		return accessKey;
+	}
+
+	public void setAccessKey(String accessKey) {
+		this.accessKey = accessKey;
+	}
+
+	@Override
 	public String getCognitoAuthenticationType() {
 		return cognitoAuthenticationType;
 	}
@@ -180,6 +191,7 @@ public final class DefaultGatewayIdentity implements GatewayIdentity {
 				&& Objects.equals(cognitoIdentityId, castOther.cognitoIdentityId)
 				&& Objects.equals(caller, castOther.caller) && Objects.equals(apiKey, castOther.apiKey)
 				&& Objects.equals(sourceIp, castOther.sourceIp)
+				&& Objects.equals(accessKey, castOther.accessKey)
 				&& Objects.equals(cognitoAuthenticationType, castOther.cognitoAuthenticationType)
 				&& Objects.equals(cognitoAuthenticationProvider, castOther.cognitoAuthenticationProvider)
 				&& Objects.equals(userArn, castOther.userArn) && Objects.equals(userAgent, castOther.userAgent)
@@ -188,7 +200,7 @@ public final class DefaultGatewayIdentity implements GatewayIdentity {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(cognitoIdentityPoolId, accountId, cognitoIdentityId, caller, apiKey, sourceIp,
+		return Objects.hash(cognitoIdentityPoolId, accountId, cognitoIdentityId, caller, apiKey, sourceIp, accessKey,
 				cognitoAuthenticationType, cognitoAuthenticationProvider, userArn, userAgent, user);
 	}
 
@@ -196,8 +208,8 @@ public final class DefaultGatewayIdentity implements GatewayIdentity {
 	public String toString() {
 		return "DefaultGatewayIdentity [cognitoIdentityPoolId=" + cognitoIdentityPoolId + ", accountId=" + accountId
 				+ ", cognitoIdentityId=" + cognitoIdentityId + ", caller=" + caller + ", apiKey=" + apiKey
-				+ ", sourceIp=" + sourceIp + ", cognitoAuthenticationType=" + cognitoAuthenticationType
-				+ ", cognitoAuthenticationProvider=" + cognitoAuthenticationProvider + ", userArn=" + userArn
-				+ ", userAgent=" + userAgent + ", user=" + user + "]";
+				+ ", sourceIp=" + sourceIp + ", accessKey=" + accessKey + ", cognitoAuthenticationType="
+				+ cognitoAuthenticationType + ", cognitoAuthenticationProvider=" + cognitoAuthenticationProvider
+				+ ", userArn=" + userArn + ", userAgent=" + userAgent + ", user=" + user + "]";
 	}
 }

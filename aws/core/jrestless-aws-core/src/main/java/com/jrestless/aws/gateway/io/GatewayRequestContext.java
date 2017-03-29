@@ -20,8 +20,6 @@ import java.util.Map;
 /**
  * The request context passed through from AWS API Gateway to the Lambda
  * function.
- * <p>
- * It can be injected into resources via {@code @Context}.
  *
  * @author Bjoern Bilger
  *

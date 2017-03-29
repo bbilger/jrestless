@@ -2,10 +2,11 @@ package com.jrestless.aws.gateway.security;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,105 +18,135 @@ import javax.ws.rs.core.SecurityContext;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.jrestless.aws.gateway.io.GatewayRequest;
+import com.jrestless.aws.gateway.io.GatewayRequestContext;
+import com.jrestless.aws.security.AwsAuthenticationSchemes;
 import com.jrestless.aws.security.CognitoUserPoolAuthorizerClaims;
 import com.jrestless.aws.security.CognitoUserPoolAuthorizerPrincipal;
 import com.jrestless.security.OpenIdAddressClaims;
 
-public class CognitoUserPoolAuthorizerFilterTest extends AuthorizerFilterTest {
+public class CognitoUserPoolSecurityContextFactoryTest extends SecurityContextFactoryTestBase {
 
-	@Override
-	AuthorizerFilter createCognitoAuthorizerFilter(GatewayRequest gatewayRequest) {
-		CognitoUserPoolAuthorizerFilter filter = new CognitoUserPoolAuthorizerFilter();
-		filter.setGatewayRequest(gatewayRequest);
-		return filter;
+	@Test
+	public void isApplicable_NoContextGiven_ShouldNotBeApplicable() {
+		GatewayRequest request = mock(GatewayRequest.class);
+		assertFalse(createSecurityContextFactory(request).isApplicable());
 	}
 
 	@Test
-	public void nullAuthorizerDateGiven_ShouldNotSetSecurityContext() {
-		filterAndVerifyNoSecurityContextSet((Map<String, Object>) null);
+	public void isApplicable_NoAuthorizerGiven_ShouldNotBeApplicable() {
+		GatewayRequestContext context = mock(GatewayRequestContext.class);
+		when(context.getAuthorizer()).thenReturn(null);
+		GatewayRequest request = mock(GatewayRequest.class);
+		when(request.getRequestContext()).thenReturn(context);
+		assertFalse(createSecurityContextFactory(request).isApplicable());
 	}
 
 	@Test
-	public void nullClaimsDateGiven_ShouldNotSetSecurityContext() {
-		filterWithClaimsAndVerifyNoSecurityContextSet((Map<String, Object>) null);
+	public void isApplicable_NoClaimsGiven_ShouldNotBeApplicable() {
+		GatewayRequestContext context = mock(GatewayRequestContext.class);
+		when(context.getAuthorizer()).thenReturn(Collections.emptyMap());
+		GatewayRequest request = mock(GatewayRequest.class);
+		when(request.getRequestContext()).thenReturn(context);
+		assertFalse(createSecurityContextFactory(request).isApplicable());
 	}
 
 	@Test
-	public void emptyClaimsDateGiven_ShouldNotSetSecurityContext() {
-		filterWithClaimsAndVerifyNoSecurityContextSet(Collections.emptyMap());
+	public void isApplicable_InvalidClaimsGiven_ShouldBeApplicable() {
+		GatewayRequest request = createRequestMock(null, null);
+		assertTrue(createSecurityContextFactory(request).isApplicable());
 	}
 
 	@Test
-	public void noSubClaimGiven_ShouldNotSetSecurityContext() {
-		filterWithClaimsAndVerifyNoSecurityContextSet(Collections.singletonMap("whatever", "whatever"));
+	public void isApplicable_ValidClaimsGiven_ShouldBeApplicable() {
+		GatewayRequest request = createRequestMock("subClaim", null);
+		assertTrue(createSecurityContextFactory(request).isApplicable());
 	}
 
 	@Test
-	public void emptySubClaimGiven_ShouldNotSetSecurityContext() {
-		filterWithClaimsAndVerifyNoSecurityContextSet(Collections.singletonMap("sub", ""));
+	public void isValid_InvalidClaimTypeGiven_ShouldNotBeValid() {
+		GatewayRequestContext context = mock(GatewayRequestContext.class);
+		when(context.getAuthorizer()).thenReturn(Collections.singletonMap("claims", 1));
+		GatewayRequest request = mock(GatewayRequest.class);
+		when(request.getRequestContext()).thenReturn(context);
+		assertFalse(createSecurityContextFactory(request).isValid());
 	}
 
 	@Test
-	public void blankSubClaimGiven_ShouldNotSetSecurityContext() {
-		filterWithClaimsAndVerifyNoSecurityContextSet(Collections.singletonMap("sub", "  "));
+	public void isValid_NoSubClaimGiven_ShouldNotBeValid() {
+		GatewayRequest request = createRequestMock(null, null);
+		assertFalse(createSecurityContextFactory(request).isValid());
 	}
 
 	@Test
-	public void invalidTypeSubClaimGiven_ShouldNotSetSecurityContext() {
-		filterWithClaimsAndVerifyNoSecurityContextSet(Collections.singletonMap("sub", new Object()));
+	public void isValid_InvalidSubClaimTypeGiven_ShouldNotBeValid() {
+		GatewayRequest request = createRequestMock(1, null);
+		assertFalse(createSecurityContextFactory(request).isValid());
 	}
 
 	@Test
-	public void subClaimGiven_ShouldSetSecurityContext() {
-		SecurityContext sc = filterWithClaimsAndReturnSecurityContext(Collections.singletonMap("sub", "123"));
-		assertNotNull(sc);
+	public void isValid_InvalidAddressClaimTypeGiven_ShouldNotBeValid() {
+		GatewayRequest request = createRequestMock("subClaim", 1);
+		assertFalse(createSecurityContextFactory(request).isValid());
 	}
 
 	@Test
-	public void validRequestGiven_ShouldSetSecurityContextThatIsSecure() {
-		SecurityContext sc = filterWithClaimsAndReturnSecurityContext(Collections.singletonMap("sub", "123"));
-		assertTrue(sc.isSecure());
+	public void isValid_SubClaimAndNoAddressGiven_ShouldBeValid() {
+		GatewayRequest request = createRequestMock("subClaim", null);
+		assertTrue(createSecurityContextFactory(request).isValid());
 	}
 
 	@Test
-	public void validRequestGiven_ShouldSetSecurityContextWithUserCognitoPoolAuthorizerAuthenticationScheme() {
-		SecurityContext sc = filterWithClaimsAndReturnSecurityContext(Collections.singletonMap("sub", "123"));
-		assertEquals("cognito_user_pool_authorizer", sc.getAuthenticationScheme());
+	public void isValid_SubClaimAndAddressGiven_ShouldBeValid() {
+		GatewayRequest request = createRequestMock("subClaim", Collections.emptyMap());
+		assertTrue(createSecurityContextFactory(request).isValid());
 	}
 
 	@Test
-	public void validRequestGiven_ShouldSetSecurityContextWithUserNeverInAnyRole() {
-		SecurityContext sc = filterWithClaimsAndReturnSecurityContext(Collections.singletonMap("sub", "123"));
-		assertFalse(sc.isUserInRole(null));
-		assertFalse(sc.isUserInRole(""));
-		assertFalse(sc.isUserInRole("user"));
-		assertFalse(sc.isUserInRole("USER"));
+	public void createSecurityContext_MinimalClaimsGiven_ShouldCreateSecurityContextWithCognitoUserPoolPrincipal() {
+		GatewayRequest request = createRequestMock(Collections.singletonMap("sub", "subClaim"));
+		SecurityContext sc = createSecurityContextFactory(request).createSecurityContext();
+		CognitoUserPoolAuthorizerPrincipal principal = (CognitoUserPoolAuthorizerPrincipal) sc.getUserPrincipal();
+		assertEquals("subClaim", principal.getName());
+
+		CognitoUserPoolAuthorizerClaims congitoUserPoolClaims = principal.getClaims();
+		assertEquals2("subClaim", congitoUserPoolClaims.getSub(), congitoUserPoolClaims.getAllClaims().get("sub"));
+		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getIss, congitoUserPoolClaims.getAllClaims().get("iss"));
+		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getAud, congitoUserPoolClaims.getAllClaims().get("aud"));
+		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getSingleAud, congitoUserPoolClaims.getAllClaims().get("aud"));
+		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getExp, congitoUserPoolClaims.getAllClaims().get("exp"));
+		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getIat, congitoUserPoolClaims.getAllClaims().get("iat"));
+		assertNull2(congitoUserPoolClaims.getAuthTime(), congitoUserPoolClaims.getAllClaims().get("auth_time"));
+		assertNull2(congitoUserPoolClaims.getNonce(), congitoUserPoolClaims.getAllClaims().get("nonce"));
+		assertNull2(congitoUserPoolClaims.getAcr(), congitoUserPoolClaims.getAllClaims().get("acr"));
+		assertNull2(congitoUserPoolClaims.getAmr(), congitoUserPoolClaims.getAllClaims().get("amr"));
+		assertNull2(congitoUserPoolClaims.getAzp(), congitoUserPoolClaims.getAllClaims().get("azp"));
+		assertNull2(congitoUserPoolClaims.getCognitoUserName(), congitoUserPoolClaims.getAllClaims().get("cognito:username"));
+		assertNull(congitoUserPoolClaims.getAllClaims().get("custom:blub"));
+
+		assertNull2(congitoUserPoolClaims.getName(), congitoUserPoolClaims.getAllClaims().get("name"));
+		assertNull2(congitoUserPoolClaims.getGivenName(), congitoUserPoolClaims.getAllClaims().get("given_name"));
+		assertNull2(congitoUserPoolClaims.getFamilyName(), congitoUserPoolClaims.getAllClaims().get("family_name"));
+		assertNull2(congitoUserPoolClaims.getMiddleName(), congitoUserPoolClaims.getAllClaims().get("middle_name"));
+		assertNull2(congitoUserPoolClaims.getPreferredUsername(), congitoUserPoolClaims.getAllClaims().get("preferred_username"));
+		assertNull2(congitoUserPoolClaims.getProfile(), congitoUserPoolClaims.getAllClaims().get("profile"));
+		assertNull2(congitoUserPoolClaims.getPicture(), congitoUserPoolClaims.getAllClaims().get("picture"));
+		assertNull2(congitoUserPoolClaims.getWebsite(), congitoUserPoolClaims.getAllClaims().get("website"));
+		assertNull2(congitoUserPoolClaims.getEmail(), congitoUserPoolClaims.getAllClaims().get("email"));
+		assertNull2(congitoUserPoolClaims.getEmailVerified(), congitoUserPoolClaims.getAllClaims().get("email_verified"));
+		assertNull2(congitoUserPoolClaims.getGender(), congitoUserPoolClaims.getAllClaims().get("gender"));
+		assertNull2(congitoUserPoolClaims.getBirthdate(), congitoUserPoolClaims.getAllClaims().get("birthdate"));
+		assertNull2(congitoUserPoolClaims.getZoneinfo(), congitoUserPoolClaims.getAllClaims().get("zoneinfo"));
+		assertNull2(congitoUserPoolClaims.getLocale(), congitoUserPoolClaims.getAllClaims().get("locale"));
+		assertNull2(congitoUserPoolClaims.getPhoneNumber(), congitoUserPoolClaims.getAllClaims().get("phone_number"));
+		assertNull2(congitoUserPoolClaims.getPhoneNumberVerified(), congitoUserPoolClaims.getAllClaims().get("phone_number_verified"));
+		assertNull2(congitoUserPoolClaims.getUpdatedAt(), congitoUserPoolClaims.getAllClaims().get("updated_at"));
+
+		assertNull(congitoUserPoolClaims.getAddress());
 	}
 
 	@Test
-	public void subClaimGiven_ShouldSetCognitoUserPoolAuthorizerPrincipalSecurityContext() {
-		SecurityContext sc = filterWithClaimsAndReturnSecurityContext(Collections.singletonMap("sub", "123"));
-		assertTrue(sc.getUserPrincipal() instanceof CognitoUserPoolAuthorizerPrincipal);
-	}
-
-	@Test
-	public void subClaimGiven_ShouldSetPrincipalNameToSubClaim() {
-		SecurityContext sc = filterWithClaimsAndReturnSecurityContext(Collections.singletonMap("sub", "123"));
-		assertEquals("123", sc.getUserPrincipal().getName());
-	}
-
-	@Test
-	public void subClaimGiven_ShouldMakeSubClaimAvailableThroughClaims() {
-		SecurityContext sc = filterWithClaimsAndReturnSecurityContext(Collections.singletonMap("sub", "123"));
-		CognitoUserPoolAuthorizerPrincipal principal = ((CognitoUserPoolAuthorizerPrincipal) sc.getUserPrincipal());
-		assertEquals("123", principal.getClaims().getAllClaims().get("sub"));
-	}
-
-	@Test
-	public void fullClaimsGiven_ShouldMakeAllClaimsAvailable() {
+	public void createSecurityContext_FullClaimsGiven_ShouldCreateSecurityContextWithCognitoUserPoolPrincipal() {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("sub", "someSubValue");
 		claims.put("iss", "someIssValue");
@@ -159,8 +190,9 @@ public class CognitoUserPoolAuthorizerFilterTest extends AuthorizerFilterTest {
 
 		claims.put("address", addressClaimsMap);
 
-		SecurityContext sc = filterWithClaimsAndReturnSecurityContext(claims);
-		CognitoUserPoolAuthorizerPrincipal principal = ((CognitoUserPoolAuthorizerPrincipal) sc.getUserPrincipal());
+		GatewayRequest request = createRequestMock(claims);
+		SecurityContext sc = createSecurityContextFactory(request).createSecurityContext();
+		CognitoUserPoolAuthorizerPrincipal principal = (CognitoUserPoolAuthorizerPrincipal) sc.getUserPrincipal();
 
 		CognitoUserPoolAuthorizerClaims congitoUserPoolClaims = principal.getClaims();
 		assertEquals2("someSubValue", congitoUserPoolClaims.getSub(), congitoUserPoolClaims.getAllClaims().get("sub"));
@@ -205,115 +237,7 @@ public class CognitoUserPoolAuthorizerFilterTest extends AuthorizerFilterTest {
 	}
 
 	@Test
-	public void minimalClaimsGiven_ShouldNotMakeUnsetClaimsAvailable() {
-		SecurityContext sc = filterWithClaimsAndReturnSecurityContext(Collections.singletonMap("sub", "123"));
-		CognitoUserPoolAuthorizerPrincipal principal = ((CognitoUserPoolAuthorizerPrincipal) sc.getUserPrincipal());
-
-		CognitoUserPoolAuthorizerClaims congitoUserPoolClaims = principal.getClaims();
-		assertEquals2("123", congitoUserPoolClaims.getSub(), congitoUserPoolClaims.getAllClaims().get("sub"));
-		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getIss, congitoUserPoolClaims.getAllClaims().get("iss"));
-		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getAud, congitoUserPoolClaims.getAllClaims().get("aud"));
-		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getSingleAud, congitoUserPoolClaims.getAllClaims().get("aud"));
-		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getExp, congitoUserPoolClaims.getAllClaims().get("exp"));
-		assertNpeFirstAndNullSecond(congitoUserPoolClaims::getIat, congitoUserPoolClaims.getAllClaims().get("iat"));
-		assertNull2(congitoUserPoolClaims.getAuthTime(), congitoUserPoolClaims.getAllClaims().get("auth_time"));
-		assertNull2(congitoUserPoolClaims.getNonce(), congitoUserPoolClaims.getAllClaims().get("nonce"));
-		assertNull2(congitoUserPoolClaims.getAcr(), congitoUserPoolClaims.getAllClaims().get("acr"));
-		assertNull2(congitoUserPoolClaims.getAmr(), congitoUserPoolClaims.getAllClaims().get("amr"));
-		assertNull2(congitoUserPoolClaims.getAzp(), congitoUserPoolClaims.getAllClaims().get("azp"));
-		assertNull2(congitoUserPoolClaims.getCognitoUserName(), congitoUserPoolClaims.getAllClaims().get("cognito:username"));
-		assertNull(congitoUserPoolClaims.getAllClaims().get("custom:blub"));
-
-		assertNull2(congitoUserPoolClaims.getName(), congitoUserPoolClaims.getAllClaims().get("name"));
-		assertNull2(congitoUserPoolClaims.getGivenName(), congitoUserPoolClaims.getAllClaims().get("given_name"));
-		assertNull2(congitoUserPoolClaims.getFamilyName(), congitoUserPoolClaims.getAllClaims().get("family_name"));
-		assertNull2(congitoUserPoolClaims.getMiddleName(), congitoUserPoolClaims.getAllClaims().get("middle_name"));
-		assertNull2(congitoUserPoolClaims.getPreferredUsername(), congitoUserPoolClaims.getAllClaims().get("preferred_username"));
-		assertNull2(congitoUserPoolClaims.getProfile(), congitoUserPoolClaims.getAllClaims().get("profile"));
-		assertNull2(congitoUserPoolClaims.getPicture(), congitoUserPoolClaims.getAllClaims().get("picture"));
-		assertNull2(congitoUserPoolClaims.getWebsite(), congitoUserPoolClaims.getAllClaims().get("website"));
-		assertNull2(congitoUserPoolClaims.getEmail(), congitoUserPoolClaims.getAllClaims().get("email"));
-		assertNull2(congitoUserPoolClaims.getEmailVerified(), congitoUserPoolClaims.getAllClaims().get("email_verified"));
-		assertNull2(congitoUserPoolClaims.getGender(), congitoUserPoolClaims.getAllClaims().get("gender"));
-		assertNull2(congitoUserPoolClaims.getBirthdate(), congitoUserPoolClaims.getAllClaims().get("birthdate"));
-		assertNull2(congitoUserPoolClaims.getZoneinfo(), congitoUserPoolClaims.getAllClaims().get("zoneinfo"));
-		assertNull2(congitoUserPoolClaims.getLocale(), congitoUserPoolClaims.getAllClaims().get("locale"));
-		assertNull2(congitoUserPoolClaims.getPhoneNumber(), congitoUserPoolClaims.getAllClaims().get("phone_number"));
-		assertNull2(congitoUserPoolClaims.getPhoneNumberVerified(), congitoUserPoolClaims.getAllClaims().get("phone_number_verified"));
-		assertNull2(congitoUserPoolClaims.getUpdatedAt(), congitoUserPoolClaims.getAllClaims().get("updated_at"));
-
-		assertNull(congitoUserPoolClaims.getAddress());
-	}
-
-	@Test
-	public void validRequestAndMissingRequiredFieldsGiven_GetRequiredFieldShouldThrowNpe() {
-		SecurityContext sc = filterWithClaimsAndReturnSecurityContext(Collections.singletonMap("sub", "123"));
-		CognitoUserPoolAuthorizerPrincipal principal = ((CognitoUserPoolAuthorizerPrincipal) sc.getUserPrincipal());
-
-		CognitoUserPoolAuthorizerClaims congitoUserPoolClaims = principal.getClaims();
-		assertNpe(congitoUserPoolClaims::getIss);
-		assertNpe(congitoUserPoolClaims::getAud);
-		assertNpe(congitoUserPoolClaims::getSingleAud);
-		assertNpe(congitoUserPoolClaims::getExp);
-		assertNpe(congitoUserPoolClaims::getIat);
-	}
-
-	@Test
-	public void validRequestAndStringArrayAudClaimGiven_ShouldTransformAudClaimToCollection() {
-		SecurityContext sc = filterWithClaimsAndReturnSecurityContext(ImmutableMap.of("sub", "someSub", "aud", new String[] { "aud0", "aud1" }));
-		CognitoUserPoolAuthorizerPrincipal principal = ((CognitoUserPoolAuthorizerPrincipal) sc.getUserPrincipal());
-
-		CognitoUserPoolAuthorizerClaims congitoUserPoolClaims = principal.getClaims();
-		assertEquals(ImmutableList.of("aud0", "aud1"), congitoUserPoolClaims.getAud());
-	}
-
-	@Test
-	public void validRequestAndSetAudClaimGiven_ShouldReturnAudAsSet() {
-		SecurityContext sc = filterWithClaimsAndReturnSecurityContext(ImmutableMap.of("sub", "someSub", "aud", ImmutableSet.of("aud0", "aud1")));
-		CognitoUserPoolAuthorizerPrincipal principal = ((CognitoUserPoolAuthorizerPrincipal) sc.getUserPrincipal());
-
-		CognitoUserPoolAuthorizerClaims congitoUserPoolClaims = principal.getClaims();
-		assertEquals(ImmutableSet.of("aud0", "aud1"), congitoUserPoolClaims.getAud());
-	}
-
-	@Test
-	public void validRequestAndListAudClaimGiven_ShouldReturnAudAsSet() {
-		SecurityContext sc = filterWithClaimsAndReturnSecurityContext(ImmutableMap.of("sub", "someSub", "aud", ImmutableList.of("aud0", "aud1")));
-		CognitoUserPoolAuthorizerPrincipal principal = ((CognitoUserPoolAuthorizerPrincipal) sc.getUserPrincipal());
-
-		CognitoUserPoolAuthorizerClaims congitoUserPoolClaims = principal.getClaims();
-		assertEquals(ImmutableList.of("aud0", "aud1"), congitoUserPoolClaims.getAud());
-	}
-
-	@Test
-	public void validRequestAndStringArrayAmrClaimGiven_ShouldTransformAmrClaimToCollection() {
-		SecurityContext sc = filterWithClaimsAndReturnSecurityContext(ImmutableMap.of("sub", "someSub", "amr", new String[] { "amr0", "amr1" }));
-		CognitoUserPoolAuthorizerPrincipal principal = ((CognitoUserPoolAuthorizerPrincipal) sc.getUserPrincipal());
-
-		CognitoUserPoolAuthorizerClaims congitoUserPoolClaims = principal.getClaims();
-		assertEquals(ImmutableList.of("amr0", "amr1"), congitoUserPoolClaims.getAmr());
-	}
-
-	@Test
-	public void validRequestAndSetAmrClaimGiven_ShouldReturnAmrAsSet() {
-		SecurityContext sc = filterWithClaimsAndReturnSecurityContext(ImmutableMap.of("sub", "someSub", "amr", ImmutableSet.of("amr0", "amr1")));
-		CognitoUserPoolAuthorizerPrincipal principal = ((CognitoUserPoolAuthorizerPrincipal) sc.getUserPrincipal());
-
-		CognitoUserPoolAuthorizerClaims congitoUserPoolClaims = principal.getClaims();
-		assertEquals(ImmutableSet.of("amr0", "amr1"), congitoUserPoolClaims.getAmr());
-	}
-
-	@Test
-	public void validRequestAndListAmrClaimGiven_ShouldReturnAmrAsSet() {
-		SecurityContext sc = filterWithClaimsAndReturnSecurityContext(ImmutableMap.of("sub", "someSub", "amr", ImmutableList.of("amr0", "amr1")));
-		CognitoUserPoolAuthorizerPrincipal principal = ((CognitoUserPoolAuthorizerPrincipal) sc.getUserPrincipal());
-
-		CognitoUserPoolAuthorizerClaims congitoUserPoolClaims = principal.getClaims();
-		assertEquals(ImmutableList.of("amr0", "amr1"), congitoUserPoolClaims.getAmr());
-	}
-
-	@Test
-	public void validRequestAndInvalidTypes_ShouldThrowClassCastExceptionOnAccess() {
+	public void createSecurityContext_FullClaimsWithInvalidTypesGiven_ShouldCreateSecurityContextWithCognitoUserPoolPrincipal() {
 
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("sub", "123");
@@ -356,8 +280,9 @@ public class CognitoUserPoolAuthorizerFilterTest extends AuthorizerFilterTest {
 
 		claims.put("address", addressClaimsMap);
 
-		SecurityContext sc = filterWithClaimsAndReturnSecurityContext(claims);
-		CognitoUserPoolAuthorizerPrincipal principal = ((CognitoUserPoolAuthorizerPrincipal) sc.getUserPrincipal());
+		GatewayRequest request = createRequestMock(claims);
+		SecurityContext sc = createSecurityContextFactory(request).createSecurityContext();
+		CognitoUserPoolAuthorizerPrincipal principal = (CognitoUserPoolAuthorizerPrincipal) sc.getUserPrincipal();
 
 		CognitoUserPoolAuthorizerClaims congitoUserPoolClaims = principal.getClaims();
 
@@ -399,6 +324,25 @@ public class CognitoUserPoolAuthorizerFilterTest extends AuthorizerFilterTest {
 		assertClassCastException(addressClaims::getCountry);
 	}
 
+	private static GatewayRequest createRequestMock(Object subClaim, Object addressClaim) {
+		Map<String, Object> claims = new HashMap<>();
+		if (subClaim != null) {
+			claims.put("sub", subClaim);
+		}
+		if (addressClaim != null) {
+			claims.put("address", addressClaim);
+		}
+		return createRequestMock(claims);
+	}
+
+	private static GatewayRequest createRequestMock(Map<String, Object> claims) {
+		GatewayRequestContext context = mock(GatewayRequestContext.class);
+		when(context.getAuthorizer()).thenReturn(Collections.singletonMap("claims", claims));
+		GatewayRequest request = mock(GatewayRequest.class);
+		when(request.getRequestContext()).thenReturn(context);
+		return request;
+	}
+
 	private static void assertEquals2(Object actual, Object expected1, Object expected2) {
 		assertEquals(actual, expected1);
 		assertEquals(actual, expected2);
@@ -432,12 +376,29 @@ public class CognitoUserPoolAuthorizerFilterTest extends AuthorizerFilterTest {
 		}
 	}
 
-	private void filterWithClaimsAndVerifyNoSecurityContextSet(Map<String, Object> claims) {
-		filterAndVerifyNoSecurityContextSet(Collections.singletonMap("claims", claims));
+	@Override
+	protected AbstractSecurityContextFactory createSecurityContextFactory(GatewayRequest request) {
+		return new CognitoUserPoolSecurityContextFactory(request);
 	}
 
-	private SecurityContext filterWithClaimsAndReturnSecurityContext(Map<String, Object> claims) {
-		return filterAndReturnSetSecurityContext(Collections.singletonMap("claims", claims));
+	@Override
+	protected String getAuthenticationScheme() {
+		return AwsAuthenticationSchemes.AWS_COGNITO_USER_POOL;
+	}
+
+	@Override
+	protected GatewayRequest createInapplicableInvlidRequest() {
+		return mock(GatewayRequest.class);
+	}
+
+	@Override
+	protected GatewayRequest createApplicableInvalidRequest() {
+		return createRequestMock(1, 1);
+	}
+
+	@Override
+	protected GatewayRequest createApplicableValidRequest() {
+		return createRequestMock("subClaim", null);
 	}
 
 }
