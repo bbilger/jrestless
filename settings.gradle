@@ -1,2 +1,2 @@
-include "test:jrestless-test", 'core:jrestless-core-container', 'core:jrestless-core', 'aws:core:jrestless-aws-core', 'aws:core:jrestless-aws-core-handler', 'aws:gateway:jrestless-aws-gateway-handler', 'aws:service:jrestless-aws-service-handler', 'aws:service:jrestless-aws-service-feign-client', 'aws:sns:jrestless-aws-sns-handler', 'docs'
+include "test:jrestless-test", 'core:jrestless-core-container', 'core:jrestless-core', 'aws:core:jrestless-aws-core', 'aws:core:jrestless-aws-core-handler', 'aws:gateway:jrestless-aws-gateway-handler', 'aws:service:jrestless-aws-service-handler', 'aws:service:jrestless-aws-service-feign-client', 'aws:sns:jrestless-aws-sns-handler'
 rootProject.name = 'jrestless'

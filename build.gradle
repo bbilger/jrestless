@@ -1,5 +1,5 @@
 def checkstyleCfg = "${projectDir}/alien/checkstyle/checkstyle.xml" as File
-	
+
 def bintrayUser = hasProperty('bintray_user') ? property('bintray_user') : 'unset'
 def bintrayKey = hasProperty('bintray_key') ? property('bintray_key') : 'unset'
 
@@ -46,7 +46,7 @@ subprojects {
 	repositories {
 		mavenCentral()
 	}
-	
+
 	ext.libraries = [
 		jersey_server: "org.glassfish.jersey.core:jersey-server:${jerseyVersion}",
 		jersey_media_json_jackson: "org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyVersion}",
@@ -120,7 +120,7 @@ subprojects {
 	artifacts {
 		archives sourcesJar, javadocJar
 	}
-	
+
 	tasks.withType(JavaCompile) {
         options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
     }
@@ -144,7 +144,7 @@ subprojects {
 		}
 		publications = ['BintrayPublication']
 	}
-	
+
 	publishing {
 		publications {
 			BintrayPublication(MavenPublication) {
@@ -152,7 +152,7 @@ subprojects {
 				groupId "$group"
 				artifactId "$project.name"
 				version "${globaleModuleVersion}"
-				artifact sourcesJar 
+				artifact sourcesJar
 				artifact javadocJar
 			}
 			// change from runtime to compile time
@@ -179,7 +179,6 @@ dependencies {
 	compile project(":aws:service:jrestless-aws-service-feign-client")
 	compile project(":aws:sns:jrestless-aws-sns-handler")
 	compile project(":test:jrestless-test")
-	compile project(":docs")
 }
 
 task wrapper(type: Wrapper) {
