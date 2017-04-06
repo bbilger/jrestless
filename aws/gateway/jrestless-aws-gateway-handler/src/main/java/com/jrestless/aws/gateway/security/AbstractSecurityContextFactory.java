@@ -58,11 +58,7 @@ abstract class AbstractSecurityContextFactory {
 		if (context == null) {
 			return null;
 		}
-		GatewayIdentity identity = context.getIdentity();
-		if (identity == null) {
-			return null;
-		}
-		return identity;
+		return context.getIdentity();
 	}
 
 	protected Map<String, Object> getAuthorizerDataSafe() {
@@ -70,11 +66,7 @@ abstract class AbstractSecurityContextFactory {
 		if (context == null) {
 			return null;
 		}
-		Map<String, Object> authorizerData = context.getAuthorizer();
-		if (authorizerData == null) {
-			return null;
-		}
-		return authorizerData;
+		return context.getAuthorizer();
 	}
 
 	public final SecurityContext createSecurityContext() {
