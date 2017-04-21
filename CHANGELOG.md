@@ -1,8 +1,20 @@
+# 0.5.1 (2017-04-22)
+
+## New Features
+
+JRestless now supports Cognito (Federated) Identity and IAM authentication. (https://github.com/bbilger/jrestless/issues/35)
+
+The new AwsSecurityContextFilter sets the according Principal (CognitoUserPoolAuthorizerPrincipal, CustomAuthorizerPrincipal, CognitoIdentityPrincipal or IamPrincipal) when available. AwsSecurityContextFilter gets registered through the GatewayFeature.
+
+## Breaking Changes
+
+CustomAuthorizerFilter and CustomUserPoolAuthorizerFilter are replaced by AwsSecurityContextFilter.
+
 # 0.5.0 (2017-03-12)
 
 ## New Features
 
-- baseUri and requestUri are handled correctly, now: https://github.com/bbilger/jrestless/blob/master/docs/src/docs/asciidoc/uri_handling.adoc
+- baseUri and requestUri are handled correctly, now: https://github.com/bbilger/jrestless-docs/blob/master/src/docs/asciidoc/uri_handling.adoc
 - support for @ApplicationPath was added
 - usage of *Features (e.g. GatewayFeature) is optional, now but highly recommended since a couple of useful filters are registered
 - a CORSFilter has been added: [example](https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-cors-frontend)
@@ -11,7 +23,6 @@
 
 ## Breaking changes
 
-breaking changes
 - *TYPES are not exposed in the *Features anymore => define them yourself
 - SimpleRequestHandler#init(Application, Binder, ServiceLocator) has been removed => use #init(Application, ServiceLocator) and override #createBinder
 
