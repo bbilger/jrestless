@@ -94,13 +94,6 @@ public final class ApplicationPathFilter implements ContainerRequestFilter {
 	}
 
 	private static boolean isBlank(String s) {
-		if (s == null) {
-			return true;
-		}
-		String trimmed = s.trim();
-		if (trimmed.isEmpty()) {
-			return true;
-		}
-		return false;
+		return s == null || s.trim().isEmpty();
 	}
 }
