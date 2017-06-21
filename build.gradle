@@ -12,9 +12,11 @@ buildscript {
 	}
 	dependencies {
 		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
-		classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.1'
+		classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5'
 	}
 }
+
+apply plugin: 'org.sonarqube'
 
 allprojects {
 
