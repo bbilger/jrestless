@@ -15,7 +15,6 @@ buildscript {
 		classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.1'
 	}
 }
-apply plugin: 'org.sonarqube'
 
 allprojects {
 
@@ -185,5 +184,5 @@ dependencies {
 }
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '3.5'
+	gradleVersion = '4.0'
 }
