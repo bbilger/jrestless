@@ -15,13 +15,11 @@
  */
 package com.jrestless.aws.gateway.io;
 
-import java.io.IOException;
-import java.util.Base64;
-
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
-import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
+
+import com.jrestless.core.interceptor.ConditionalBase64WriteInterceptor;
 
 
 /**
@@ -45,16 +43,12 @@ import javax.ws.rs.ext.WriterInterceptorContext;
  */
 // make sure this gets invoked after any encoding WriteInterceptor
 @Priority(Priorities.ENTITY_CODER - GatewayBinaryWriteInterceptor.PRIORITY_OFFSET)
-public class GatewayBinaryWriteInterceptor implements WriterInterceptor {
+public class GatewayBinaryWriteInterceptor extends ConditionalBase64WriteInterceptor {
 
 	static final int PRIORITY_OFFSET = 100;
 
 	@Override
-	public void aroundWriteTo(WriterInterceptorContext context) throws IOException {
-		Object headerValue = context.getHeaders().getFirst(GatewayBinaryResponseFilter.HEADER_BINARY_RESPONSE);
-		if (Boolean.TRUE.equals(headerValue)) {
-			context.setOutputStream(Base64.getEncoder().wrap(context.getOutputStream()));
-		}
-		context.proceed();
+	protected boolean isBase64(WriterInterceptorContext context) {
+		return Boolean.TRUE.equals(context.getHeaders().getFirst(GatewayBinaryResponseFilter.HEADER_BINARY_RESPONSE));
 	}
 }

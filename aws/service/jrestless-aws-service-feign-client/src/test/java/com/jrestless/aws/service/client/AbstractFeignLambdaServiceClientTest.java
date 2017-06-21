@@ -1,13 +1,10 @@
 package com.jrestless.aws.service.client;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.Collections;
@@ -15,9 +12,9 @@ import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.jrestless.aws.service.client.AbstractFeignLambdaServiceClient;
 import com.jrestless.aws.service.io.ServiceRequest;
 import com.jrestless.aws.service.io.ServiceResponse;
+import com.jrestless.test.IOUtils;
 
 public class AbstractFeignLambdaServiceClientTest {
 
@@ -105,7 +102,7 @@ public class AbstractFeignLambdaServiceClientTest {
 		FeignLambdaClientImpl client = new FeignLambdaClientImpl(serviceResponse);
 		when(serviceResponse.getBody()).thenReturn("some body");
 		feign.Response response = client.execute(feignRequest, null);
-		assertArrayEquals("some body".getBytes(), toBytes(response.body().asInputStream()));
+		assertEquals("some body", IOUtils.toString(response.body().asInputStream()));
 	}
 
 	@Test
@@ -168,17 +165,6 @@ public class AbstractFeignLambdaServiceClientTest {
 		FeignLambdaClientImpl client = new FeignLambdaClientImpl(serviceResponse);
 		client.execute(feignRequest, null);
 		assertEquals(null, client.getFeignRequestOptions());
-	}
-
-	private byte[] toBytes(InputStream is) throws IOException {
-	    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-	    int nRead;
-	    byte[] data = new byte[1024];
-	    while ((nRead = is.read(data, 0, data.length)) != -1) {
-	        buffer.write(data, 0, nRead);
-	    }
-	    buffer.flush();
-	    return buffer.toByteArray();
 	}
 
 	private static class FeignLambdaClientImpl extends AbstractFeignLambdaServiceClient {

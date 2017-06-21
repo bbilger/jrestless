@@ -74,6 +74,11 @@ public class AccessibleRunnerTest {
 		}
 	}
 
+	@Test
+	public void bumpCodeCoverageByInvokingThePrivateConstructor() {
+		 UtilityClassCodeCoverageBumper.invokePrivateConstructor(AccessibleRunner.class);
+	}
+
 	public static class SomeObject {
 		@SuppressWarnings("unused")
 		private void method() {

@@ -15,13 +15,11 @@
  */
 package com.jrestless.aws.gateway.io;
 
-import java.io.IOException;
-import java.util.Base64;
-
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
-import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
+
+import com.jrestless.core.interceptor.ConditionalBase64ReadInterceptor;
 
 /**
  * Read interceptor that decodes the response from base64 if the property
@@ -50,16 +48,13 @@ import javax.ws.rs.ext.ReaderInterceptorContext;
  */
 // make sure this gets invoked before any encoding ReaderInterceptor
 @Priority(Priorities.ENTITY_CODER - GatewayBinaryReadInterceptor.PRIORITY_OFFSET)
-public class GatewayBinaryReadInterceptor implements ReaderInterceptor {
+public class GatewayBinaryReadInterceptor extends ConditionalBase64ReadInterceptor {
 
 	public static final String PROPERTY_BASE_64_ENCODED_REQUEST = "base64EncodedAwsApiGatewayRequest";
 	static final int PRIORITY_OFFSET = 100;
 
 	@Override
-	public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException {
-		if (Boolean.TRUE.equals(context.getProperty(PROPERTY_BASE_64_ENCODED_REQUEST))) {
-			context.setInputStream(Base64.getDecoder().wrap(context.getInputStream()));
-		}
-		return context.proceed();
+	protected boolean isBase64(ReaderInterceptorContext context) {
+		return Boolean.TRUE.equals(context.getProperty(PROPERTY_BASE_64_ENCODED_REQUEST));
 	}
 }

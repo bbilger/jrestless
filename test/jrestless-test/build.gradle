@@ -3,7 +3,9 @@ version = "${globaleModuleVersion}"
 
 dependencies {
 	compile(
-		libraries.guava_testlib
+		libraries.guava_testlib,
+		libraries.jersey_test_core,
+		libraries.jersey_test_grizzly
 	)
 	testCompile(
 		libraries.junit,

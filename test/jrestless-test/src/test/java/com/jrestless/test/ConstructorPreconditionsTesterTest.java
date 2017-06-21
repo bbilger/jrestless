@@ -202,6 +202,15 @@ public class ConstructorPreconditionsTesterTest {
 		tester.addInvalidArgs(0, NullPointerException.class, 1L);
 	}
 
+	@Test(expected = AssertionError.class)
+	public void addInvalidArgs_IncorrectExceptionGiven_ShouldThrowAssertionError() {
+		tester
+			.addInvalidArgs(0, IllegalArgumentException.class, new Object[] { null })
+			.addValidArgs(0, 1)
+			.addValidArgs(1, 1.0)
+			.testPreconditions();
+	}
+
 	private static class SomeClassCapture {
 		private final Integer a;
 		private final double b;

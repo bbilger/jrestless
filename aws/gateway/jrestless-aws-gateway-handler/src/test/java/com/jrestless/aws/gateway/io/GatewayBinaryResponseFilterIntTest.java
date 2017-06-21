@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 
@@ -21,7 +19,10 @@ import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
 
-public class GatewayBinaryResponseFilterIntTest {
+import com.jrestless.test.DynamicJerseyTestRunner;
+import com.jrestless.test.IOUtils;
+
+public class GatewayBinaryResponseFilterIntTest extends DynamicJerseyTestRunner {
 
 	@Test
 	public void testBinaryZippedWhenZippingRequested() throws Exception {
@@ -35,7 +36,7 @@ public class GatewayBinaryResponseFilterIntTest {
 			assertNotNull(response.getHeaderString(HttpHeaders.CONTENT_ENCODING));
 			assertNotNull(response.getHeaderString(GatewayBinaryResponseFilter.HEADER_BINARY_RESPONSE));
 			InputStream unzipStream = new GZIPInputStream(response.readEntity(InputStream.class));
-			assertEquals("binary", new String(toBytes(unzipStream)));
+			assertEquals("binary", IOUtils.toString(unzipStream));
 		});
 	}
 
@@ -94,7 +95,7 @@ public class GatewayBinaryResponseFilterIntTest {
 			assertNotNull(response.getHeaderString(HttpHeaders.CONTENT_ENCODING));
 			assertNotNull(response.getHeaderString(GatewayBinaryResponseFilter.HEADER_BINARY_RESPONSE));
 			InputStream unzipStream = new GZIPInputStream(response.readEntity(InputStream.class));
-			assertEquals("non-binary", new String(toBytes(unzipStream)));
+			assertEquals("non-binary", new String(IOUtils.toBytes(unzipStream)));
 		});
 	}
 
@@ -110,23 +111,6 @@ public class GatewayBinaryResponseFilterIntTest {
 			assertNull(response.getHeaderString(GatewayBinaryResponseFilter.HEADER_BINARY_RESPONSE));
 			assertEquals("non-binary", response.readEntity(String.class));
 		});
-	}
-
-	private void runJerseyTest(JerseyTest jerseyTest, ThrowingConsumer<JerseyTest> test) throws Exception {
-		try {
-			try {
-				jerseyTest.setUp();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-			test.accept(jerseyTest);
-		} finally {
-			try {
-				jerseyTest.tearDown();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
 	}
 
 
@@ -148,17 +132,6 @@ public class GatewayBinaryResponseFilterIntTest {
 		};
 	}
 
-	private byte[] toBytes(InputStream is) throws IOException {
-	    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-	    int nRead;
-	    byte[] data = new byte[1024];
-	    while ((nRead = is.read(data, 0, data.length)) != -1) {
-	        buffer.write(data, 0, nRead);
-	    }
-	    buffer.flush();
-	    return buffer.toByteArray();
-	}
-
 	@Path("/")
 	public static class TestResource {
 		@GET
@@ -171,10 +144,5 @@ public class GatewayBinaryResponseFilterIntTest {
 		public Response getNonBinary() {
 			return Response.ok("non-binary").build();
 		}
-	}
-
-	@FunctionalInterface
-	private static interface ThrowingConsumer<T> {
-		void accept(T in) throws Exception;
 	}
 }

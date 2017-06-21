@@ -1,0 +1,20 @@
+group = 'com.jrestless.openwhisk'
+version = "${globaleModuleVersion}"
+
+dependencies {
+	compile project(':openwhisk:core:jrestless-openwhisk-core')
+	compile project(':core:jrestless-core-container')
+	compile(
+		libraries.gson
+	)
+	testCompile project(":test:jrestless-test")
+	testCompile (
+		libraries.junit,
+		libraries.mockito_core,
+		libraries.slf4j_simple,
+		libraries.jersey_media_json_jackson,
+		libraries.jsonassert,
+		libraries.jersey_test_core,
+		libraries.jersey_test_grizzly
+	)
+}

@@ -93,6 +93,7 @@ import com.jrestless.aws.gateway.util.DefaultGatewayRequestBuilder;
 import com.jrestless.aws.security.CognitoUserPoolAuthorizerPrincipal;
 import com.jrestless.aws.security.CustomAuthorizerPrincipal;
 import com.jrestless.core.container.dpi.InstanceBinder;
+import com.jrestless.test.IOUtils;
 
 public class GatewayRequestObjectHandlerIntTest {
 
@@ -247,7 +248,7 @@ public class GatewayRequestObjectHandlerIntTest {
 		assertTrue(response.isIsBase64Encoded());
 		byte[] bytes = Base64.getDecoder().decode(response.getBody());
 		InputStream unzipStream = new GZIPInputStream(new ByteArrayInputStream(bytes));
-		assertEquals("test", new String(toBytes(unzipStream)));
+		assertEquals("test", IOUtils.toString(unzipStream));
 		assertNotNull(response.getHeaders().get(HttpHeaders.CONTENT_ENCODING));
 	}
 
@@ -263,17 +264,6 @@ public class GatewayRequestObjectHandlerIntTest {
 		assertFalse(response.isIsBase64Encoded());
 		assertEquals("test", new String(response.getBody()));
 		assertNull(response.getHeaders().get(HttpHeaders.CONTENT_ENCODING));
-	}
-
-	private byte[] toBytes(InputStream is) throws IOException {
-	    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-	    int nRead;
-	    byte[] data = new byte[1024];
-	    while ((nRead = is.read(data, 0, data.length)) != -1) {
-	        buffer.write(data, 0, nRead);
-	    }
-	    buffer.flush();
-	    return buffer.toByteArray();
 	}
 
 	private void testBase64Encoding(String resoruce) {

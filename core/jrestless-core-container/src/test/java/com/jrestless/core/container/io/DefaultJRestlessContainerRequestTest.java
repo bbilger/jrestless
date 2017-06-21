@@ -8,7 +8,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.util.ArrayList;
@@ -20,9 +19,9 @@ import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.io.CharStreams;
 import com.jrestless.test.ConstructorPreconditionsTester;
 import com.jrestless.test.CopyConstructorEqualsTester;
+import com.jrestless.test.IOUtils;
 
 public class DefaultJRestlessContainerRequestTest {
 
@@ -32,7 +31,7 @@ public class DefaultJRestlessContainerRequestTest {
 				new ByteArrayInputStream("123".getBytes()), ImmutableMap.of("a", ImmutableList.of("a0", "a1")));
 		assertEquals(URI.create("/123"), request.getBaseUri());
 		assertEquals(URI.create("/456"), request.getRequestUri());
-		assertEquals("123", CharStreams.toString(new InputStreamReader(request.getEntityStream())));
+		assertEquals("123", IOUtils.toString(request.getEntityStream()));
 		assertEquals(ImmutableMap.of("a", ImmutableList.of("a0", "a1")), request.getHeaders());
 	}
 

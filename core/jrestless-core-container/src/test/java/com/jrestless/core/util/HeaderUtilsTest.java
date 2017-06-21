@@ -13,6 +13,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
+import com.jrestless.test.UtilityClassCodeCoverageBumper;
 
 import jersey.repackaged.com.google.common.collect.ImmutableList;
 
@@ -130,5 +131,10 @@ public class HeaderUtilsTest {
 	@Test(expected = UnsupportedOperationException.class)
 	public void exandHeaders_AnyGiven_ShouldReturnImmutableList() {
 		expandHeaders(ImmutableMap.of("k", "v0")).get("k").add("v1");
+	}
+
+	@Test
+	public void bumpCodeCoverageByInvokingThePrivateConstructor() {
+		 UtilityClassCodeCoverageBumper.invokePrivateConstructor(HeaderUtils.class);
 	}
 }

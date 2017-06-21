@@ -69,7 +69,8 @@ subprojects {
 		junit: 'junit:junit:4.12',
 		mockito_core: 'org.mockito:mockito-core:2.2.0',
 		guava_testlib: 'com.google.guava:guava-testlib:18.0',
-		jsonassert: 'org.skyscreamer:jsonassert:1.3.0'
+		jsonassert: 'org.skyscreamer:jsonassert:1.3.0',
+		gson: 'com.google.code.gson:gson:2.8.1'
 	]
 
 	checkstyle {
@@ -178,6 +179,8 @@ dependencies {
 	compile project(":aws:service:jrestless-aws-service-handler")
 	compile project(":aws:service:jrestless-aws-service-feign-client")
 	compile project(":aws:sns:jrestless-aws-sns-handler")
+	compile project(":openwhisk:core:jrestless-openwhisk-core")
+	compile project(":openwhisk:webaction:jrestless-openwhisk-webaction-handler")
 	compile project(":test:jrestless-test")
 }
 

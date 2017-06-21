@@ -119,12 +119,10 @@ public class GatewayRequestHandlerTest {
 		requestScopedInitializer.initialize(serviceLocator);
 	}
 
-
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings("unchecked")
 	private RequestScopedInitializer getSetRequestScopedInitializer(Context context, GatewayRequest request) {
 		GatewayRequestAndLambdaContext reqAndContext = new GatewayRequestAndLambdaContext(request, context);
-		ArgumentCaptor<Consumer> containerEnhancerCaptor = ArgumentCaptor.forClass(Consumer.class);
+		ArgumentCaptor<Consumer<ContainerRequest>> containerEnhancerCaptor = ArgumentCaptor.forClass(Consumer.class);
 		gatewayHandler.delegateRequest(reqAndContext);
 		verify(container).handleRequest(any(), any(), any(), containerEnhancerCaptor.capture());
 
