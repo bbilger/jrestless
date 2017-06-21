@@ -41,18 +41,10 @@ public class DynamicJerseyTestRunner {
 	 */
 	public void runJerseyTest(JerseyTest jerseyTest, ThrowingConsumer<JerseyTest> test) throws Exception {
 		try {
-			try {
-				jerseyTest.setUp();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
+			jerseyTest.setUp();
 			test.accept(jerseyTest);
 		} finally {
-			try {
-				jerseyTest.tearDown();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
+			jerseyTest.tearDown();
 		}
 	}
 

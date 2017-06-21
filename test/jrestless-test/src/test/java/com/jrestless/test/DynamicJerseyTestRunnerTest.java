@@ -41,7 +41,7 @@ public class DynamicJerseyTestRunnerTest {
 			runner.runJerseyTest(jerseyTest, consumer);
 			fail("expected exception to be thrown");
 		} catch (RuntimeException re) {
-			assertSame(thrownException, re.getCause());
+			assertSame(thrownException, re);
 		}
 	}
 
@@ -64,7 +64,7 @@ public class DynamicJerseyTestRunnerTest {
 			runner.runJerseyTest(jerseyTest, consumer);
 			fail("expected exception to be thrown");
 		} catch (RuntimeException re) {
-			assertSame(thrownException, re.getCause());
+			assertSame(thrownException, re);
 		}
 	}
 
@@ -117,7 +117,7 @@ public class DynamicJerseyTestRunnerTest {
 			runner.runJerseyTest(jerseyTest, consumer);
 			fail("expected exception to be thrown");
 		} catch (Exception e) {
-			assertSame(tearDownException, e.getCause());
+			assertSame(tearDownException, e);
 		}
 	}
 }

@@ -21,7 +21,15 @@ public final class UtilityClassCodeCoverageBumper {
 			constructor.newInstance();
 		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException e) {
-			throw new RuntimeException(e);
+			throw new ConstructorInvocationException(e);
 		}
+	}
+
+	public static final class ConstructorInvocationException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+		private ConstructorInvocationException(Exception e) {
+			super(e);
+		}
+
 	}
 }

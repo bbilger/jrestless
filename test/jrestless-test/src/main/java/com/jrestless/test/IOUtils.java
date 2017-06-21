@@ -54,7 +54,7 @@ public final class IOUtils {
 			buffer.flush();
 			return buffer.toByteArray();
 		} catch (IOException ioe) {
-			throw new RuntimeException(ioe);
+			throw new IORuntimeException(ioe);
 		}
 	}
 
@@ -83,6 +83,13 @@ public final class IOUtils {
 	 */
 	public static String toString(InputStream is, Charset charset) {
 		return new String(toBytes(is), charset);
+	}
+
+	public static final class IORuntimeException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+		private IORuntimeException(IOException ioe) {
+			super(ioe);
+		}
 	}
 
 }

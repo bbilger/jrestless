@@ -18,7 +18,6 @@ package com.jrestless.core.interceptor;
 import java.io.IOException;
 import java.util.Base64;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
 
@@ -33,7 +32,7 @@ import javax.ws.rs.ext.ReaderInterceptorContext;
 public abstract class ConditionalBase64ReadInterceptor implements ReaderInterceptor {
 
 	@Override
-	public final Object aroundReadFrom(ReaderInterceptorContext context) throws IOException, WebApplicationException {
+	public final Object aroundReadFrom(ReaderInterceptorContext context) throws IOException {
 		if (isBase64(context)) {
 			context.setInputStream(Base64.getDecoder().wrap(context.getInputStream()));
 		}
