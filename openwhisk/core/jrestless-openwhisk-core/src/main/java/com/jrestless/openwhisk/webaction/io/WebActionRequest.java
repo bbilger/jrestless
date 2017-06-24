@@ -30,7 +30,7 @@ public interface WebActionRequest {
 	/**
 	 * The HTTP method of the request.
 	 */
-	String getHttpMethod();
+	String getMethod();
 
 	/**
 	 * The request headers.

@@ -96,7 +96,7 @@ public abstract class WebActionRequestHandler extends SimpleRequestHandler<WebAc
 	@Override
 	protected JRestlessContainerRequest createContainerRequest(WebActionRequest request) {
 		requireNonNull(request);
-		final String httpMethod = requireNonNull(request.getHttpMethod(), "httpMethod must be given").toUpperCase();
+		final String httpMethod = requireNonNull(request.getMethod(), "httpMethod must be given").toUpperCase();
 		final String body = request.getBody();
 		final Map<String, String> requestHeaders = request.getHeaders();
 		final Map<String, List<String>> containerRequestHeaders;
@@ -118,22 +118,24 @@ public abstract class WebActionRequestHandler extends SimpleRequestHandler<WebAc
 
 	protected RequestAndBaseUri getRequestAndBaseUri(WebActionRequest request) {
 		final String path = request.getPath();
-		final URI requestUri;
-		/*
-		 * prepend "/"
-		 */
+		String generatedRequestUri;
+		// prepend "/"
 		if (path == null || path.isEmpty()) {
-			requestUri = URI.create("/");
+			generatedRequestUri = "/";
 		} else if (!path.startsWith("/")) {
-			requestUri = URI.create("/" + path);
+			generatedRequestUri = "/" + path;
 		} else {
-			requestUri = URI.create(path);
+			generatedRequestUri = path;
+		}
+		// append query parameters
+		if (request.getQuery() != null && !request.getQuery().isEmpty()) {
+			generatedRequestUri += "?" + request.getQuery();
 		}
 		/*
 		 * we have to use "/" as base URI since there is no proper way to get
 		 * the base URI from the request
 		 */
-		return new RequestAndBaseUri(URI.create("/"), requestUri);
+		return new RequestAndBaseUri(URI.create("/"), URI.create(generatedRequestUri));
 	}
 
 	@Override

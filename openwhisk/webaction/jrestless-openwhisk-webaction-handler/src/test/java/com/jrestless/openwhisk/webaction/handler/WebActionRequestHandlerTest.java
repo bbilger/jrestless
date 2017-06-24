@@ -134,7 +134,7 @@ public class WebActionRequestHandlerTest {
 	@Test
 	public void createContainerRequest_NullBodyGiven_ShouldMapToEmptyInputStream() {
 		WebActionRequest request = minimalRequestBuilder()
-				.setRawBody(null)
+				.setBody(null)
 				.build();
 		JRestlessContainerRequest containerRequest = handler.createContainerRequest(request);
 		assertArrayEquals(new byte[0], IOUtils.toBytes(containerRequest.getEntityStream()));
@@ -143,7 +143,7 @@ public class WebActionRequestHandlerTest {
 	@Test
 	public void createContainerRequest_BodyGiven_ShouldMapToInputStream() {
 		WebActionRequest request = minimalRequestBuilder()
-				.setRawBody("some body")
+				.setBody("some body")
 				.build();
 		JRestlessContainerRequest containerRequest = handler.createContainerRequest(request);
 		assertArrayEquals("some body".getBytes(), IOUtils.toBytes(containerRequest.getEntityStream()));
@@ -197,6 +197,28 @@ public class WebActionRequestHandlerTest {
 				.build();
 		JRestlessContainerRequest containerRequest = handler.createContainerRequest(request);
 		assertEquals(URI.create("/path"), containerRequest.getRequestUri());
+		assertEquals(URI.create("/"), containerRequest.getBaseUri());
+	}
+
+	@Test
+	public void createContainerRequest_PathAndEmpyQueryGiven_ShouldNotAppendQuery() {
+		WebActionRequest request = minimalRequestBuilder()
+				.setPath("/path")
+				.setQuery("")
+				.build();
+		JRestlessContainerRequest containerRequest = handler.createContainerRequest(request);
+		assertEquals(URI.create("/path"), containerRequest.getRequestUri());
+		assertEquals(URI.create("/"), containerRequest.getBaseUri());
+	}
+
+	@Test
+	public void createContainerRequest_PathAndQueryGiven_ShouldNotAppendQuery() {
+		WebActionRequest request = minimalRequestBuilder()
+				.setPath("/path")
+				.setQuery("a=b")
+				.build();
+		JRestlessContainerRequest containerRequest = handler.createContainerRequest(request);
+		assertEquals(URI.create("/path?a=b"), containerRequest.getRequestUri());
 		assertEquals(URI.create("/"), containerRequest.getBaseUri());
 	}
 

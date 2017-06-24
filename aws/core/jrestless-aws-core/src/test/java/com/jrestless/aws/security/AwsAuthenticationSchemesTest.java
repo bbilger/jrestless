@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.jrestless.test.UtilityClassCodeCoverageBumper;
+
 public class AwsAuthenticationSchemesTest {
 
 	@Test
@@ -22,5 +24,10 @@ public class AwsAuthenticationSchemesTest {
 		}
 		authenticationSchemes.removeAll(AwsAuthenticationSchemes.ALL_AWS_AUTHENTICATION_SCHEMES);
 		assertTrue(authenticationSchemes.isEmpty());
+	}
+
+	@Test
+	public void bumpCodeCoverageByInvokingThePrivateConstructor() {
+		 UtilityClassCodeCoverageBumper.invokePrivateConstructor(AwsAuthenticationSchemes.class);
 	}
 }

@@ -29,6 +29,7 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -162,7 +163,7 @@ public class WebActionHttpRequestHandlerIntTest {
 		JsonObject request = new WebActionRequestBuilder()
 				.setHttpMethod(HttpMethod.POST)
 				.setPath("post-json-get-string")
-				.setBodyBase64Encoded("{\"value\":\"123\"}")
+				.setBodyBase64Encoded("{\"value\": \"123\"}")
 				.setContentType(MediaType.APPLICATION_JSON)
 				.buildJson();
 		JsonObject actualResponse = handler.delegateJsonRequest(request);
@@ -222,6 +223,20 @@ public class WebActionHttpRequestHandlerIntTest {
 		// we cannot use the object since the proxy is "Not inside a request scope", anymore
 		inOrder.verify(testService).injectedStringArg(requestBuilder0.build().getPath());
 		inOrder.verify(testService).injectedStringArg(requestBuilder1.build().getPath());
+	}
+
+	@Test
+	public void testQueryParameters() {
+		JsonObject request = new WebActionRequestBuilder()
+				.setHttpMethod(HttpMethod.GET)
+				.setPath("/inject-query-params")
+				.setQuery("q1=1&q2=2")
+				.buildJson();
+		JsonObject actualResponse = handler.delegateJsonRequest(request);
+		assertEquals(WebActionHttpResponseBuilder.noContent(), actualResponse);
+		InOrder inOrder = Mockito.inOrder(testService);
+		inOrder.verify(testService).injectedStringArg("1");
+		inOrder.verify(testService).injectedStringArg("2");
 	}
 
 	@Path("/")
@@ -310,16 +325,23 @@ public class WebActionHttpRequestHandlerIntTest {
 			testService.injectedWebActionRequest(request);
 		}
 
-		@Path("/inject-webaction-request-member0")
 		@GET
+		@Path("/inject-webaction-request-member0")
 		public void injectWebActionRequestAsMember0() {
 			testService.injectedStringArg(webActionRequestMember.getPath());
 		}
 
-		@Path("/inject-webaction-request-member1")
 		@GET
+		@Path("/inject-webaction-request-member1")
 		public void injectWebActionRequestAsMember1() {
 			testService.injectedStringArg(webActionRequestMember.getPath());
+		}
+
+		@GET
+		@Path("/inject-query-params")
+		public void injectQuerieParams(@QueryParam("q1") String q1, @QueryParam("q2") String q2) {
+			testService.injectedStringArg(q1);
+			testService.injectedStringArg(q2);
 		}
 	}
 

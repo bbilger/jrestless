@@ -76,13 +76,13 @@ public class WebActionRequestBuilder {
 		return this;
 	}
 
-	public WebActionRequestBuilder setRawBody(String body) {
+	public WebActionRequestBuilder setBody(String body) {
 		this.body = body;
 		return this;
 	}
 
 	public WebActionRequestBuilder setBodyBase64Encoded(String body) {
-		return setRawBody(new String(Base64.getEncoder().encode(body.getBytes()), StandardCharsets.UTF_8));
+		return setBody(new String(Base64.getEncoder().encode(body.getBytes()), StandardCharsets.UTF_8));
 	}
 
 	public WebActionRequestBuilder setQuery(String query) {
