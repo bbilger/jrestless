@@ -183,6 +183,7 @@ dependencies {
 	compile project(":aws:sns:jrestless-aws-sns-handler")
 	compile project(":openwhisk:core:jrestless-openwhisk-core")
 	compile project(":openwhisk:webaction:jrestless-openwhisk-webaction-handler")
+	compile project(":fnproject:core:jrestless-fnproject-core")
 	compile project(":test:jrestless-test")
 }
 
