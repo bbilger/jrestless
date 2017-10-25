@@ -18,7 +18,9 @@ package com.jrestless.core.filter;
 import java.io.IOException;
 import java.net.URI;
 
+import javax.annotation.Priority;
 import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
@@ -37,7 +39,11 @@ import javax.ws.rs.core.UriInfo;
  *
  */
 @PreMatching
+@Priority(ApplicationPathFilter.PRIORITY)
 public final class ApplicationPathFilter implements ContainerRequestFilter {
+
+	private static final int PRIORITY_OFFSET = 100;
+	public static final int PRIORITY = Priorities.HEADER_DECORATOR + PRIORITY_OFFSET;
 
 	private Application applicationConfig;
 
