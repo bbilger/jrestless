@@ -20,8 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.api.TypeLiteral;
+import javax.ws.rs.core.GenericType;
+
+import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.RequestScopedInitializer;
@@ -40,7 +41,7 @@ import com.jrestless.core.container.io.JRestlessContainerRequest;
 
 public class ServiceRequestHandlerTest {
 
-	private static final Type SERVICE_REQUEST_TYPE = (new TypeLiteral<Ref<ServiceRequest>>() { }).getType();
+	private static final Type SERVICE_REQUEST_TYPE = (new GenericType<Ref<ServiceRequest>>() { }).getType();
 
 	private JRestlessHandlerContainer<JRestlessContainerRequest> container;
 	private ServiceRequestHandlerImpl serviceHandler;
@@ -65,11 +66,11 @@ public class ServiceRequestHandlerTest {
 		Ref<ServiceRequest> serviceRequestRef = mock(Ref.class);
 		Ref<Context> contextRef = mock(Ref.class);
 
-		ServiceLocator serviceLocator = mock(ServiceLocator.class);
-		when(serviceLocator.getService(SERVICE_REQUEST_TYPE)).thenReturn(serviceRequestRef);
-		when(serviceLocator.getService(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE)).thenReturn(contextRef);
+		InjectionManager injectionManager = mock(InjectionManager.class);
+		when(injectionManager.getInstance(SERVICE_REQUEST_TYPE)).thenReturn(serviceRequestRef);
+		when(injectionManager.getInstance(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE)).thenReturn(contextRef);
 
-		requestScopedInitializer.initialize(serviceLocator);
+		requestScopedInitializer.initialize(injectionManager);
 
 		verify(serviceRequestRef).set(request);
 		verify(contextRef).set(context);
@@ -82,8 +83,8 @@ public class ServiceRequestHandlerTest {
 
 		RequestScopedInitializer requestScopedInitializer = getSetRequestScopedInitializer(context, request);
 
-		ServiceLocator serviceLocator = mock(ServiceLocator.class);
-		requestScopedInitializer.initialize(serviceLocator);
+		InjectionManager injectionManager = mock(InjectionManager.class);
+		requestScopedInitializer.initialize(injectionManager);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

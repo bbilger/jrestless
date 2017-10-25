@@ -15,6 +15,7 @@ dependencies {
 		libraries.jersey_media_json_jackson,
 		libraries.jsonassert,
 		libraries.jersey_test_core,
-		libraries.jersey_test_grizzly
+		libraries.jersey_test_grizzly,
+		libraries.jersey_inject_hk2
 	)
 }

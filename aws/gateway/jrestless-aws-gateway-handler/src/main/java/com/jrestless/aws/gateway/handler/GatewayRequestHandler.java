@@ -33,13 +33,13 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
 
-import org.glassfish.hk2.api.TypeLiteral;
-import org.glassfish.hk2.utilities.Binder;
+import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.internal.inject.ReferencingFactory;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
@@ -76,7 +76,7 @@ public abstract class GatewayRequestHandler
 	private static final Logger LOG = LoggerFactory.getLogger(GatewayRequestHandler.class);
 	private static final String AWS_DOMAIN = "amazonaws.com";
 	private static final URI BASE_ROOT_URI = URI.create("/");
-	private static final Type GATEWAY_REQUEST_TYPE = (new TypeLiteral<Ref<GatewayRequest>>() { }).getType();
+	private static final Type GATEWAY_REQUEST_TYPE = (new GenericType<Ref<GatewayRequest>>() { }).getType();
 
 	protected GatewayRequestHandler() {
 	}
@@ -108,14 +108,14 @@ public abstract class GatewayRequestHandler
 		Context lambdaContext = requestAndLambdaContext.getLambdaContext();
 		actualContainerRequest.setRequestScopedInitializer(locator -> {
 			Ref<GatewayRequest> gatewayRequestRef = locator
-					.<Ref<GatewayRequest>>getService(GATEWAY_REQUEST_TYPE);
+					.<Ref<GatewayRequest>>getInstance(GATEWAY_REQUEST_TYPE);
 			if (gatewayRequestRef != null) {
 				gatewayRequestRef.set(request);
 			} else {
 				LOG.error("GatewayFeature has not been registered. GatewayRequest injection won't work.");
 			}
 			Ref<Context> contextRef = locator
-					.<Ref<Context>>getService(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE);
+					.<Ref<Context>>getInstance(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE);
 			if (contextRef != null) {
 				contextRef.set(lambdaContext);
 			} else {
@@ -523,7 +523,7 @@ public abstract class GatewayRequestHandler
 		public void configure() {
 			bindReferencingLambdaContextFactory();
 			bindReferencingFactory(GatewayRequest.class, ReferencingGatewayRequestFactory.class,
-					new TypeLiteral<Ref<GatewayRequest>>() { });
+					new GenericType<Ref<GatewayRequest>>() { });
 		}
 	}
 

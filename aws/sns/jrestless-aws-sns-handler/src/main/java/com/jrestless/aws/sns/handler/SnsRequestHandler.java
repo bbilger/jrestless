@@ -34,13 +34,13 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 
-import org.glassfish.hk2.api.TypeLiteral;
-import org.glassfish.hk2.utilities.Binder;
+import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.internal.inject.ReferencingFactory;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
@@ -76,7 +76,7 @@ public abstract class SnsRequestHandler extends SimpleRequestHandler<SnsRecordAn
 
 	private static final URI BASE_ROOT_URI = URI.create("/");
 
-	private static final Type SNS_RECORD_TYPE = (new TypeLiteral<Ref<SNSRecord>>() { }).getType();
+	private static final Type SNS_RECORD_TYPE = (new GenericType<Ref<SNSRecord>>() { }).getType();
 
 	protected SnsRequestHandler() {
 	}
@@ -183,14 +183,14 @@ public abstract class SnsRequestHandler extends SimpleRequestHandler<SnsRecordAn
 		SNSRecord snsRecord = snsRecordAndContext.getSnsRecord();
 		Context lambdaContext = snsRecordAndContext.getLambdaContext();
 		actualContainerRequest.setRequestScopedInitializer(locator -> {
-			Ref<SNSRecord> snsRecordRef = locator.<Ref<SNSRecord>>getService(SNS_RECORD_TYPE);
+			Ref<SNSRecord> snsRecordRef = locator.<Ref<SNSRecord>>getInstance(SNS_RECORD_TYPE);
 			if (snsRecordRef != null) {
 				snsRecordRef.set(snsRecord);
 			} else {
 				LOG.error("SnsFeature has not been registered. SNSRecord injection won't work.");
 			}
 			Ref<Context> contextRef = locator
-					.<Ref<Context>>getService(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE);
+					.<Ref<Context>>getInstance(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE);
 			if (contextRef != null) {
 				contextRef.set(lambdaContext);
 			} else {
@@ -270,7 +270,7 @@ public abstract class SnsRequestHandler extends SimpleRequestHandler<SnsRecordAn
 		protected void configure() {
 			bindReferencingLambdaContextFactory();
 			bindReferencingFactory(SNSRecord.class, ReferencingSnsRecordFactory.class,
-					new TypeLiteral<Ref<SNSRecord>>() { });
+					new GenericType<Ref<SNSRecord>>() { });
 		}
 	}
 

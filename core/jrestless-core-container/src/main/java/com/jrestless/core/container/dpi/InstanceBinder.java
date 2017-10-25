@@ -22,13 +22,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 
-import org.glassfish.hk2.api.Factory;
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 
 /**
- * Simple HK2 instance binder.
+ * Simple instance binder.
  * <p>
  * Use the {@link Builder builder} to create an instance binder.
  *
@@ -37,16 +37,16 @@ import org.glassfish.jersey.process.internal.RequestScoped;
  */
 public final class InstanceBinder extends AbstractBinder {
 
-	private final Collection<InstanceFactory<?>> factories;
+	private final Collection<InstanceFactoryDefinition<?>> factoryDefinitions;
 
-	private InstanceBinder(Collection<InstanceFactory<?>> factories) {
-		this.factories = factories;
+	private InstanceBinder(Collection<InstanceFactoryDefinition<?>> factoryDefinitions) {
+		this.factoryDefinitions = factoryDefinitions;
 	}
 
 	@Override
 	protected void configure() {
-		for (InstanceFactory<?> factory : factories) {
-			bindFactory(factory).to(factory.getType()).in(factory.getScope());
+		for (InstanceFactoryDefinition<?> factory : factoryDefinitions) {
+			bindFactory(factory.getInstanceFactory()).to(factory.getType()).in(factory.getScope());
 		}
 	}
 	/**
@@ -57,7 +57,7 @@ public final class InstanceBinder extends AbstractBinder {
 	 */
 	public static class Builder {
 
-		private List<InstanceFactory<?>> factories = new ArrayList<>();
+		private List<InstanceFactoryDefinition<?>> factoryDefinitions = new ArrayList<>();
 
 		/**
 		 * Add an instance for the given type and scope.
@@ -65,8 +65,8 @@ public final class InstanceBinder extends AbstractBinder {
 		 * @param instanceFactory
 		 * @return
 		 */
-		public <T> Builder addInstance(InstanceFactory<T> instanceFactory) {
-			factories.add(instanceFactory);
+		public <T> Builder addInstance(InstanceFactoryDefinition<T> instanceFactory) {
+			factoryDefinitions.add(instanceFactory);
 			return this;
 		}
 
@@ -90,7 +90,7 @@ public final class InstanceBinder extends AbstractBinder {
 		 * @return
 		 */
 		public <T> Builder addInstance(T instance, Class<T> type, Class<? extends Annotation> scope) {
-			return addInstance(new InstanceFactory<T>(instance, type, scope));
+			return addInstance(new InstanceFactoryDefinition<T>(instance, type, scope));
 		}
 
 		/**
@@ -99,38 +99,41 @@ public final class InstanceBinder extends AbstractBinder {
 		 * @return
 		 */
 		public InstanceBinder build() {
-			return new InstanceBinder(new LinkedList<>(factories));
+			return new InstanceBinder(new LinkedList<>(factoryDefinitions));
 		}
 	}
 
-	public static class InstanceFactory<T> implements Factory<T> {
+	static class InstanceFactoryDefinition<T> {
 
-		private final T instance;
+		private final Supplier<T> instanceFactory;
 		private final Class<T> type;
 		private final Class<? extends Annotation> scope;
 
-		public InstanceFactory(T instance, Class<T> type, Class<? extends Annotation> scope) {
-			this.instance = requireNonNull(instance);
+		InstanceFactoryDefinition(T instance, Class<T> type, Class<? extends Annotation> scope) {
+			this(wrap(instance), type, scope);
+		}
+
+		private static <T> Supplier<T> wrap(T instance) {
+			requireNonNull(instance);
+			return () -> instance;
+		}
+
+		InstanceFactoryDefinition(Supplier<T> instanceSupplier, Class<T> type, Class<? extends Annotation> scope) {
+			this.instanceFactory = requireNonNull(instanceSupplier);
 			this.type = requireNonNull(type);
 			this.scope = requireNonNull(scope);
 		}
 
-		public Class<? extends Annotation> getScope() {
+		Class<? extends Annotation> getScope() {
 			return scope;
 		}
 
-		public Class<T> getType() {
+		Class<T> getType() {
 			return type;
 		}
 
-		@Override
-		public void dispose(T t) {
-			// hook; nothing to do by default
-		}
-
-		@Override
-		public T provide() {
-			return instance;
+		Supplier<T> getInstanceFactory() {
+			return instanceFactory;
 		}
 	}
 }

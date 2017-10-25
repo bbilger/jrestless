@@ -53,7 +53,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 
-import org.glassfish.hk2.utilities.Binder;
+import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.junit.Before;

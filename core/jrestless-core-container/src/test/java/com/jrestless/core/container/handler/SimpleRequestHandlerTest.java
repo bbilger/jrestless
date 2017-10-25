@@ -22,7 +22,6 @@ import java.util.Map;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response.Status;
 
-import org.glassfish.hk2.api.ServiceLocator;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -54,7 +53,7 @@ public class SimpleRequestHandlerTest {
 
 	@Test(expected = NullPointerException.class)
 	public void init1_NullAppGiven_ShouldThrowNpe() {
-		new SimpleRequestHandlerImpl().init((Application) null, mock(ServiceLocator.class));
+		new SimpleRequestHandlerImpl().init((Application) null, "");
 	}
 
 	@Test

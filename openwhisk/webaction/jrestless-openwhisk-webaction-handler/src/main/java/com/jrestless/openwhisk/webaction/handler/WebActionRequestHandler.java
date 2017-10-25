@@ -32,11 +32,11 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 
-import org.glassfish.hk2.api.TypeLiteral;
-import org.glassfish.hk2.utilities.Binder;
+import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.internal.inject.ReferencingFactory;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
@@ -78,7 +78,7 @@ public abstract class WebActionRequestHandler extends SimpleRequestHandler<WebAc
 
 	private static final Logger LOG = LoggerFactory.getLogger(WebActionRequestHandler.class);
 	private static final Gson GSON = new GsonBuilder().create();
-	private static final Type WEB_ACTION_REQUEST_TYPE = (new TypeLiteral<Ref<WebActionRequest>>() { }).getType();
+	private static final Type WEB_ACTION_REQUEST_TYPE = (new GenericType<Ref<WebActionRequest>>() { }).getType();
 
 	protected abstract JsonObject createJsonResponse(String body, Map<String, String> responseHeaders,
 			StatusType statusType);
@@ -156,7 +156,7 @@ public abstract class WebActionRequestHandler extends SimpleRequestHandler<WebAc
 			JRestlessContainerRequest containerRequest, WebActionRequest request) {
 		actualContainerRequest.setRequestScopedInitializer(locator -> {
 			Ref<WebActionRequest> webActionRequestRef = locator
-					.<Ref<WebActionRequest>>getService(WEB_ACTION_REQUEST_TYPE);
+					.<Ref<WebActionRequest>>getInstance(WEB_ACTION_REQUEST_TYPE);
 			if (webActionRequestRef != null) {
 				webActionRequestRef.set(request);
 			} else {
@@ -196,7 +196,7 @@ public abstract class WebActionRequestHandler extends SimpleRequestHandler<WebAc
 		@Override
 		public void configure() {
 			bindReferencingFactory(WebActionRequest.class, ReferencingWebActionRequestFactory.class,
-					new TypeLiteral<Ref<WebActionRequest>>() { });
+					new GenericType<Ref<WebActionRequest>>() { });
 		}
 	}
 

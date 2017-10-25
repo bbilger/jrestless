@@ -18,6 +18,7 @@ package com.jrestless.openwhisk.webaction.handler;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
@@ -28,8 +29,6 @@ import org.junit.Test;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-
-import jersey.repackaged.com.google.common.collect.ImmutableMap;
 
 public class WebActionHttpRequestHandlerTest {
 
@@ -72,7 +71,9 @@ public class WebActionHttpRequestHandlerTest {
 
 	@Test
 	public void createJsonResponse_MultipleHeadersGiven_ShouldCreateResponseWithAllHeaders() {
-		final Map<String, String> headers = ImmutableMap.of("header1", "value1", "header2", "value2");
+		final Map<String, String> headers = new HashMap<>();
+		headers.put("header1", "value1");
+		headers.put("header2", "value2");
 		testResponse(null, headers, Status.OK);
 	}
 

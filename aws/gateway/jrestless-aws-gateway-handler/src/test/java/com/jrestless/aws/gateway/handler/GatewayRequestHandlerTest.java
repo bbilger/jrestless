@@ -36,10 +36,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response.Status;
 
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.api.TypeLiteral;
+import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.RequestScopedInitializer;
@@ -63,7 +63,7 @@ import com.jrestless.core.container.io.RequestAndBaseUri;
 
 public class GatewayRequestHandlerTest {
 
-	private static final Type GATEWAY_REQUEST_TYPE = (new TypeLiteral<Ref<GatewayRequest>>() { }).getType();
+	private static final Type GATEWAY_REQUEST_TYPE = (new GenericType<Ref<GatewayRequest>>() { }).getType();
 
 	private static final String TEST_AWS_DOMAIN = "0123456789.execute-api.eu-central-1.amazonaws.com";
 	private static final String TEST_AWS_DOMAIN_WITH_SCHEME = "https://" + TEST_AWS_DOMAIN;
@@ -95,11 +95,12 @@ public class GatewayRequestHandlerTest {
 		Ref<GatewayRequest> gatewayRequestRef = mock(Ref.class);
 		Ref<Context> contextRef = mock(Ref.class);
 
-		ServiceLocator serviceLocator = mock(ServiceLocator.class);
-		when(serviceLocator.getService(GATEWAY_REQUEST_TYPE)).thenReturn(gatewayRequestRef);
-		when(serviceLocator.getService(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE)).thenReturn(contextRef);
 
-		requestScopedInitializer.initialize(serviceLocator);
+		InjectionManager injectionManager = mock(InjectionManager.class);
+		when(injectionManager.getInstance(GATEWAY_REQUEST_TYPE)).thenReturn(gatewayRequestRef);
+		when(injectionManager.getInstance(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE)).thenReturn(contextRef);
+
+		requestScopedInitializer.initialize(injectionManager);
 
 		verify(gatewayRequestRef).set(request);
 		verify(contextRef).set(context);
@@ -115,8 +116,8 @@ public class GatewayRequestHandlerTest {
 
 		RequestScopedInitializer requestScopedInitializer = getSetRequestScopedInitializer(context, request);
 
-		ServiceLocator serviceLocator = mock(ServiceLocator.class);
-		requestScopedInitializer.initialize(serviceLocator);
+		InjectionManager injectionManager = mock(InjectionManager.class);
+		requestScopedInitializer.initialize(injectionManager);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -5,7 +5,8 @@ dependencies {
 	compile(
 		libraries.guava_testlib,
 		libraries.jersey_test_core,
-		libraries.jersey_test_grizzly
+		libraries.jersey_test_grizzly,
+		libraries.jersey_inject_hk2
 	)
 	testCompile(
 		libraries.junit,

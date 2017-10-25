@@ -16,15 +16,14 @@
 package com.jrestless.core.container.handler;
 
 import static java.util.Objects.requireNonNull;
-import static jersey.repackaged.com.google.common.base.Preconditions.checkState;
+import static org.glassfish.jersey.internal.guava.Preconditions.checkState;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.SecurityContext;
 
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.utilities.Binder;
+import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.server.ContainerRequest;
 
 import com.jrestless.core.container.JRestlessHandlerContainer;
@@ -66,11 +65,11 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	 * May be called once, only.
 	 *
 	 * @param application
-	 * @param parent
+	 * @param parentManager
 	 */
-	public final void init(@Nonnull Application application, @Nullable ServiceLocator parent) {
+	public final void init(@Nonnull Application application, @Nullable Object parentManager) {
 		requireNonNull(application);
-		init(new JRestlessHandlerContainer<>(application, createBinder(), parent));
+		init(new JRestlessHandlerContainer<>(application, createBinder(), parentManager));
 	}
 
 	protected Binder createBinder() {

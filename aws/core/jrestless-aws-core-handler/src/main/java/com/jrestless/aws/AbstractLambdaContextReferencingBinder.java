@@ -19,8 +19,8 @@ import java.lang.reflect.Type;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.ws.rs.core.GenericType;
 
-import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.jersey.internal.inject.ReferencingFactory;
 import org.glassfish.jersey.internal.util.collection.Ref;
 
@@ -38,11 +38,11 @@ import com.jrestless.core.container.dpi.AbstractReferencingBinder;
  */
 public abstract class AbstractLambdaContextReferencingBinder extends AbstractReferencingBinder {
 
-	public static final Type LAMBDA_CONTEXT_TYPE = (new TypeLiteral<Ref<Context>>() { }).getType();
+	public static final Type LAMBDA_CONTEXT_TYPE = (new GenericType<Ref<Context>>() { }).getType();
 
 	protected final void bindReferencingLambdaContextFactory() {
 		bindReferencingFactory(Context.class, ReferencingLambdaContextFactory.class,
-				new TypeLiteral<Ref<Context>>() { });
+				new GenericType<Ref<Context>>() { });
 	}
 
 	private static class ReferencingLambdaContextFactory extends ReferencingFactory<Context> {

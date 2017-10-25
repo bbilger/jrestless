@@ -28,11 +28,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.api.TypeLiteral;
+import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.RequestScopedInitializer;
@@ -53,7 +53,7 @@ import com.jrestless.test.IOUtils;
 
 public class WebActionRequestHandlerTest {
 
-	private static final Type WEB_ACTION_REQUEST_TYPE = (new TypeLiteral<Ref<WebActionRequest>>() { }).getType();
+	private static final Type WEB_ACTION_REQUEST_TYPE = (new GenericType<Ref<WebActionRequest>>() { }).getType();
 	private static final Gson GSON = new GsonBuilder().create();
 
 	private final WebActionRequestHandler handler = new WebActionRequestHandler() {
@@ -252,10 +252,10 @@ public class WebActionRequestHandlerTest {
 		@SuppressWarnings("unchecked")
 		Ref<WebActionRequest> gatewayRequestRef = mock(Ref.class);
 
-		ServiceLocator serviceLocator = mock(ServiceLocator.class);
-		when(serviceLocator.getService(WEB_ACTION_REQUEST_TYPE)).thenReturn(gatewayRequestRef);
+		InjectionManager injectionManager = mock(InjectionManager.class);
+		when(injectionManager.getInstance(WEB_ACTION_REQUEST_TYPE)).thenReturn(gatewayRequestRef);
 
-		requestScopedInitializer.initialize(serviceLocator);
+		requestScopedInitializer.initialize(injectionManager);
 
 		verify(gatewayRequestRef).set(request);
 	}
@@ -269,8 +269,8 @@ public class WebActionRequestHandlerTest {
 
 		RequestScopedInitializer requestScopedInitializer = getSetRequestScopedInitializer(jsonRequest);
 
-		ServiceLocator serviceLocator = mock(ServiceLocator.class);
-		requestScopedInitializer.initialize(serviceLocator);
+		InjectionManager injectionManager = mock(InjectionManager.class);
+		requestScopedInitializer.initialize(injectionManager);
 	}
 
 	@SuppressWarnings("unchecked")

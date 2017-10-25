@@ -35,9 +35,8 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.SecurityContext;
 
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.utilities.Binder;
 import org.glassfish.jersey.internal.MapPropertiesDelegate;
+import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ContainerException;
 import org.glassfish.jersey.server.ContainerRequest;
@@ -98,14 +97,17 @@ public class JRestlessHandlerContainer<RequestT extends JRestlessContainerReques
 	 *            JAX-RS / Jersey application to be deployed on the JRestless
 	 *            container
 	 * @param customBinder
-	 *            additional custom bindings used during {@link ServiceLocator}
+	 *            additional custom bindings used during
+	 *            {@link org.glassfish.jersey.internal.inject.InjectionManager}
 	 *            creation
-	 * @param parentLocator
-	 *            parent HK2 service locator
+	 * @param parentManager
+	 *            parent used in
+	 *            {@link org.glassfish.jersey.internal.inject.InjectionManager}
+	 *            for a specific DI provider
 	 */
 	public JRestlessHandlerContainer(@Nonnull Application application, @Nullable Binder customBinder,
-			@Nullable ServiceLocator parentLocator) {
-		this(new ApplicationHandler(requireNonNull(application), customBinder, parentLocator));
+			@Nullable Object parentManager) {
+		this(new ApplicationHandler(requireNonNull(application), customBinder, parentManager));
 	}
 
 	protected JRestlessHandlerContainer(@Nonnull ApplicationHandler applicationHandler) {

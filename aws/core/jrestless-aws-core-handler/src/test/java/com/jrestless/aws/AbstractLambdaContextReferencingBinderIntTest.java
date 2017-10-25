@@ -18,8 +18,8 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.utilities.Binder;
+import org.glassfish.jersey.internal.inject.Binder;
+import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
@@ -128,17 +128,17 @@ public class AbstractLambdaContextReferencingBinderIntTest extends JerseyTest {
 	public static class LambdaContextSetter implements ContainerRequestFilter {
 
 		private final LambdaContextProvider lambdaContextProvider;
-		private final ServiceLocator serviceLocator;
+		private final InjectionManager injectionManager;
 
 		@Inject
-		public LambdaContextSetter(LambdaContextProvider lambdaContextProvider, ServiceLocator serviceLocator) {
+		public LambdaContextSetter(LambdaContextProvider lambdaContextProvider, InjectionManager injectionManager) {
 			this.lambdaContextProvider = lambdaContextProvider;
-			this.serviceLocator = serviceLocator;
+			this.injectionManager = injectionManager;
 		}
 
 		@Override
 		public void filter(ContainerRequestContext requestContext) throws IOException {
-			serviceLocator.<Ref<Context>>getService(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE)
+			injectionManager.<Ref<Context>>getInstance(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE)
 					.set(lambdaContextProvider.getLambdaContext());
 		}
 

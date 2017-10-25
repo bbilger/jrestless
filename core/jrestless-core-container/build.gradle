@@ -15,7 +15,8 @@ dependencies {
 		libraries.slf4j_simple,
 		libraries.jersey_media_json_jackson,
 		libraries.jersey_test_core,
-		libraries.jersey_test_grizzly
+		libraries.jersey_test_grizzly,
+		libraries.jersey_inject_hk2
 	)
 }
 

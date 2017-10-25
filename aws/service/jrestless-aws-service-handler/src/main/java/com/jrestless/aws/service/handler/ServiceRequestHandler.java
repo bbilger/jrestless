@@ -32,11 +32,11 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 
-import org.glassfish.hk2.api.TypeLiteral;
-import org.glassfish.hk2.utilities.Binder;
+import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.internal.inject.ReferencingFactory;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
@@ -72,7 +72,7 @@ public abstract class ServiceRequestHandler
 
 	private static final URI BASE_ROOT_URI = URI.create("/");
 
-	private static final Type SERVICE_REQUEST_TYPE = (new TypeLiteral<Ref<ServiceRequest>>() { }).getType();
+	private static final Type SERVICE_REQUEST_TYPE = (new GenericType<Ref<ServiceRequest>>() { }).getType();
 
 	protected ServiceRequestHandler() {
 	}
@@ -100,14 +100,14 @@ public abstract class ServiceRequestHandler
 		Context lambdaContext = requestAndLambdaContext.getLambdaContext();
 		actualContainerRequest.setRequestScopedInitializer(locator -> {
 			Ref<ServiceRequest> serviceRequestRef = locator
-					.<Ref<ServiceRequest>>getService(SERVICE_REQUEST_TYPE);
+					.<Ref<ServiceRequest>>getInstance(SERVICE_REQUEST_TYPE);
 			if (serviceRequestRef != null) {
 				serviceRequestRef.set(request);
 			} else {
 				LOG.error("ServiceFeature has not been registered. ServiceRequest injection won't work.");
 			}
 			Ref<Context> contextRef = locator
-					.<Ref<Context>>getService(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE);
+					.<Ref<Context>>getInstance(AbstractLambdaContextReferencingBinder.LAMBDA_CONTEXT_TYPE);
 			if (contextRef != null) {
 				contextRef.set(lambdaContext);
 			} else {
@@ -173,7 +173,7 @@ public abstract class ServiceRequestHandler
 		protected void configure() {
 			bindReferencingLambdaContextFactory();
 			bindReferencingFactory(ServiceRequest.class, ReferencingServiceRequestFactory.class,
-					new TypeLiteral<Ref<ServiceRequest>>() { });
+					new GenericType<Ref<ServiceRequest>>() { });
 		}
 	}
 

@@ -14,7 +14,7 @@ import javax.inject.Singleton;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
-import org.glassfish.hk2.utilities.Binder;
+import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Before;
 import org.junit.Test;

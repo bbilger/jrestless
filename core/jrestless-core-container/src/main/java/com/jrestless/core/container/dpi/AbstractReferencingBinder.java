@@ -15,8 +15,9 @@
  */
 package com.jrestless.core.container.dpi;
 
-import org.glassfish.hk2.api.TypeLiteral;
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import javax.ws.rs.core.GenericType;
+
+import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.internal.inject.ReferencingFactory;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.process.internal.RequestScoped;
@@ -41,7 +42,7 @@ public abstract class AbstractReferencingBinder extends AbstractBinder {
 	 * @param referenceTypeLiteral
 	 */
 	public final <T> void bindReferencingFactory(Class<T> referenceType,
-			Class<? extends ReferencingFactory<T>> referencingFacatory, TypeLiteral<Ref<T>> referenceTypeLiteral) {
+			Class<? extends ReferencingFactory<T>> referencingFacatory, GenericType<Ref<T>> referenceTypeLiteral) {
 		bindFactory(referencingFacatory)
 			.to(referenceType)
 			.proxy(true)

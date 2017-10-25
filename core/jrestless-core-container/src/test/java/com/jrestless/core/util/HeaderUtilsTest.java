@@ -15,8 +15,6 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableMap;
 import com.jrestless.test.UtilityClassCodeCoverageBumper;
 
-import jersey.repackaged.com.google.common.collect.ImmutableList;
-
 public class HeaderUtilsTest {
 
 	@Test
@@ -83,7 +81,10 @@ public class HeaderUtilsTest {
 	@Test
 	public void flattenHeaders_MultipleValuesGiven_ShouldPassHeader() {
 		Map<String, List<String>> listHeaders = new HashMap<>();
-		listHeaders.put("a_k", ImmutableList.of("a_v0", "a_v1"));
+		List<String> headerValues = new ArrayList<>();
+		headerValues.add("a_v0");
+		headerValues.add("a_v1");
+		listHeaders.put("a_k", headerValues);
 		Map<String, String> flattenedHeaders = flattenHeaders(listHeaders);
 		assertEquals(ImmutableMap.of("a_k", "a_v0,a_v1"), flattenedHeaders);
 	}
