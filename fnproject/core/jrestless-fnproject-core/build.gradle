@@ -14,7 +14,7 @@ dependencies {
 	compile(
 		libraries.slf4j_simple,
 		"com.fnproject.fn:api:1.0.42",
-		"org.glassfish.jersey.media:jersey-media-json-jackson:2.25.1"
+		"org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyVersion}"
 	)
 
 	testCompile project(":test:jrestless-test")

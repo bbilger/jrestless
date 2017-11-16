@@ -10,15 +10,17 @@ import com.jrestless.core.container.handler.SimpleRequestHandler;
 import com.jrestless.core.container.io.DefaultJRestlessContainerRequest;
 import com.jrestless.core.container.io.JRestlessContainerRequest;
 import com.jrestless.core.container.io.RequestAndBaseUri;
-import org.glassfish.hk2.api.TypeLiteral;
-import org.glassfish.hk2.utilities.Binder;
+import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.internal.inject.ReferencingFactory;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -44,8 +46,11 @@ import static java.util.Objects.requireNonNull;
  */
 public abstract class FnRequestHandler extends
 	SimpleRequestHandler<FnRequestHandler.WrappedInput, FnRequestHandler.WrappedOutput> {
-	private static final Type INPUT_EVENT_TYPE = (new TypeLiteral<Ref<InputEvent>>() { }).getType();
-	private static final Type RUNTIME_CONTEXT_TYPE = (new TypeLiteral<Ref<RuntimeContext>>() { }).getType();
+
+	private static final Logger LOG = LoggerFactory.getLogger(FnRequestHandler.class);
+
+	private static final Type INPUT_EVENT_TYPE = (new GenericType<Ref<InputEvent>>() { }).getType();
+	private static final Type RUNTIME_CONTEXT_TYPE = (new GenericType<Ref<RuntimeContext>>() { }).getType();
 	private RuntimeContext rctx;
 	private String defaultContentType = MediaType.APPLICATION_JSON;
 
@@ -119,12 +124,12 @@ public abstract class FnRequestHandler extends
 		InputEvent event = wrappedInput.inputEvent;
 		actualContainerRequest.setRequestScopedInitializer(locator -> {
 			Ref<InputEvent> inputEventRef = locator
-					.<Ref<InputEvent>>getService(INPUT_EVENT_TYPE);
+					.<Ref<InputEvent>>getInstance(INPUT_EVENT_TYPE);
 			if (inputEventRef != null) {
 				inputEventRef.set(event);
 			}
 			Ref<RuntimeContext> contextRef = locator
-					.<Ref<RuntimeContext>>getService(RUNTIME_CONTEXT_TYPE);
+					.<Ref<RuntimeContext>>getInstance(RUNTIME_CONTEXT_TYPE);
 			if (contextRef != null) {
 				contextRef.set(rctx);
 			}
@@ -143,11 +148,11 @@ public abstract class FnRequestHandler extends
 		public void configure() {
 			bindReferencingFactory(InputEvent.class,
 					ReferencingInputEventFactory.class,
-					new TypeLiteral<Ref<InputEvent>>() { }
+					new GenericType<Ref<InputEvent>>() { }
 					);
 			bindReferencingFactory(RuntimeContext.class,
 					ReferencingRuntimeContextFactory.class,
-					new TypeLiteral<Ref<RuntimeContext>>() { }
+					new GenericType<Ref<RuntimeContext>>() { }
 					);
 		}
 	}
@@ -225,8 +230,8 @@ public abstract class FnRequestHandler extends
 	protected WrappedOutput onRequestFailure(Exception e,
 											WrappedInput wrappedInput,
 											@Nullable JRestlessContainerRequest jRestlessContainerRequest) {
-		System.err.println("request failed" + e.getMessage());
-		e.printStackTrace();
+		LOG.error("Request failed", e);
+
 		OutputEvent outputEvent = OutputEvent.emptyResult(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
 		return new WrappedOutput(outputEvent, null, Response.Status.INTERNAL_SERVER_ERROR);
 	}
