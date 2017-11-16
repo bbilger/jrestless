@@ -11,14 +11,14 @@ JRestless allows you to create serverless or rather AWS Lambda applications usin
 [![License](https://img.shields.io/github/license/bbilger/jrestless.svg?maxAge=60&style=flat-square)](https://github.com/bbilger/jrestless/blob/master/LICENSE)
 
 SonarQube:
-[![SonarQube - Quality Gate](https://sonarqube.com/api/badges/gate?key=jrestless)](https://sonarqube.com/dashboard?id=jrestless)
-[![SonarQube - Coverage](https://sonarqube.com/api/badges/measure?key=jrestless&metric=coverage&template=FLAT)](https://sonarqube.com/component_measures/domain/Coverage?id=jrestless)
-[![SonarQube - Bugs](https://sonarqube.com/api/badges/measure?key=jrestless&metric=bugs&template=FLAT)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=BUG)
-[![SonarQube - Vulnerabilities](https://sonarqube.com/api/badges/measure?key=jrestless&metric=vulnerabilities&template=FLAT)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=VULNERABILITY)
-[![SonarQube - Tests](https://sonarqube.com/api/badges/measure?key=jrestless&metric=tests&template=FLAT)](https://sonarqube.com/component_measures/metric/tests/list?id=jrestless)
-[![SonarQube - Duplicated Blocks](https://sonarqube.com/api/badges/measure?key=jrestless&metric=duplicated_lines_density&template=FLAT)](https://sonarqube.com/component_measures/metric/duplicated_blocks/list?id=jrestless)
-[![SonarQube - Technical Debt](https://sonarqube.com/api/badges/measure?key=jrestless&metric=sqale_debt_ratio&template=FLAT)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|facetMode=effort|types=CODE_SMELL)
-[![SonarQube - Code Smells](https://sonarqube.com/api/badges/measure?key=jrestless&metric=code_smells&template=FLAT)](https://sonarqube.com/component_issues?id=jrestless#resolved=false|types=CODE_SMELL)
+[![SonarQube - Quality Gate](https://sonarcloud.io/api/badges/gate?key=jrestless)](https://sonarcloud.io/dashboard?id=jrestless)
+[![SonarQube - Coverage](https://sonarcloud.io/api/badges/measure?key=jrestless&metric=coverage&template=FLAT)](https://sonarcloud.io/component_measures/domain/Coverage?id=jrestless)
+[![SonarQube - Bugs](https://sonarcloud.io/api/badges/measure?key=jrestless&metric=bugs&template=FLAT)](https://sonarcloud.io/project/issues?id=jrestless&resolved=false&types=BUG)
+[![SonarQube - Vulnerabilities](https://sonarcloud.io/api/badges/measure?key=jrestless&metric=vulnerabilities&template=FLAT)](https://sonarcloud.io/project/issues?id=jrestless&resolved=false&types=VULNERABILITY)
+[![SonarQube - Tests](https://sonarcloud.io/api/badges/measure?key=jrestless&metric=tests&template=FLAT)](https://sonarcloud.io/component_measures?id=jrestless&metric=tests)
+[![SonarQube - Duplicated Blocks](https://sonarcloud.io/api/badges/measure?key=jrestless&metric=duplicated_lines_density&template=FLAT)](https://sonarcloud.io/component_measures?id=jrestless&metric=duplicated_blocks)
+[![SonarQube - Technical Debt](https://sonarcloud.io/api/badges/measure?key=jrestless&metric=sqale_debt_ratio&template=FLAT)](https://sonarcloud.io/component_measures?id=jrestless&metric=sqale_debt_ratio)
+[![SonarQube - Code Smells](https://sonarcloud.io/api/badges/measure?key=jrestless&metric=code_smells&template=FLAT)](https://sonarcloud.io/project/issues?id=jrestless&resolved=false&types=CODE_SMELL)
 
 ## Table of Contents
 
