@@ -1,17 +1,11 @@
-package com.fnproject.fn.jrestless;
+package com.jrestless.fnproject;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fnproject.fn.api.InputEvent;
-import com.fnproject.fn.api.RuntimeContext;
-import com.jrestless.core.container.dpi.InstanceBinder;
-import jersey.repackaged.com.google.common.collect.ImmutableMap;
-import org.glassfish.hk2.utilities.Binder;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+
+import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
+import java.util.Map;
 
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -23,25 +17,31 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
-import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import org.glassfish.jersey.internal.inject.Binder;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fnproject.fn.api.InputEvent;
+import com.fnproject.fn.api.RuntimeContext;
+import com.google.common.collect.ImmutableMap;
+import com.jrestless.core.container.dpi.InstanceBinder;
 
 public class FnFutureRequestHandlerTest {
     private String DOMAIN_WITH_SCHEME = "http://www.example.com";
     private FnTestObjectHandler handler;
     private TestService testService;
     private RuntimeContext runtimeContext = mock(RuntimeContext.class);
-    private ByteArrayInputStream defaultBody;
 
     @Before
     public void setUp() {
         testService = mock(TestService.class);
         handler = createAndStartHandler(new ResourceConfig(), testService);
-        defaultBody = new ByteArrayInputStream(new byte[]{});
     }
 
     private interface TestService {
@@ -79,8 +79,8 @@ public class FnFutureRequestHandlerTest {
                 .getInputEvent();
         FnRequestHandler.WrappedOutput wrappedOutput = handler.handleTestRequest(inputEvent);
 
-        assertEquals(201, wrappedOutput.statusCode);
-        assertEquals(contents, wrappedOutput.body);
+        assertEquals(200, wrappedOutput.getStatusCode());
+        assertEquals(contents, wrappedOutput.getBody());
     }
 
     @Test
@@ -91,7 +91,7 @@ public class FnFutureRequestHandlerTest {
                 .getInputEvent();
 
         FnRequestHandler.WrappedOutput wrappedOutput = handler.handleTestRequest(inputEvent);
-        assertEquals(404, wrappedOutput.statusCode);
+        assertEquals(404, wrappedOutput.getStatusCode());
     }
 
     @Test
@@ -121,8 +121,8 @@ public class FnFutureRequestHandlerTest {
                 .getInputEvent();
 
         FnRequestHandler.WrappedOutput wrappedOutput = handler.handleTestRequest(inputEvent);
-        assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), wrappedOutput.statusCode);
-        assertEquals(exceptionMapper.getSimpleName(), wrappedOutput.body);
+        assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), wrappedOutput.getStatusCode());
+        assertEquals(exceptionMapper.getSimpleName(), wrappedOutput.getBody());
     }
 
     @Test
@@ -133,8 +133,8 @@ public class FnFutureRequestHandlerTest {
         RuntimeException exception = new RuntimeException("Testing that onRequestFailure works");
 
         FnRequestHandler.WrappedOutput output = handler.onRequestFailure(exception, wrappedInput, null);
-        assertEquals(null, output.body);
-        assertEquals(500, output.statusCode);
+        assertEquals(null, output.getBody());
+        assertEquals(500, output.getStatusCode());
     }
 
     @Path("/")
@@ -213,15 +213,15 @@ public class FnFutureRequestHandlerTest {
         }
     }
 
-    private static class AnObject {
+    static class AnObject {
         private String value;
 
         @JsonCreator
-        private AnObject(@JsonProperty("value") String value) {
+        AnObject(@JsonProperty("value") String value) {
             this.value = value;
         }
 
-        public String getValue() {
+		public String getValue() {
             return value;
         }
     }

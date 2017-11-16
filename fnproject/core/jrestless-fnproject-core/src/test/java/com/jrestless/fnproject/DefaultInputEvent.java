@@ -1,16 +1,16 @@
-package com.fnproject.fn.jrestless;
+package com.jrestless.fnproject;
 
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
 import com.fnproject.fn.api.Headers;
 import com.fnproject.fn.api.InputEvent;
 import com.fnproject.fn.api.QueryParameters;
 import com.fnproject.fn.runtime.QueryParametersImpl;
 import com.fnproject.fn.runtime.ReadOnceInputEvent;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
 
 public class DefaultInputEvent {
     private String domainWithScheme = "http://www.example.com";

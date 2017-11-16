@@ -1,48 +1,47 @@
-package com.fnproject.fn.jrestless;
+package com.jrestless.fnproject;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fnproject.fn.api.InputEvent;
-import com.fnproject.fn.api.OutputEvent;
-import com.fnproject.fn.api.RuntimeContext;
-import com.jrestless.core.container.dpi.InstanceBinder;
-import com.jrestless.core.filter.ApplicationPathFilter;
-import jersey.repackaged.com.google.common.collect.ImmutableMap;
-import org.glassfish.hk2.utilities.Binder;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
+import java.net.URI;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+
+import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.ws.rs.*;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import java.io.ByteArrayInputStream;
-import java.net.URI;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.same;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fnproject.fn.api.InputEvent;
+import com.fnproject.fn.api.RuntimeContext;
+import com.google.common.collect.ImmutableMap;
+import com.jrestless.core.container.dpi.InstanceBinder;
+import com.jrestless.core.filter.ApplicationPathFilter;
 
 public class FnRequestHandlerIntTest {
     private String DOMAIN_WITH_SCHEME = "http://www.example.com";
     private FnRequestHandler handler;
     private TestService testService;
     private RuntimeContext runtimeContext = mock(RuntimeContext.class);
-    private ByteArrayInputStream defaultBody;
 
     @Before
     public void setUp() {
         testService = mock(TestService.class);
         handler = createAndStartHandler(new ResourceConfig(), testService);
-        defaultBody = new ByteArrayInputStream(new byte[]{});
     }
 
     private FnRequestHandler createAndStartHandler(ResourceConfig config, TestService testService) {
@@ -180,11 +179,11 @@ public class FnRequestHandlerIntTest {
         }
     }
 
-    private static class AnObject {
+    static class AnObject {
         private String value;
 
         @JsonCreator
-        private AnObject(@JsonProperty("value") String value) {
+        AnObject(@JsonProperty("value") String value) {
             this.value = value;
         }
 

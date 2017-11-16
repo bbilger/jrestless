@@ -1,4 +1,4 @@
-package com.fnproject.fn.jrestless;
+package com.jrestless.fnproject;
 
 
 import com.fnproject.fn.api.InputEvent;

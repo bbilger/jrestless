@@ -1,29 +1,7 @@
 package com.jrestless.fnproject;
 
-import com.fnproject.fn.api.FnConfiguration;
-import com.fnproject.fn.api.Headers;
-import com.fnproject.fn.api.InputEvent;
-import com.fnproject.fn.api.OutputEvent;
-import com.fnproject.fn.api.RuntimeContext;
-import com.jrestless.core.container.dpi.AbstractReferencingBinder;
-import com.jrestless.core.container.handler.SimpleRequestHandler;
-import com.jrestless.core.container.io.DefaultJRestlessContainerRequest;
-import com.jrestless.core.container.io.JRestlessContainerRequest;
-import com.jrestless.core.container.io.RequestAndBaseUri;
-import org.glassfish.jersey.internal.inject.Binder;
-import org.glassfish.jersey.internal.inject.ReferencingFactory;
-import org.glassfish.jersey.internal.util.collection.Ref;
-import org.glassfish.jersey.server.ContainerRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.util.Objects.requireNonNull;
 
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +15,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static java.util.Objects.requireNonNull;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+
+import org.glassfish.jersey.internal.inject.Binder;
+import org.glassfish.jersey.internal.inject.ReferencingFactory;
+import org.glassfish.jersey.internal.util.collection.Ref;
+import org.glassfish.jersey.server.ContainerRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fnproject.fn.api.FnConfiguration;
+import com.fnproject.fn.api.Headers;
+import com.fnproject.fn.api.InputEvent;
+import com.fnproject.fn.api.OutputEvent;
+import com.fnproject.fn.api.RuntimeContext;
+import com.jrestless.core.container.dpi.AbstractReferencingBinder;
+import com.jrestless.core.container.handler.SimpleRequestHandler;
+import com.jrestless.core.container.io.DefaultJRestlessContainerRequest;
+import com.jrestless.core.container.io.JRestlessContainerRequest;
+import com.jrestless.core.container.io.RequestAndBaseUri;
 
 /**
  * Fn JRestless Request Handler.
@@ -284,6 +286,18 @@ public abstract class FnRequestHandler extends
 			this.statusCode = statusType.getStatusCode();
 			this.body = body;
 			this.outputEvent = outputEvent;
+		}
+		// visible for testing
+		OutputEvent getOutputEvent() {
+			return outputEvent;
+		}
+		// visible for testing
+		String getBody() {
+			return body;
+		}
+		// visible for testing
+		int getStatusCode() {
+			return statusCode;
 		}
 	}
 }

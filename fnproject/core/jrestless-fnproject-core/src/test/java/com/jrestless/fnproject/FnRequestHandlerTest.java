@@ -1,18 +1,10 @@
-package com.fnproject.fn.jrestless;
+package com.jrestless.fnproject;
 
-import com.fnproject.fn.api.Headers;
-import com.fnproject.fn.api.InputEvent;
-import com.jrestless.core.container.JRestlessHandlerContainer;
-import com.jrestless.core.container.handler.SimpleRequestHandler;
-import com.jrestless.core.container.io.JRestlessContainerRequest;
-import com.jrestless.core.container.io.RequestAndBaseUri;
-import jersey.repackaged.com.google.common.collect.ImmutableMap;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import static java.util.Collections.singletonList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.mock;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -22,10 +14,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.mockito.Mockito.mock;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.fnproject.fn.api.Headers;
+import com.fnproject.fn.api.InputEvent;
+import com.google.common.collect.ImmutableMap;
+import com.jrestless.core.container.JRestlessHandlerContainer;
+import com.jrestless.core.container.handler.SimpleRequestHandler;
+import com.jrestless.core.container.io.JRestlessContainerRequest;
+import com.jrestless.core.container.io.RequestAndBaseUri;
 
 public class FnRequestHandlerTest {
     private String DOMAIN_WITH_SCHEME = "http://www.example.com";
@@ -34,7 +36,8 @@ public class FnRequestHandlerTest {
     private ByteArrayInputStream defaultBody;
 
 
-    @Before
+    @SuppressWarnings("unchecked")
+	@Before
     public void setUp() {
         container = mock(JRestlessHandlerContainer.class);
         requestHandler = new DefaultFnRequestHandler(container);
@@ -120,7 +123,7 @@ public class FnRequestHandlerTest {
         Map<String, List<String>> headers = new HashMap<>();
         SimpleRequestHandler.SimpleResponseWriter<FnRequestHandler.WrappedOutput> responseWriter = requestHandler.createResponseWriter(null);
         responseWriter.writeResponse(Response.Status.OK, headers, new ByteArrayOutputStream());
-        Assert.assertTrue(responseWriter.getResponse().outputEvent.getContentType().get().equals(MediaType.APPLICATION_JSON));
+        Assert.assertTrue(responseWriter.getResponse().getOutputEvent().getContentType().get().equals(MediaType.APPLICATION_JSON));
     }
 
     @Test
@@ -129,7 +132,7 @@ public class FnRequestHandlerTest {
         headers.put("Content-Type", Collections.singletonList(MediaType.TEXT_HTML));
         SimpleRequestHandler.SimpleResponseWriter<FnRequestHandler.WrappedOutput> responseWriter = requestHandler.createResponseWriter(null);
         responseWriter.writeResponse(Response.Status.OK, headers, new ByteArrayOutputStream());
-        Assert.assertTrue(responseWriter.getResponse().outputEvent.getContentType().get().equals(MediaType.TEXT_HTML));
+        Assert.assertTrue(responseWriter.getResponse().getOutputEvent().getContentType().get().equals(MediaType.TEXT_HTML));
     }
 
     @Test
@@ -140,7 +143,7 @@ public class FnRequestHandlerTest {
         RuntimeException exception = new RuntimeException("Testing that onRequestFailure works");
 
         FnRequestHandler.WrappedOutput output = requestHandler.onRequestFailure(exception, wrappedInput, null);
-        assertFalse(output.outputEvent.isSuccess());
+        assertFalse(output.getOutputEvent().isSuccess());
     }
 
     private static class DefaultFnRequestHandler extends FnRequestHandler {
