@@ -124,8 +124,8 @@ public abstract class FnRequestHandler extends
 	 */
 	@Override
 	protected void extendActualJerseyContainerRequest(ContainerRequest actualContainerRequest,
-													  JRestlessContainerRequest containerRequest,
-													  WrappedInput wrappedInput) {
+													JRestlessContainerRequest containerRequest,
+													WrappedInput wrappedInput) {
 		InputEvent event = wrappedInput.inputEvent;
 		actualContainerRequest.setRequestScopedInitializer(locator -> {
 			Ref<InputEvent> inputEventRef = locator
@@ -191,7 +191,7 @@ public abstract class FnRequestHandler extends
 		return new ResponseWriter();
 	}
 
-	private class ResponseWriter implements SimpleResponseWriter<WrappedOutput> {
+	private static class ResponseWriter implements SimpleResponseWriter<WrappedOutput> {
 		private WrappedOutput response;
 
 		@Override
@@ -206,8 +206,8 @@ public abstract class FnRequestHandler extends
 
 		@Override
 		public void writeResponse(Response.StatusType statusType,
-								  Map<String, List<String>> headers,
-								  OutputStream outputStream)
+								Map<String, List<String>> headers,
+								OutputStream outputStream)
 			throws IOException {
 			// NOTE: This is a safe cast as it is set to a ByteArrayOutputStream by getEntityOutputStream
 			// See JRestlessHandlerContainer class for more details
@@ -233,8 +233,8 @@ public abstract class FnRequestHandler extends
 	 */
 	@Override
 	protected WrappedOutput onRequestFailure(Exception e,
-											 WrappedInput wrappedInput,
-											 @Nullable JRestlessContainerRequest jRestlessContainerRequest) {
+											WrappedInput wrappedInput,
+											@Nullable JRestlessContainerRequest jRestlessContainerRequest) {
 		LOG.error("Request failed", e);
 
 		OutputEvent outputEvent = OutputEvent.emptyResult(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
