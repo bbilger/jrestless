@@ -8,11 +8,11 @@ buildscript {
 		jcenter()
 		maven {
 			url 'https://plugins.gradle.org/m2/'
-	    }
+	  }
 	}
 	dependencies {
 		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
-		classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5'
+		classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6'
 	}
 }
 
@@ -25,11 +25,17 @@ allprojects {
 	sourceCompatibility = 1.8
 	targetCompatibility = 1.8
 
-    repositories {
+  repositories {
 		jcenter()
 		maven {
 			url 'https://plugins.gradle.org/m2/'
-	    }
+			/*
+			 * this repo is required by fnproject, only, it's define in its build.gradle and the project compiles
+			 * BUT the sonarqube task fails with "Could not find com.fnproject.fn:api"
+			 * So we add it to all modules in order to make SonarQube happy...
+			 */
+			url 'https://dl.bintray.com/fnproject/fnproject/'
+	  }
 	}
 }
 
