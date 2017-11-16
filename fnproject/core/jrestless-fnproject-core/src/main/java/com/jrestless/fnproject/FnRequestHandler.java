@@ -15,10 +15,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -53,8 +55,9 @@ public abstract class FnRequestHandler extends
 
 	private static final Type INPUT_EVENT_TYPE = (new GenericType<Ref<InputEvent>>() { }).getType();
 	private static final Type RUNTIME_CONTEXT_TYPE = (new GenericType<Ref<RuntimeContext>>() { }).getType();
+	private static final String DEFAULT_CONTENT_TYPE = MediaType.APPLICATION_JSON;
+
 	private RuntimeContext rctx;
-	private String defaultContentType = MediaType.APPLICATION_JSON;
 
 
 	/**
@@ -121,8 +124,8 @@ public abstract class FnRequestHandler extends
 	 */
 	@Override
 	protected void extendActualJerseyContainerRequest(ContainerRequest actualContainerRequest,
-													JRestlessContainerRequest containerRequest,
-													WrappedInput wrappedInput) {
+													  JRestlessContainerRequest containerRequest,
+													  WrappedInput wrappedInput) {
 		InputEvent event = wrappedInput.inputEvent;
 		actualContainerRequest.setRequestScopedInitializer(locator -> {
 			Ref<InputEvent> inputEventRef = locator
@@ -203,14 +206,14 @@ public abstract class FnRequestHandler extends
 
 		@Override
 		public void writeResponse(Response.StatusType statusType,
-								Map<String, List<String>> headers,
-								OutputStream outputStream)
+								  Map<String, List<String>> headers,
+								  OutputStream outputStream)
 			throws IOException {
 			// NOTE: This is a safe cast as it is set to a ByteArrayOutputStream by getEntityOutputStream
 			// See JRestlessHandlerContainer class for more details
 			String responseBody = ((ByteArrayOutputStream) outputStream).toString(StandardCharsets.UTF_8.name());
 			String contentType = headers
-				.getOrDefault("Content-Type", Collections.singletonList(defaultContentType))
+				.getOrDefault(HttpHeaders.CONTENT_TYPE, Collections.singletonList(DEFAULT_CONTENT_TYPE))
 				.get(0);
 			Map<String, String> outHeaders = new HashMap<>();
 			headers.forEach((k, v) -> outHeaders.put(k, v.stream().collect(Collectors.joining(","))));
@@ -230,8 +233,8 @@ public abstract class FnRequestHandler extends
 	 */
 	@Override
 	protected WrappedOutput onRequestFailure(Exception e,
-											WrappedInput wrappedInput,
-											@Nullable JRestlessContainerRequest jRestlessContainerRequest) {
+											 WrappedInput wrappedInput,
+											 @Nullable JRestlessContainerRequest jRestlessContainerRequest) {
 		LOG.error("Request failed", e);
 
 		OutputEvent outputEvent = OutputEvent.emptyResult(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
@@ -259,7 +262,7 @@ public abstract class FnRequestHandler extends
 	 * @return The output event to the oracle functions platform
 	 */
 	public final OutputEvent handleRequest(InputEvent inputEvent) {
-		return inputEvent.consumeBody((inputStream) -> {
+		return inputEvent.consumeBody(inputStream -> {
 			WrappedInput wrappedInput = new WrappedInput(inputEvent, inputStream);
 			WrappedOutput response = this.delegateRequest(wrappedInput);
 			return response.outputEvent;
@@ -281,7 +284,7 @@ public abstract class FnRequestHandler extends
 		private final String body;
 		private final int statusCode;
 
-		public WrappedOutput(OutputEvent outputEvent, @Nullable String body, Response.StatusType statusType) {
+		public WrappedOutput(OutputEvent outputEvent, @Nullable String body, @Nonnull Response.StatusType statusType) {
 			requireNonNull(statusType);
 			this.statusCode = statusType.getStatusCode();
 			this.body = body;
