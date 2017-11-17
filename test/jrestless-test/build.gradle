@@ -1,5 +1,5 @@
 group = 'com.jrestless.test'
-version = "${globaleModuleVersion}"
+version = "${globalModuleVersion}"
 
 dependencies {
 	compile(
@@ -13,7 +13,3 @@ dependencies {
 		libraries.mockito_core
 	)
 }
-
-
-
-

@@ -1,2 +1,2 @@
 group = 'com.jrestless.openwhisk'
-version = "${globaleModuleVersion}"
+version = "${globalModuleVersion}"

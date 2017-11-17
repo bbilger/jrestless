@@ -146,9 +146,9 @@ subprojects {
 			websiteUrl = 'https://github.com/bbilger/jrestless'
 			githubRepo = 'bbilger/jrestless'
 			version {
-				name = "${globaleModuleVersion}"
-				vcsTag = 'v' + "${globaleModuleVersion}"
-				desc = "${globaleModuleVersion}"
+				name = "${globalModuleVersion}"
+				vcsTag = 'v' + "${globalModuleVersion}"
+				desc = "${globalModuleVersion}"
 			}
 		}
 		publications = ['BintrayPublication']
@@ -160,7 +160,7 @@ subprojects {
 				from components.java
 				groupId "$group"
 				artifactId "$project.name"
-				version "${globaleModuleVersion}"
+				version "${globalModuleVersion}"
 				artifact sourcesJar
 				artifact javadocJar
 			}

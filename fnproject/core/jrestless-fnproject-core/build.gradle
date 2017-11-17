@@ -1,5 +1,5 @@
 group = 'com.jrestless.fnproject'
-version = "${globaleModuleVersion}"
+version = "${globalModuleVersion}"
 
 repositories {
 	maven {
@@ -13,7 +13,7 @@ dependencies {
 
 	compile(
 		libraries.slf4j_simple,
-		"com.fnproject.fn:api:1.0.42",
+		"com.fnproject.fn:api:${fnProjectVersion}",
 		"org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyVersion}"
 	)
 
@@ -22,6 +22,6 @@ dependencies {
 	testCompile(
 		libraries.mockito_core,
 		libraries.junit,
-		"com.fnproject.fn:testing:1.0.42"
+		"com.fnproject.fn:testing:${fnProjectVersion}"
 	)
 }

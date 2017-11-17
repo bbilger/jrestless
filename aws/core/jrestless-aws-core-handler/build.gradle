@@ -1,5 +1,5 @@
 group = 'com.jrestless.aws'
-version = "${globaleModuleVersion}"
+version = "${globalModuleVersion}"
 
 dependencies {
 	compile project(':core:jrestless-core-container')
