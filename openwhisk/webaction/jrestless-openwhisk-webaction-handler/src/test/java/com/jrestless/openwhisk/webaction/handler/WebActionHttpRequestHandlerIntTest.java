@@ -35,6 +35,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -65,6 +66,11 @@ public class WebActionHttpRequestHandlerIntTest {
 		config.register(TestResource.class);
 		handler.init(config);
 		handler.start();
+	}
+
+	@After
+	public void tearDown() {
+		handler.stop();
 	}
 
 	@Test

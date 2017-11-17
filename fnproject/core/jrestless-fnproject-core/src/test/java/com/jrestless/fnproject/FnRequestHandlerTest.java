@@ -17,6 +17,7 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,6 +43,11 @@ public class FnRequestHandlerTest {
         container = mock(JRestlessHandlerContainer.class);
         requestHandler = new DefaultFnRequestHandler(container);
         defaultBody = new ByteArrayInputStream(new byte[]{});
+    }
+
+    @After
+    public void tearDown() {
+    	requestHandler.stop();
     }
 
     @Test

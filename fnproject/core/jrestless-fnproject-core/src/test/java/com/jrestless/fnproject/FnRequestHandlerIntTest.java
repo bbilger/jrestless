@@ -21,6 +21,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,6 +43,11 @@ public class FnRequestHandlerIntTest {
     public void setUp() {
         testService = mock(TestService.class);
         handler = createAndStartHandler(new ResourceConfig(), testService);
+    }
+
+    @After
+    public void tearDown() {
+    	handler.stop();
     }
 
     private FnRequestHandler createAndStartHandler(ResourceConfig config, TestService testService) {
@@ -106,30 +112,40 @@ public class FnRequestHandlerIntTest {
 
     @Test
     public void testAppPathWithoutHost() {
-        FnRequestHandler handlerWithAppPath = createAndStartHandler(new ApiResourceConfig(), testService);
-        InputEvent inputEvent = new DefaultInputEvent()
-                .setReqUrlAndRoute(DOMAIN_WITH_SCHEME + "/api/uris", "/api/uris")
-                .setMethod("GET")
-                .getInputEvent();
+        FnRequestHandler handlerWithAppPath = null;
+        try {
+        	handlerWithAppPath = createAndStartHandler(new ApiResourceConfig(), testService);
+	        InputEvent inputEvent = new DefaultInputEvent()
+	                .setReqUrlAndRoute(DOMAIN_WITH_SCHEME + "/api/uris", "/api/uris")
+	                .setMethod("GET")
+	                .getInputEvent();
 
-        handlerWithAppPath.handleRequest(inputEvent);
-        verify(testService).baseUri(URI.create(DOMAIN_WITH_SCHEME + "/api/"));
-        verify(testService).requestUri(URI.create(DOMAIN_WITH_SCHEME + "/api/uris"));
+	        handlerWithAppPath.handleRequest(inputEvent);
+	        verify(testService).baseUri(URI.create(DOMAIN_WITH_SCHEME + "/api/"));
+	        verify(testService).requestUri(URI.create(DOMAIN_WITH_SCHEME + "/api/uris"));
+        } finally {
+        	handlerWithAppPath.stop();
+        }
     }
 
     @Test
     public void testAppPathWithHost() {
         Map<String, String> inputHeaders = ImmutableMap.of(HttpHeaders.HOST, "www.example.com");
-        FnRequestHandler handlerWithAppPath = createAndStartHandler(new ApiResourceConfig(), testService);
-        InputEvent inputEvent = new DefaultInputEvent()
-                .setReqUrlAndRoute(DOMAIN_WITH_SCHEME + "/api/uris", "/api/uris")
-                .setMethod("GET")
-                .setHeaders(inputHeaders)
-                .getInputEvent();
+        FnRequestHandler handlerWithAppPath = null;
+        try {
+	        handlerWithAppPath = createAndStartHandler(new ApiResourceConfig(), testService);
+	        InputEvent inputEvent = new DefaultInputEvent()
+	                .setReqUrlAndRoute(DOMAIN_WITH_SCHEME + "/api/uris", "/api/uris")
+	                .setMethod("GET")
+	                .setHeaders(inputHeaders)
+	                .getInputEvent();
 
-        handlerWithAppPath.handleRequest(inputEvent);
-        verify(testService).baseUri(URI.create(DOMAIN_WITH_SCHEME + "/api/"));
-        verify(testService).requestUri(URI.create(DOMAIN_WITH_SCHEME + "/api/uris"));
+	        handlerWithAppPath.handleRequest(inputEvent);
+	        verify(testService).baseUri(URI.create(DOMAIN_WITH_SCHEME + "/api/"));
+	        verify(testService).requestUri(URI.create(DOMAIN_WITH_SCHEME + "/api/uris"));
+        } finally {
+        	handlerWithAppPath.stop();
+        }
     }
 
     private interface TestService{

@@ -43,6 +43,7 @@ import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.RequestScopedInitializer;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -80,6 +81,11 @@ public class GatewayRequestHandlerTest {
 		gatewayHandler = new GatewayRequestHandlerImpl();
 		gatewayHandler.init(container);
 		gatewayHandler.start();
+	}
+
+	@After
+	public void tearDown() {
+		gatewayHandler.stop();
 	}
 
 	@SuppressWarnings("unchecked")

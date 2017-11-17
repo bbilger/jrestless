@@ -16,6 +16,7 @@ import javax.ws.rs.Path;
 
 import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -47,6 +48,11 @@ public class SnsRequestHandlerIntTest {
 		handler = new SnsRequestObjectHandlerImpl();
 		handler.init(config);
 		handler.start();
+	}
+
+	@After
+	public void tearDown() {
+		handler.stop();
 	}
 
 	@Test

@@ -103,6 +103,19 @@ public abstract class SimpleRequestHandler<RequestT, ResponseT> {
 	}
 
 	/**
+	 * Stops the container.
+	 * <p>
+	 * May be called once, only.
+	 * <p>
+	 * {@link #start()} must be called, first.
+	 */
+	public final void stop() {
+		checkState(started, "container has already been stopped");
+		container.onShutdown();
+		started = false;
+	}
+
+	/**
 	 * Handles the request by passing it to the container and so Jersey.
 	 *
 	 * @param request

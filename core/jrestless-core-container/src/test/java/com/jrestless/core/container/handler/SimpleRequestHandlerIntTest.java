@@ -50,6 +50,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -82,6 +83,11 @@ public class SimpleRequestHandlerIntTest {
 		handler = new SimpleRequestHandlerImpl();
 		handler.init(config);
 		handler.start();
+	}
+
+	@After
+	public void tearDown() {
+		handler.stop();
 	}
 
 	private JRestlessContainerRequest createRequest(String requestUri, String httpMethod, String body, Map<String, List<String>> headers) {

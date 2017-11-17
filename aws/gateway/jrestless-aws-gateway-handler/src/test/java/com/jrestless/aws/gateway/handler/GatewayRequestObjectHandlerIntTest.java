@@ -71,6 +71,7 @@ import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.EncodingFilter;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -105,6 +106,11 @@ public class GatewayRequestObjectHandlerIntTest {
 	public void setup() {
 		testService = mock(TestService.class);
 		handler = createAndStartHandler(new ResourceConfig(), testService);
+	}
+
+	@After
+	public void tearDown() {
+		handler.stop();
 	}
 
 	private GatewayRequestObjectHandlerImpl createAndStartHandler(ResourceConfig config, TestService testService) {
@@ -172,11 +178,16 @@ public class GatewayRequestObjectHandlerIntTest {
 
 	@Test
 	public void testContainerFailureCreates500() {
-		GatewayRequestObjectHandlerImpl throwingHandler = spy(createAndStartHandler(new ResourceConfig(), testService));
-		DefaultGatewayRequest request = new DefaultGatewayRequest();
-		doThrow(new RuntimeException()).when(throwingHandler).createContainerRequest(any());
-		GatewayResponse response = throwingHandler.handleRequest(request, context);
-		assertEquals(new GatewayResponse(null, new HashMap<>(), Status.INTERNAL_SERVER_ERROR, false), response);
+		GatewayRequestObjectHandlerImpl throwingHandler = null;
+		try {
+			throwingHandler = spy(createAndStartHandler(new ResourceConfig(), testService));
+			DefaultGatewayRequest request = new DefaultGatewayRequest();
+			doThrow(new RuntimeException()).when(throwingHandler).createContainerRequest(any());
+			GatewayResponse response = throwingHandler.handleRequest(request, context);
+			assertEquals(new GatewayResponse(null, new HashMap<>(), Status.INTERNAL_SERVER_ERROR, false), response);
+		} finally {
+			throwingHandler.stop();
+		}
 	}
 
 	@Test
@@ -383,29 +394,37 @@ public class GatewayRequestObjectHandlerIntTest {
 
 	@Test
 	public void testAppPathWithoutHost() {
-		GatewayRequestObjectHandlerImpl handlerWithAppPath = createAndStartHandler(new ApiResourceConfig(),
-				testService);
-		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
-				.httpMethod("GET")
-				.resource("/api/uris") // = path
-				.build();
-		handlerWithAppPath.handleRequest(request, context);
-		verify(testService).baseUri(URI.create("/api/"));
-		verify(testService).requestUri(URI.create("/api/uris"));
+		GatewayRequestObjectHandlerImpl handlerWithAppPath = null;
+		try {
+			handlerWithAppPath = createAndStartHandler(new ApiResourceConfig(), testService);
+			DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+					.httpMethod("GET")
+					.resource("/api/uris") // = path
+					.build();
+			handlerWithAppPath.handleRequest(request, context);
+			verify(testService).baseUri(URI.create("/api/"));
+			verify(testService).requestUri(URI.create("/api/uris"));
+		} finally {
+			handlerWithAppPath.stop();
+		}
 	}
 
 	@Test
 	public void testAppPathWithHost() {
-		GatewayRequestObjectHandlerImpl handlerWithAppPath = createAndStartHandler(new ApiResourceConfig(),
-				testService);
-		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
-				.httpMethod("GET")
-				.resource("/api/uris") // = path
-				.domain("api.example.com")
-				.build();
-		handlerWithAppPath.handleRequest(request, context);
-		verify(testService).baseUri(URI.create("https://api.example.com/api/"));
-		verify(testService).requestUri(URI.create("https://api.example.com/api/uris"));
+		GatewayRequestObjectHandlerImpl handlerWithAppPath = null;
+		try {
+			handlerWithAppPath = createAndStartHandler(new ApiResourceConfig(), testService);
+			DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+					.httpMethod("GET")
+					.resource("/api/uris") // = path
+					.domain("api.example.com")
+					.build();
+			handlerWithAppPath.handleRequest(request, context);
+			verify(testService).baseUri(URI.create("https://api.example.com/api/"));
+			verify(testService).requestUri(URI.create("https://api.example.com/api/uris"));
+		} finally {
+			handlerWithAppPath.stop();
+		}
 	}
 
 	@Test
@@ -425,51 +444,63 @@ public class GatewayRequestObjectHandlerIntTest {
 	public void testProxyBasePathingWithoutDomainWithoutPathBasePath() {
 		ResourceConfig config = new ResourceConfig();
 		config.register(DynamicProxyBasePathFilter.class);
-		GatewayRequestObjectHandlerImpl handlerWithProxyFilter = createAndStartHandler(config,
-				testService);
-		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
-				.httpMethod("GET")
-				.resource("/a/{proxy+}")
-				.pathParams(Collections.singletonMap("proxy", "uris"))
-				.build();
-		handlerWithProxyFilter.handleRequest(request, context);
-		verify(testService).baseUri(URI.create("/a/"));
-		verify(testService).requestUri(URI.create("/a/uris"));
+		GatewayRequestObjectHandlerImpl handlerWithProxyFilter = null;
+		try {
+			handlerWithProxyFilter = createAndStartHandler(config, testService);
+			DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+					.httpMethod("GET")
+					.resource("/a/{proxy+}")
+					.pathParams(Collections.singletonMap("proxy", "uris"))
+					.build();
+			handlerWithProxyFilter.handleRequest(request, context);
+			verify(testService).baseUri(URI.create("/a/"));
+			verify(testService).requestUri(URI.create("/a/uris"));
+		} finally {
+			handlerWithProxyFilter.stop();
+		}
 	}
 
 	@Test
 	public void testProxyBasePathingWithDomainWithoutPathBasePath() {
 		ResourceConfig config = new ResourceConfig();
 		config.register(DynamicProxyBasePathFilter.class);
-		GatewayRequestObjectHandlerImpl handlerWithProxyFilter = createAndStartHandler(config,
-				testService);
-		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
-				.httpMethod("GET")
-				.resource("/a/{proxy+}")
-				.pathParams(Collections.singletonMap("proxy", "uris"))
-				.domain("api.example.com")
-				.build();
-		handlerWithProxyFilter.handleRequest(request, context);
-		verify(testService).baseUri(URI.create("https://api.example.com/a/"));
-		verify(testService).requestUri(URI.create("https://api.example.com/a/uris"));
+		GatewayRequestObjectHandlerImpl handlerWithProxyFilter = null;
+		try {
+			handlerWithProxyFilter = createAndStartHandler(config, testService);
+			DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+					.httpMethod("GET")
+					.resource("/a/{proxy+}")
+					.pathParams(Collections.singletonMap("proxy", "uris"))
+					.domain("api.example.com")
+					.build();
+			handlerWithProxyFilter.handleRequest(request, context);
+			verify(testService).baseUri(URI.create("https://api.example.com/a/"));
+			verify(testService).requestUri(URI.create("https://api.example.com/a/uris"));
+		} finally {
+			handlerWithProxyFilter.stop();
+		}
 	}
 
 	@Test
 	public void testProxyBasePathingWithDomainWithPathBasePath() {
 		ResourceConfig config = new ResourceConfig();
 		config.register(DynamicProxyBasePathFilter.class);
-		GatewayRequestObjectHandlerImpl handlerWithProxyFilter = createAndStartHandler(config,
-				testService);
-		DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
-				.httpMethod("GET")
-				.resource("/p/{proxy+}")
-				.pathParams(Collections.singletonMap("proxy", "uris"))
-				.path("/a/p/uris")
-				.domain("api.example.com")
-				.build();
-		handlerWithProxyFilter.handleRequest(request, context);
-		verify(testService).baseUri(URI.create("https://api.example.com/a/p/"));
-		verify(testService).requestUri(URI.create("https://api.example.com/a/p/uris"));
+		GatewayRequestObjectHandlerImpl handlerWithProxyFilter = null;
+		try {
+			handlerWithProxyFilter = createAndStartHandler(config, testService);
+			DefaultGatewayRequest request = new DefaultGatewayRequestBuilder()
+					.httpMethod("GET")
+					.resource("/p/{proxy+}")
+					.pathParams(Collections.singletonMap("proxy", "uris"))
+					.path("/a/p/uris")
+					.domain("api.example.com")
+					.build();
+			handlerWithProxyFilter.handleRequest(request, context);
+			verify(testService).baseUri(URI.create("https://api.example.com/a/p/"));
+			verify(testService).requestUri(URI.create("https://api.example.com/a/p/uris"));
+		} finally {
+			handlerWithProxyFilter.stop();
+		}
 	}
 
 	@Test

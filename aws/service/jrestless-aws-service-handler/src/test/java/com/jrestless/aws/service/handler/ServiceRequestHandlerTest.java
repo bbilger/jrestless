@@ -26,6 +26,7 @@ import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.RequestScopedInitializer;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -53,6 +54,11 @@ public class ServiceRequestHandlerTest {
 		serviceHandler = spy(new ServiceRequestHandlerImpl());
 		serviceHandler.init(container);
 		serviceHandler.start();
+	}
+
+	@After
+	public void tearDown() {
+		serviceHandler.stop();
 	}
 
 	@SuppressWarnings("unchecked")

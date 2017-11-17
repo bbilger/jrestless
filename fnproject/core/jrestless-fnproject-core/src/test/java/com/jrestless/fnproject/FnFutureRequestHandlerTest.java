@@ -20,6 +20,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,6 +43,11 @@ public class FnFutureRequestHandlerTest {
     public void setUp() {
         testService = mock(TestService.class);
         handler = createAndStartHandler(new ResourceConfig(), testService);
+    }
+
+    @After
+    public void tearDown() {
+    	handler.stop();
     }
 
     private interface TestService {

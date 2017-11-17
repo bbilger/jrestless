@@ -22,6 +22,7 @@ import java.util.Map;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response.Status;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,6 +45,11 @@ public class SimpleRequestHandlerTest {
 		handler = spy(new SimpleRequestHandlerImpl());
 		handler.init(container);
 		handler.start();
+	}
+
+	@After
+	public void tearDown() {
+		handler.stop();
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -79,6 +85,58 @@ public class SimpleRequestHandlerTest {
 	@Test(expected = IllegalStateException.class)
 	public void start_MultiStart_ShouldThrowIse() {
 		handler.start();
+	}
+
+	@Test
+	public void start_Initialized_ShouldDelegateStartToContainer() {
+		@SuppressWarnings("unchecked")
+		JRestlessHandlerContainer<JRestlessContainerRequest> customContainer = mock(JRestlessHandlerContainer.class);
+		SimpleRequestHandlerImpl customHandler = new SimpleRequestHandlerImpl();
+		customHandler.init(customContainer);
+		customHandler.start();
+		verify(customContainer).onStartup();
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void stop_NotInitialized_ShouldThrowIse() {
+		new SimpleRequestHandlerImpl().stop();
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void stop_NotStarted_ShouldThrowIse() {
+		SimpleRequestHandlerImpl customHandler = null;
+		try {
+			customHandler = new SimpleRequestHandlerImpl();
+			customHandler.init(container);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		customHandler.stop();
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void stop_MultiStop_ShouldThrowIse() {
+		SimpleRequestHandlerImpl customHandler = null;
+		try {
+			customHandler = new SimpleRequestHandlerImpl();
+			customHandler.init(container);
+			customHandler.start();
+			customHandler.stop();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		customHandler.stop();
+	}
+
+	@Test
+	public void stop_Running_ShouldDelegateStopToContainer() {
+		@SuppressWarnings("unchecked")
+		JRestlessHandlerContainer<JRestlessContainerRequest> customContainer = mock(JRestlessHandlerContainer.class);
+		SimpleRequestHandlerImpl customHandler = new SimpleRequestHandlerImpl();
+		customHandler.init(customContainer);
+		customHandler.start();
+		customHandler.stop();
+		verify(customContainer).onShutdown();
 	}
 
 	@Test

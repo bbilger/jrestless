@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -62,6 +63,11 @@ public class ServiceRequestObjectHandlerIntTest {
 		handler = spy(new ServiceRequestObjectHandlerImpl());
 		handler.init(config);
 		handler.start();
+	}
+
+	@After
+	public void tearDown() {
+		handler.stop();
 	}
 
 	@Test
