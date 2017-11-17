@@ -130,8 +130,9 @@ repositories {
 }
 dependencies {
   compile(
-    'com.jrestless.aws:jrestless-aws-gateway-handler:0.5.0',
-    'org.glassfish.jersey.media:jersey-media-json-jackson:2.23'
+    'com.jrestless.aws:jrestless-aws-gateway-handler:0.6.0',
+    'org.glassfish.jersey.inject:jersey-hk2:2.26',
+    'org.glassfish.jersey.media:jersey-media-json-jackson:2.26'
   )
 }
 task buildZip(type: Zip) {

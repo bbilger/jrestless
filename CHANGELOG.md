@@ -1,3 +1,35 @@
+# 0.6.0 (2017-11-17)
+
+## New Features
+
+- Jersey version 2.26 is used now: https://github.com/bbilger/jrestless/issues/41
+- (initial) support for Fn Project has been added; thanks to this PR: https://github.com/bbilger/jrestless/pull/43
+
+## Breaking Changes / Migration
+
+There are a few breaking changes (https://jersey.github.io/documentation/latest/user-guide.html#mig-2.26) in Jersey 2.26 but most of these changes affect JRestless' internals, only.
+
+You are, however, required to add an additional dependency:
+
+``` 
+# Gradle
+compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.26'
+
+# Maven
+<dependency>
+    <groupId>org.glassfish.jersey.inject</groupId>
+    <artifactId>jersey-hk2</artifactId>
+    <version>2.26</version>
+</dependency>
+
+```
+
+## Known Issues
+
+Aside from the HK2 injection manager (jersey-hk2) mentioned above, Jersey offers an alternative CDI 2 SE injection manager (jersey-cdi2-se).
+The CDI 2 SE injection manager (jersey-cdi2-se) is, however, not yet supported by JRestless because of a bug which by the way affects all containers: https://github.com/jersey/jersey/issues/3621
+
+
 # 0.5.1 (2017-04-22)
 
 ## New Features
