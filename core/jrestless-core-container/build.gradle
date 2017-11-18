@@ -17,8 +17,14 @@ dependencies {
 		libraries.jersey_inject_hk2
 	)
 }
-
+// < JUnit 5
 test {
+	systemProperties = [
+		'sun.net.http.allowRestrictedHeaders': 'true'
+	]
+}
+// >= JUnit 5
+junitPlatformTest {
 	systemProperties = [
 		'sun.net.http.allowRestrictedHeaders': 'true'
 	]
