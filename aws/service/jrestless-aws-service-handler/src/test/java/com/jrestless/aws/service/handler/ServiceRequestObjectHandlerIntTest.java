@@ -1,6 +1,6 @@
 package com.jrestless.aws.service.handler;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doThrow;
@@ -29,9 +29,9 @@ import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -52,7 +52,7 @@ public class ServiceRequestObjectHandlerIntTest {
 	private TestService testService;
 	private Context context = mock(Context.class);
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		ResourceConfig config = new ResourceConfig();
 		config.register(ServiceFeature.class);
@@ -65,7 +65,7 @@ public class ServiceRequestObjectHandlerIntTest {
 		handler.start();
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		handler.stop();
 	}

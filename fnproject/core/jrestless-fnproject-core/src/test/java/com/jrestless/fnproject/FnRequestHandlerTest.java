@@ -1,8 +1,9 @@
 package com.jrestless.fnproject;
 
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import java.io.ByteArrayInputStream;
@@ -19,8 +20,8 @@ import javax.ws.rs.core.Response;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.fnproject.fn.api.Headers;
 import com.fnproject.fn.api.InputEvent;
@@ -38,7 +39,7 @@ public class FnRequestHandlerTest {
 
 
     @SuppressWarnings("unchecked")
-	@Before
+	@BeforeEach
     public void setUp() {
         container = mock(JRestlessHandlerContainer.class);
         requestHandler = new DefaultFnRequestHandler(container);
@@ -102,13 +103,13 @@ public class FnRequestHandlerTest {
         assertEquals("", toString((ByteArrayInputStream) (containerRequest.getEntityStream())));
     }
 
-    @Test (expected = IllegalStateException.class)
+    @Test
     public void getRequestAndBaseUri_RouteDiffersInURL_ShouldThrowException() {
         InputEvent inputEvent = new DefaultInputEvent()
                 .setReqUrlAndRoute(DOMAIN_WITH_SCHEME + "/r/route", "/invalidRoute")
                 .getInputEvent();
 
-        requestHandler.getRequestAndBaseUri(inputEvent);
+        assertThrows(IllegalStateException.class, () -> requestHandler.getRequestAndBaseUri(inputEvent));
     }
 
     @Test

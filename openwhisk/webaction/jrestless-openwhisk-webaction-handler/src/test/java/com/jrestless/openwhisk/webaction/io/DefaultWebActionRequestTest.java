@@ -21,15 +21,16 @@ import static com.jrestless.openwhisk.webaction.io.DefaultWebActionRequest.SERIA
 import static com.jrestless.openwhisk.webaction.io.DefaultWebActionRequest.SERIALIZED_PATH_NAME;
 import static com.jrestless.openwhisk.webaction.io.DefaultWebActionRequest.SERIALIZED_QUERY_NAME;
 import static com.jrestless.openwhisk.webaction.io.DefaultWebActionRequest.SERIALIZED_USER_NAME;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
@@ -54,18 +55,18 @@ public class DefaultWebActionRequestTest {
 		testBodyDeserialization(null, new JsonObject());
 	}
 
-	@Test(expected = JsonSyntaxException.class)
+	@Test
 	public void deser_NonEmptyObjectBodyGiven_ShouldDeserializedAsNull() {
 		JsonObject bodyObject = new JsonObject();
 		bodyObject.addProperty("key", "value");
-		testBodyDeserialization(null, bodyObject);
+		assertThrows(JsonSyntaxException.class, () -> testBodyDeserialization(null, bodyObject));
 	}
 
-	@Test(expected = JsonSyntaxException.class)
+	@Test
 	public void deser_ArrayBodyGiven_ShouldDeserializedAsNull() {
 		JsonObject bodyObject = new JsonObject();
 		bodyObject.addProperty("key", "value");
-		testBodyDeserialization(null, bodyObject);
+		assertThrows(JsonSyntaxException.class, () -> testBodyDeserialization(null, bodyObject));
 	}
 
 	@Test
@@ -154,11 +155,11 @@ public class DefaultWebActionRequestTest {
 		}
 	}
 
-	@Test(expected = JsonSyntaxException.class)
+	@Test
 	public void deser_HeadersWithNonPrimitiveValuesGiven_ShouldFailToDeserialize() {
 		JsonObject serializedHeaders = new JsonObject();
 		serializedHeaders.add("key1", new JsonObject());
-		testHeadersDeserialization(new HashMap<>(), serializedHeaders);
+		assertThrows(JsonSyntaxException.class, () -> testHeadersDeserialization(new HashMap<>(), serializedHeaders));
 	}
 
 	private void testDeserializationFailsForNonPrimitiveTypes(String propertyName) {

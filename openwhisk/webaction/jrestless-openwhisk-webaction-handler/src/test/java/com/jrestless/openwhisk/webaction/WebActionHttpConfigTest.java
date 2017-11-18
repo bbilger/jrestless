@@ -1,10 +1,10 @@
 package com.jrestless.openwhisk.webaction;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.ImmutableSet;
 import com.jrestless.core.filter.ApplicationPathFilter;

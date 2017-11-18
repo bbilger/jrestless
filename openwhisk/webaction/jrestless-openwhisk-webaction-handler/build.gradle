@@ -9,8 +9,7 @@ dependencies {
 	)
 	testCompile project(":test:jrestless-test")
 	testCompile (
-		libraries.junit,
-		libraries.mockito_core,
+		libraries.junit_jupiter_params,
 		libraries.slf4j_simple,
 		libraries.jersey_media_json_jackson,
 		libraries.jsonassert,

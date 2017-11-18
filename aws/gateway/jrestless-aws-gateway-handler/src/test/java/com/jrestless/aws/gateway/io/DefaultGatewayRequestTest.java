@@ -1,7 +1,8 @@
 package com.jrestless.aws.gateway.io;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
@@ -9,17 +10,17 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.ImmutableMap;
 import com.jrestless.test.CopyConstructorEqualsTester;
 
 public class DefaultGatewayRequestTest {
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void testHeadersReturnsUnmodifiableMap() {
 		DefaultGatewayRequest request = new DefaultGatewayRequest();
-		testReturnsUnmodifiableMap(request::setHeaders, request::getHeaders);
+		assertThrows(UnsupportedOperationException.class, () -> testReturnsUnmodifiableMap(request::setHeaders, request::getHeaders));
 	}
 
 	@Test
@@ -34,10 +35,10 @@ public class DefaultGatewayRequestTest {
 		testMapClearsValuesOnNull(request::setHeaders, request::getHeaders);
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void testQueryStringParametersReturnsUnmodifiableMap() {
 		DefaultGatewayRequest request = new DefaultGatewayRequest();
-		testReturnsUnmodifiableMap(request::setQueryStringParameters, request::getQueryStringParameters);
+		assertThrows(UnsupportedOperationException.class, () -> testReturnsUnmodifiableMap(request::setQueryStringParameters, request::getQueryStringParameters));
 	}
 
 	@Test
@@ -52,10 +53,10 @@ public class DefaultGatewayRequestTest {
 		testMapClearsValuesOnNull(request::setQueryStringParameters, request::getQueryStringParameters);
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void testPathParameterReturnsUnmodifiableMap() {
 		DefaultGatewayRequest request = new DefaultGatewayRequest();
-		testReturnsUnmodifiableMap(request::setPathParameters, request::getPathParameters);
+		assertThrows(UnsupportedOperationException.class, () -> testReturnsUnmodifiableMap(request::setPathParameters, request::getPathParameters));
 	}
 
 	@Test
@@ -70,10 +71,10 @@ public class DefaultGatewayRequestTest {
 		testMapClearsValuesOnNull(request::setPathParameters, request::getPathParameters);
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void testStageVariablesReturnsUnmodifiableMap() {
 		DefaultGatewayRequest request = new DefaultGatewayRequest();
-		testReturnsUnmodifiableMap(request::setStageVariables, request::getStageVariables);
+		assertThrows(UnsupportedOperationException.class, () -> testReturnsUnmodifiableMap(request::setStageVariables, request::getStageVariables));
 	}
 
 	@Test

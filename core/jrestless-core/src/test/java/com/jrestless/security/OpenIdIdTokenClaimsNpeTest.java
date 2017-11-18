@@ -1,30 +1,29 @@
 package com.jrestless.security;
 
-import static org.junit.Assert.assertTrue;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Collection;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.Collections;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
 public class OpenIdIdTokenClaimsNpeTest {
-	@Parameters
-    public static Collection<Object[]> data() {
-    	return Arrays.asList(new Object[][] {
-			{ "getIss" },
-			{ "getSub" },
-			{ "getAud" },
-			{ "getSingleAud" },
-			{ "getExp" },
-			{ "getIat" }
-    	});
+
+    public static Stream<Arguments> data() {
+    	Stream<Function<OpenIdIdTokenClaims, ?>> stream;
+    	stream = Stream.of(
+			OpenIdIdTokenClaims::getIss,
+			OpenIdIdTokenClaims::getSub,
+			OpenIdIdTokenClaims::getAud,
+			OpenIdIdTokenClaims::getSingleAud,
+			OpenIdIdTokenClaims::getExp,
+			OpenIdIdTokenClaims::getIat);
+		return stream.map(Arguments::of);
     }
 
 	private OpenIdIdTokenClaims openIdIdTokenClaims = new OpenIdIdTokenClaims() {
@@ -34,20 +33,14 @@ public class OpenIdIdTokenClaimsNpeTest {
 		}
 	};
 
-	private final String getterName;
-
-	public OpenIdIdTokenClaimsNpeTest(String getterName) {
-		this.getterName = getterName;
-	}
-
-
-	@Test
-	public void noValueGiven_ShouldThrowNpe() throws IllegalAccessException, IllegalArgumentException,
-			InvocationTargetException, NoSuchMethodException, SecurityException {
+	@ParameterizedTest
+	@MethodSource("data")
+	public void noValueGiven_ShouldThrowNpe(Function<OpenIdIdTokenClaims, ?> getter) {
 		try {
-			OpenIdIdTokenClaims.class.getMethod(getterName).invoke(openIdIdTokenClaims);
-		} catch (InvocationTargetException ite) {
-			assertTrue(ite.getTargetException() instanceof NullPointerException);
+			getter.apply(openIdIdTokenClaims);
+			fail("expected an NPE");
+		} catch (NullPointerException npe) {
+			// expected
 		}
 	}
 }

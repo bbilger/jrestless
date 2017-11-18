@@ -3,7 +3,8 @@ package com.jrestless.aws.service.io;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.reflect.Constructor;
 import java.net.URI;
@@ -13,13 +14,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.testing.EqualsTester;
 import com.jrestless.test.ConstructorPreconditionsTester;
 import com.jrestless.test.CopyConstructorEqualsTester;
+import com.jrestless.test.guava.testing.EqualsTester;
 
 public class DefaultServiceRequestTest {
 
@@ -45,23 +46,23 @@ public class DefaultServiceRequestTest {
 		assertEquals(null, req2.getHttpMethod());
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void testHeaderMapImmutability() {
 		Map<String, List<String>> headers = new HashMap<>();
 		headers.put("0", emptyList());
 		ServiceRequest req = new DefaultServiceRequest(null, headers, URI.create("/"), "GET");
 		Map<String, List<String>> requestHeaders = req.getHeaders();
-		requestHeaders.put("0", emptyList());
+		assertThrows(UnsupportedOperationException.class, () -> requestHeaders.put("0", emptyList()));
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void testHeaderValueListImmutability() {
 		Map<String, List<String>> headers = new HashMap<>();
 		List<String> headerValues = new ArrayList<>();
 		headers.put("0", headerValues);
 		ServiceRequest req = new DefaultServiceRequest(null, headers, URI.create("/"), "GET");
 		Map<String, List<String>> requestHeaders = req.getHeaders();
-		requestHeaders.get("0").add("1");
+		assertThrows(UnsupportedOperationException.class, () -> requestHeaders.get("0").add("1"));
 	}
 
 	@Test

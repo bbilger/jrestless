@@ -19,8 +19,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import com.google.common.testing.EqualsTester;
 import com.jrestless.test.InvokableArguments.Argument;
+import com.jrestless.test.guava.testing.EqualsTester;
 
 /**
  * Simple equals tester for immutable value objects.

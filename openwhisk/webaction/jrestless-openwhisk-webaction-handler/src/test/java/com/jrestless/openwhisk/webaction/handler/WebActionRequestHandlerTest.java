@@ -15,8 +15,9 @@
  */
 package com.jrestless.openwhisk.webaction.handler;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -36,9 +37,9 @@ import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.RequestScopedInitializer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.google.common.collect.ImmutableMap;
@@ -67,14 +68,14 @@ public class WebActionRequestHandlerTest {
 	private JRestlessHandlerContainer<JRestlessContainerRequest> container;
 
 	@SuppressWarnings("unchecked")
-	@Before
+	@BeforeEach
 	public void setup() {
 		container = mock(JRestlessHandlerContainer.class);
 		handler.init(container);
 		handler.start();
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		handler.stop();
 	}
@@ -115,17 +116,19 @@ public class WebActionRequestHandlerTest {
 //		assertEquals(expectedResponse, actualResponse);
 //	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void createContainerRequest_NullRequestGiven_ShouldFailWithNpe() {
-		handler.createContainerRequest(null);
+		assertThrows(NullPointerException.class, () -> handler.createContainerRequest(null));
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void createContainerRequest_NullMethodGiven_ShouldFailWithNpe() {
-		WebActionRequest request = minimalRequestBuilder()
-				.setHttpMethod(null)
-				.build();
-		handler.createContainerRequest(request);
+		assertThrows(NullPointerException.class, () -> {
+			WebActionRequest request = minimalRequestBuilder()
+					.setHttpMethod(null)
+					.build();
+			handler.createContainerRequest(request);
+		});
 	}
 
 	@Test

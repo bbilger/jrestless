@@ -1,6 +1,7 @@
 package com.jrestless.aws.sns.handler;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -16,9 +17,9 @@ import javax.ws.rs.Path;
 
 import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
@@ -37,7 +38,7 @@ public class SnsRequestHandlerIntTest {
 	private TestService testService;
 	private Context context = mock(Context.class);
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		ResourceConfig config = new ResourceConfig();
 		config.register(SnsFeature.class);
@@ -50,7 +51,7 @@ public class SnsRequestHandlerIntTest {
 		handler.start();
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		handler.stop();
 	}
@@ -85,11 +86,11 @@ public class SnsRequestHandlerIntTest {
 	 * If we had an interface we wouldn't get a proxy.
 	 * If we didn't use proxy=true we wouldn't get a proxy.
 	 */
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void testSnsRecordInjectionAsMock() {
 		SNSEvent snsEvent = createSnsEvent("inject-sns-record-mock");
 		handler.handleRequest(snsEvent, context);
-		verify(testService).injectedSnsRecord(same(snsEvent.getRecords().get(0)));
+		assertThrows(IllegalStateException.class, () -> verify(testService).injectedSnsRecord(same(snsEvent.getRecords().get(0))));
 	}
 
 	@Test

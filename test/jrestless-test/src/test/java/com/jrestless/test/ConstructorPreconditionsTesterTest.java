@@ -15,15 +15,16 @@
  */
 package com.jrestless.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ConstructorPreconditionsTesterTest {
 
@@ -31,29 +32,31 @@ public class ConstructorPreconditionsTesterTest {
 	private static Set<SomeClassCapture> validCaptures = new HashSet<>();
 	private static Set<SomeClassCapture> invalidCaptures = new HashSet<>();
 
-	@Before
+	@BeforeEach
 	public void setup() throws NoSuchMethodException, SecurityException {
 		tester = new ConstructorPreconditionsTester(SomeClass.class.getDeclaredConstructor(Integer.class, double.class));
 		validCaptures.clear();
 		invalidCaptures.clear();
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void init_NoArgsConstructorGiven_ShouldThrowIae() throws NoSuchMethodException, SecurityException {
-		new ConstructorPreconditionsTester(ConstructorPreconditionsTesterTest.class.getDeclaredConstructor());
+		assertThrows(IllegalArgumentException.class, () -> {
+			new ConstructorPreconditionsTester(ConstructorPreconditionsTesterTest.class.getDeclaredConstructor());
+		});
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void testPreconditions_NotAllArgumentsGiven_ShouldThrowIse() {
 		tester.addValidArgs(0, 1);
-		tester.testPreconditions();
+		assertThrows(IllegalStateException.class, tester::testPreconditions);
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void testPreconditions_NoInvalidArgsSet_ShouldThrowIse() {
 		tester.addValidArgs(0, 1);
 		tester.addValidArgs(1, 0.0);
-		tester.testPreconditions();
+		assertThrows(IllegalStateException.class, tester::testPreconditions);
 	}
 
 	@Test
@@ -89,21 +92,21 @@ public class ConstructorPreconditionsTesterTest {
 		assertTrue(invalidCaptures.contains(new SomeClassCapture(1, -0.2)));
 	}
 
-	@Test(expected = AssertionError.class)
+	@Test
 	public void testPreconditions_InvalidArgumentGivenThatIsValid_ShouldThrowException() {
 		tester.addValidArgs(0, 0);
 		tester.addInvalidArgs(0, NullPointerException.class, 1);
 		tester.addValidArgs(1, 0.0);
-		tester.testPreconditions();
+		assertThrows(AssertionError.class, tester::testPreconditions);
 	}
 
-	@Test(expected = AssertionError.class)
+	@Test
 	public void testValidCombinations_ValidArgumentGivenThatIsInalid_ShouldThrowException() {
 		tester.addValidArgs(0, 0);
 		tester.addInvalidNpeArg(0);
 		tester.addValidArgs(1, -0.1);
 		tester.addInvalidArgs(1, IllegalArgumentException.class, -0.2);
-		tester.testValidCombinations();
+		assertThrows(AssertionError.class, tester::testValidCombinations);
 	}
 
 	@Test
@@ -166,20 +169,20 @@ public class ConstructorPreconditionsTesterTest {
 		assertTrue(invalidCaptures.contains(new SomeClassCapture(1, -0.2)));
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void testValidArguments_NotAllArgumentsGiven_ShouldThrowIse() {
 		tester.addValidArgs(0, 1);
-		tester.testValidCombinations();
+		assertThrows(IllegalStateException.class, tester::testValidCombinations);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void addValidArgs_NullOnPrimitiveTypeGiven_ShouldThrowIae() {
-		tester.addValidArgs(1, 0.0, null);
+		assertThrows(IllegalArgumentException.class, () -> tester.addValidArgs(1, 0.0, null));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void addValidArgs_IncompatibleTypeGiven_ShouldThrowIae() {
-		tester.addValidArgs(0, 1L);
+		assertThrows(IllegalArgumentException.class, () -> tester.addValidArgs(0, 1L));
 	}
 
 	@Test
@@ -192,23 +195,30 @@ public class ConstructorPreconditionsTesterTest {
 		assertTrue(invalidCaptures.contains(new SomeClassCapture(null, 0.0)));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void addInvalidArgs_NullOnPrimitiveTypeGiven_ShouldThrowIae() {
-		tester.addInvalidArgs(1, NullPointerException.class, 1.0, null);
+		assertThrows(IllegalArgumentException.class, () -> {
+			tester.addInvalidArgs(1, NullPointerException.class, 1.0, null);
+		});
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void addInvalidArgs_IncompatibleTypeGiven_ShouldThrowIae() {
-		tester.addInvalidArgs(0, NullPointerException.class, 1L);
+		assertThrows(IllegalArgumentException.class, () -> {
+			tester.addInvalidArgs(0, NullPointerException.class, 1L);
+		});
 	}
 
-	@Test(expected = AssertionError.class)
+	@Test
 	public void addInvalidArgs_IncorrectExceptionGiven_ShouldThrowAssertionError() {
-		tester
-			.addInvalidArgs(0, IllegalArgumentException.class, new Object[] { null })
-			.addValidArgs(0, 1)
-			.addValidArgs(1, 1.0)
-			.testPreconditions();
+		assertThrows(AssertionError.class, () -> {
+			tester
+				.addInvalidArgs(0, IllegalArgumentException.class, new Object[] { null })
+				.addValidArgs(0, 1)
+				.addValidArgs(1, 1.0)
+				.testPreconditions();
+
+		});
 	}
 
 	private static class SomeClassCapture {

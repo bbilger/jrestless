@@ -1,8 +1,9 @@
 package com.jrestless.core.filter.cors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -27,7 +28,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.google.common.collect.ImmutableSet;
@@ -241,58 +242,58 @@ public class CorsFilterTest {
 		assertEquals(" h1, h2 ", response.getHeaderString(CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS));
 	}
 
-	@Test(expected = ForbiddenException.class)
+	@Test
 	public void preflightRequestFilter_InvalidMethodGiven_CorsFails() throws IOException {
 		CorsFilter filter = new CorsFilter.Builder()
 				.allowMethod(HttpMethod.GET)
 				.build();
 		ContainerRequestContext request = createPreflightRequestMock(DEFAULT_HOST, DEFAULT_ORIGIN, HttpMethod.DELETE);
-		filter.filter(request);
+		assertThrows(ForbiddenException.class, () -> filter.filter(request));
 	}
 
-	@Test(expected = ForbiddenException.class)
+	@Test
 	public void preflightRequestFilter_BlankMethodGiven_CorsFails() throws IOException {
 		CorsFilter filter = new CorsFilter.Builder()
 				.allowMethod(HttpMethod.GET)
 				.build();
 		ContainerRequestContext request = createPreflightRequestMock(DEFAULT_HOST, DEFAULT_ORIGIN, " ");
-		filter.filter(request);
+		assertThrows(ForbiddenException.class, () -> filter.filter(request));
 	}
 
-	@Test(expected = ForbiddenException.class)
+	@Test
 	public void preflightRequestFilter_InvalidOriginGiven_CorsFails() throws IOException {
 		CorsFilter filter = new CorsFilter.Builder()
 				.allowOrigin(DEFAULT_HOST)
 				.build();
 		ContainerRequestContext request = createPreflightRequestMock(DEFAULT_HOST, DEFAULT_ORIGIN, HttpMethod.GET);
-		filter.filter(request);
+		assertThrows(ForbiddenException.class, () -> filter.filter(request));
 	}
 
-	@Test(expected = ForbiddenException.class)
+	@Test
 	public void preflightRequestFilter_InvalidHeaderGiven_CorsFails() throws IOException {
 		CorsFilter filter = new CorsFilter.Builder()
 				.allowHeaders(Collections.singleton("h1"))
 				.build();
 		ContainerRequestContext request = createPreflightRequestMock(DEFAULT_HOST, DEFAULT_ORIGIN, HttpMethod.GET, "h2");
-		filter.filter(request);
+		assertThrows(ForbiddenException.class, () -> filter.filter(request));
 	}
 
-	@Test(expected = ForbiddenException.class)
+	@Test
 	public void actualRequestFilter_InvalidOriginGiven_CorsFails() throws IOException {
 		CorsFilter filter = new CorsFilter.Builder()
 				.allowOrigin(DEFAULT_HOST)
 				.build();
 		ContainerRequestContext request = createActualRequestMock(DEFAULT_HOST, DEFAULT_ORIGIN, HttpMethod.GET);
-		filter.filter(request);
+		assertThrows(ForbiddenException.class, () -> filter.filter(request));
 	}
 
-	@Test(expected = ForbiddenException.class)
+	@Test
 	public void actualRequestFilter_InvalidMethodGiven_CorsFails() throws IOException {
 		CorsFilter filter = new CorsFilter.Builder()
 				.allowMethod(HttpMethod.DELETE)
 				.build();
 		ContainerRequestContext request = createActualRequestMock(DEFAULT_HOST, DEFAULT_ORIGIN, HttpMethod.GET);
-		filter.filter(request);
+		assertThrows(ForbiddenException.class, () -> filter.filter(request));
 	}
 
 	@Test

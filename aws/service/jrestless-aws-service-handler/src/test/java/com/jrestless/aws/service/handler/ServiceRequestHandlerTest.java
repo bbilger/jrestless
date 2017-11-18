@@ -2,8 +2,8 @@ package com.jrestless.aws.service.handler;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -26,9 +26,9 @@ import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.RequestScopedInitializer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.amazonaws.services.lambda.runtime.Context;
@@ -48,7 +48,7 @@ public class ServiceRequestHandlerTest {
 	private ServiceRequestHandlerImpl serviceHandler;
 
 	@SuppressWarnings("unchecked")
-	@Before
+	@BeforeEach
 	public void setup() {
 		container = mock(JRestlessHandlerContainer.class);
 		serviceHandler = spy(new ServiceRequestHandlerImpl());
@@ -56,7 +56,7 @@ public class ServiceRequestHandlerTest {
 		serviceHandler.start();
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		serviceHandler.stop();
 	}

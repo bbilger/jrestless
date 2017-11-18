@@ -4,7 +4,8 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -12,15 +13,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.testing.EqualsTester;
-import com.jrestless.aws.service.io.ServiceResponse;
-import com.jrestless.aws.service.io.DefaultServiceResponse;
 import com.jrestless.test.ConstructorPreconditionsTester;
 import com.jrestless.test.CopyConstructorEqualsTester;
+import com.jrestless.test.guava.testing.EqualsTester;
 
 public class DefaultServiceResponseTest {
 
@@ -46,23 +45,23 @@ public class DefaultServiceResponseTest {
 		assertEquals(null, resp2.getReasonPhrase());
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void testHeaderMapImmutability() {
 		Map<String, List<String>> headers = new HashMap<>();
 		headers.put("0", emptyList());
 		ServiceResponse req = new DefaultServiceResponse(null, headers, 0, null);
 		Map<String, List<String>> requestHeaders = req.getHeaders();
-		requestHeaders.put("0", emptyList());
+		assertThrows(UnsupportedOperationException.class, () -> requestHeaders.put("0", emptyList()));
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void testHeaderValueListImmutability() {
 		Map<String, List<String>> headers = new HashMap<>();
 		List<String> headerValues = new ArrayList<>();
 		headers.put("0", headerValues);
 		ServiceResponse req = new DefaultServiceResponse(null, headers, 0, null);
 		Map<String, List<String>> requestHeaders = req.getHeaders();
-		requestHeaders.get("0").add("1");
+		assertThrows(UnsupportedOperationException.class, () -> requestHeaders.get("0").add("1"));
 	}
 
 	@Test

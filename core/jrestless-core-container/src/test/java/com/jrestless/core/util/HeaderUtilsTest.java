@@ -3,14 +3,15 @@ package com.jrestless.core.util;
 import static com.jrestless.core.util.HeaderUtils.expandHeaders;
 import static com.jrestless.core.util.HeaderUtils.flattenHeaders;
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.ImmutableMap;
 import com.jrestless.test.UtilityClassCodeCoverageBumper;
@@ -65,9 +66,9 @@ public class HeaderUtilsTest {
 		assertEquals(ImmutableMap.of("a_k", "a_v", "d_k", "d_v"), flattenedHeaders);
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void flattenHeaders_AnyGiven_ShouldReturnImmutableMap() {
-		flattenHeaders(new HashMap<>()).put("k", "v");
+		assertThrows(UnsupportedOperationException.class, () -> flattenHeaders(new HashMap<>()).put("k", "v"));
 	}
 
 	@Test
@@ -124,14 +125,14 @@ public class HeaderUtilsTest {
 		assertEquals(ImmutableMap.of("a_k", singletonList("a_v0,a_v1")), expandedHeaders);
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void exandHeaders_AnyGiven_ShouldReturnImmutableMap() {
-		expandHeaders(new HashMap<>()).put("k", new ArrayList<>());
+		assertThrows(UnsupportedOperationException.class, () -> expandHeaders(new HashMap<>()).put("k", new ArrayList<>()));
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void exandHeaders_AnyGiven_ShouldReturnImmutableList() {
-		expandHeaders(ImmutableMap.of("k", "v0")).get("k").add("v1");
+		assertThrows(UnsupportedOperationException.class, () -> expandHeaders(ImmutableMap.of("k", "v0")).get("k").add("v1"));
 	}
 
 	@Test

@@ -34,8 +34,8 @@ import java.util.Map;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.Response.Status;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.jrestless.core.container.JRestlessHandlerContainer.JRestlessContainerResponse;
 import com.jrestless.core.container.io.JRestlessResponseWriter;
@@ -46,7 +46,7 @@ public class JRestlessContainerResponseTest {
 
 	private JRestlessContainerResponse containerResponse;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		responseWriter = mock(JRestlessResponseWriter.class);
 		when(responseWriter.getEntityOutputStream()).thenReturn(new ByteArrayOutputStream());

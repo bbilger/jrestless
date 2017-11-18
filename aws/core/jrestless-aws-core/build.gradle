@@ -8,8 +8,4 @@ dependencies {
 	)
 
 	testCompile project(':test:jrestless-test')
-	testCompile (
-		libraries.junit,
-		libraries.mockito_core
-	)
 }

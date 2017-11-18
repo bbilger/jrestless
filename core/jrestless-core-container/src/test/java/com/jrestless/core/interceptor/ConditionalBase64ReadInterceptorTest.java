@@ -1,7 +1,8 @@
 package com.jrestless.core.interceptor;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -18,7 +19,7 @@ import java.util.Random;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.ReaderInterceptorContext;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.jrestless.test.IOUtils;
@@ -67,18 +68,18 @@ public class ConditionalBase64ReadInterceptorTest {
 		verify(is).close();
 	}
 
-	@Test(expected = Base64DecodingFailedException.class)
+	@Test
 	public void testDoesNotWrapInputStreamWithBase64UrlEncoder() throws IOException {
 		// should be KUra8+qaMAL+Kpv0/5pR6zm8/d4=
 		final String base64Bytes = "KUra8-qaMAL-Kpv0_5pR6zm8_d4=";
-		testBase64DecodingFails(base64Bytes);
+		assertThrows(Base64DecodingFailedException.class, () -> testBase64DecodingFails(base64Bytes));
 	}
 
-	@Test(expected = Base64DecodingFailedException.class)
+	@Test
 	public void testDoesNotWrapInputStreamWithBase64MimeEncoder() throws IOException {
 		final byte[] bytes = new byte[200];
 		new Random().nextBytes(bytes);
-		testBase64DecodingFails(Base64.getMimeEncoder().encodeToString(bytes));
+		assertThrows(Base64DecodingFailedException.class, () -> testBase64DecodingFails(Base64.getMimeEncoder().encodeToString(bytes)));
 	}
 
 	@Test

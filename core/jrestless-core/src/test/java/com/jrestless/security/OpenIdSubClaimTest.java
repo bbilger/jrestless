@@ -1,28 +1,19 @@
 package com.jrestless.security;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
-public class OpenIdSubClaimTest extends ClaimsTest<OpenIdSubClaim> {
+public class OpenIdSubClaimTest extends ClaimsTestBase<OpenIdSubClaim> {
 
-	@Parameters
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] {
-                 { "getSub", "sub" }
-           });
+	public static Stream<Arguments> data() {
+    	return Stream.of(
+			ClaimArguments.of(OpenIdSubClaim::getSub, "sub"));
     }
-
-	public OpenIdSubClaimTest(String getterName, String key)
-			throws NoSuchMethodException, SecurityException {
-		super(getterName, key, "some" + key + "value");
-	}
 
 	@Override
 	OpenIdSubClaim getClaims() {
@@ -34,8 +25,22 @@ public class OpenIdSubClaimTest extends ClaimsTest<OpenIdSubClaim> {
 		};
 	}
 
-	@Override
-	Method getGetterByName(String getterName) throws NoSuchMethodException, SecurityException {
-		return OpenIdSubClaim.class.getMethod(getterName);
+	@ParameterizedTest
+	@MethodSource("data")
+	public void get_MapValueGiven_ShouldReturnMapValue(Function<OpenIdSubClaim, String> getter, String mapKey,
+			Object mapValue) {
+		testGetterReturnsMapValue(getter, mapKey, mapValue);
+	}
+
+	@ParameterizedTest
+	@MethodSource("data")
+	public void get_NoMapValueGiven_ShouldReturnNull(Function<OpenIdSubClaim, String> getter) {
+		testGetterReturnsNullIfNoValueInMap(getter);
+	}
+
+	@ParameterizedTest
+	@MethodSource("data")
+	public void get_InvalidTypeValueGiven_ShouldThrowClassCastException(Function<OpenIdSubClaim, String> getter) {
+		testGetterReturnsNullIfNoValueInMap(getter);
 	}
 }

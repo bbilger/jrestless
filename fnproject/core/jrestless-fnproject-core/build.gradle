@@ -14,14 +14,13 @@ dependencies {
 	compile(
 		libraries.slf4j_simple,
 		"com.fnproject.fn:api:${fnProjectVersion}",
-		"org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyVersion}"
+		libraries.jersey_media_json_jackson
 	)
 
 	testCompile project(":test:jrestless-test")
 
 	testCompile(
-		libraries.mockito_core,
-		libraries.junit,
-		"com.fnproject.fn:testing:${fnProjectVersion}"
+		"com.fnproject.fn:testing:${fnProjectVersion}",
+		libraries.jersey_inject_hk2
 	)
 }

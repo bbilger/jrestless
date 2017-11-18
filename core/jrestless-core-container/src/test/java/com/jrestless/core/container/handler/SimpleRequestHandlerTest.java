@@ -1,7 +1,8 @@
 package com.jrestless.core.container.handler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
@@ -22,9 +23,9 @@ import java.util.Map;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response.Status;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -39,7 +40,7 @@ public class SimpleRequestHandlerTest {
 	private SimpleRequestHandler<JRestlessContainerRequest, SimpleContainerResponse> handler;
 
 	@SuppressWarnings("unchecked")
-	@Before
+	@BeforeEach
 	public void setup() {
 		container = mock(JRestlessHandlerContainer.class);
 		handler = spy(new SimpleRequestHandlerImpl());
@@ -47,19 +48,19 @@ public class SimpleRequestHandlerTest {
 		handler.start();
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		handler.stop();
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void init0_NullAppGiven_ShouldThrowNpe() {
-		new SimpleRequestHandlerImpl().init((Application) null);
+		assertThrows(NullPointerException.class, () -> new SimpleRequestHandlerImpl().init((Application) null));
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void init1_NullAppGiven_ShouldThrowNpe() {
-		new SimpleRequestHandlerImpl().init((Application) null, "");
+		assertThrows(NullPointerException.class, () -> new SimpleRequestHandlerImpl().init((Application) null, ""));
 	}
 
 	@Test
@@ -67,24 +68,24 @@ public class SimpleRequestHandlerTest {
 		new SimpleRequestHandlerImpl().init(mock(Application.class), null);
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void init2_NullHandlerContainerGiven_ShouldThrowNpe() {
-		new SimpleRequestHandlerImpl().init((JRestlessHandlerContainer<JRestlessContainerRequest>) null);
+		assertThrows(NullPointerException.class, () -> new SimpleRequestHandlerImpl().init((JRestlessHandlerContainer<JRestlessContainerRequest>) null));
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void init2_MultiInit_ShouldThrowIse() {
-		handler.init(container);
+		assertThrows(IllegalStateException.class, () -> handler.init(container));
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void start_NotInitialized_ShouldThrowIse() {
-		new SimpleRequestHandlerImpl().start();
+		assertThrows(IllegalStateException.class, () -> new SimpleRequestHandlerImpl().start());
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void start_MultiStart_ShouldThrowIse() {
-		handler.start();
+		assertThrows(IllegalStateException.class, handler::start);
 	}
 
 	@Test
@@ -97,12 +98,12 @@ public class SimpleRequestHandlerTest {
 		verify(customContainer).onStartup();
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void stop_NotInitialized_ShouldThrowIse() {
-		new SimpleRequestHandlerImpl().stop();
+		assertThrows(IllegalStateException.class, () -> new SimpleRequestHandlerImpl().stop());
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void stop_NotStarted_ShouldThrowIse() {
 		SimpleRequestHandlerImpl customHandler = null;
 		try {
@@ -111,10 +112,10 @@ public class SimpleRequestHandlerTest {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		customHandler.stop();
+		assertThrows(IllegalStateException.class, customHandler::stop);
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void stop_MultiStop_ShouldThrowIse() {
 		SimpleRequestHandlerImpl customHandler = null;
 		try {
@@ -125,7 +126,7 @@ public class SimpleRequestHandlerTest {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		customHandler.stop();
+		assertThrows(IllegalStateException.class, customHandler::stop);
 	}
 
 	@Test

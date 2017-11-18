@@ -1,7 +1,7 @@
 package com.jrestless.core.filter.cors;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.UriInfo;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class DefaultSameOriginPolicyTest {
 

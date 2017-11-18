@@ -1,8 +1,9 @@
 package com.jrestless.security;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,7 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 
 public class OpenIdIdTokenClaimsTransformTest {
 
@@ -22,9 +24,9 @@ public class OpenIdIdTokenClaimsTransformTest {
 		}
 	};
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void getAud_AudNullGiven_ShouldThrowNpe() {
-		assertNull(openIdIdTokenClaims.getAud());
+		assertThrows(NullPointerException.class, openIdIdTokenClaims::getAud);
 	}
 
 	@Test
@@ -48,17 +50,17 @@ public class OpenIdIdTokenClaimsTransformTest {
 		assertEquals(Collections.singletonList("aud0"), openIdIdTokenClaims.getAud());
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void getAud_AudStringArrayGiven_ShouldReturnUnmodifiableList() {
 		String[] auds = new String[] { "aud0" };
 		claimsMaps.put("aud", auds);
-		openIdIdTokenClaims.getAud().add("123");
+		assertThrows(UnsupportedOperationException.class, () -> openIdIdTokenClaims.getAud().add("123"));
 	}
 
-	@Test(expected = ClassCastException.class)
+	@Test
 	public void getAud_AudNonCollectionOrStringArrayGiven_ShouldThrowClassCastException() {
 		claimsMaps.put("aud", 123L);
-		openIdIdTokenClaims.getAud();
+		assertThrows(ClassCastException.class, openIdIdTokenClaims::getAud);
 	}
 
 	@Test
@@ -87,16 +89,16 @@ public class OpenIdIdTokenClaimsTransformTest {
 		assertEquals(Collections.singletonList("amr0"), openIdIdTokenClaims.getAmr());
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void getAmr_AmrStringArrayGiven_ShouldReturnUnmodifiableList() {
 		String[] auds = new String[] { "amr0" };
 		claimsMaps.put("amr", auds);
-		openIdIdTokenClaims.getAmr().add("123");
+		assertThrows(UnsupportedOperationException.class, () -> openIdIdTokenClaims.getAmr().add("123"));
 	}
 
-	@Test(expected = ClassCastException.class)
+	@Test
 	public void getAmr_AmrNonCollectionOrStringArrayGiven_ShouldThrowClassCastException() {
 		claimsMaps.put("amr", 123L);
-		openIdIdTokenClaims.getAmr();
+		assertThrows(ClassCastException.class, openIdIdTokenClaims::getAmr);
 	}
 }

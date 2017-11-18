@@ -1,6 +1,8 @@
 package com.jrestless.test;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Test;
 
 public class UtilityClassCodeCoverageBumperTest {
 
@@ -14,9 +16,9 @@ public class UtilityClassCodeCoverageBumperTest {
 		UtilityClassCodeCoverageBumper.invokePrivateConstructor(PrivateNoArgs.class);
 	}
 
-	@Test(expected = RuntimeException.class)
+	@Test
 	public void testFailsToInvokeClassWithNoNoArgsConstructor() {
-		UtilityClassCodeCoverageBumper.invokePrivateConstructor(NoNoArgs.class);
+		assertThrows(RuntimeException.class, () -> UtilityClassCodeCoverageBumper.invokePrivateConstructor(NoNoArgs.class));
 	}
 
 	@Test
@@ -33,6 +35,7 @@ public class UtilityClassCodeCoverageBumperTest {
 	}
 
 	private static class NoNoArgs {
+		@SuppressWarnings("unused")
 		public NoNoArgs(String x) {
 		}
 	}

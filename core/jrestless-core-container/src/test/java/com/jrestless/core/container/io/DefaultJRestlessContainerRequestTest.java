@@ -1,9 +1,10 @@
 package com.jrestless.core.container.io;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -52,18 +53,18 @@ public class DefaultJRestlessContainerRequestTest {
 		assertTrue(request.getHeaders().isEmpty());
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void testHeadersImmutable() throws IOException {
 		JRestlessContainerRequest request = new DefaultJRestlessContainerRequest(URI.create("/123"), URI.create("/456"), "DELETE",
 				new ByteArrayInputStream("123".getBytes()), new HashMap<>());
-		request.getHeaders().put("0", ImmutableList.of());
+		assertThrows(UnsupportedOperationException.class, () -> request.getHeaders().put("0", ImmutableList.of()));
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void testHeaderValuesImmutable() throws IOException {
 		JRestlessContainerRequest request = new DefaultJRestlessContainerRequest(URI.create("/123"), URI.create("/456"), "DELETE",
 				new ByteArrayInputStream("123".getBytes()), ImmutableMap.of("a", ImmutableList.of("a0", "a1")));
-		request.getHeaders().get("a").add("123");
+		assertThrows(UnsupportedOperationException.class, () -> request.getHeaders().get("a").add("123"));
 	}
 
 	@Test
@@ -82,16 +83,20 @@ public class DefaultJRestlessContainerRequestTest {
 		assertEquals(1, request.getHeaders().size());
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void construtor_NullRequestAndBaseUriPairGiven_ShouldThrowNpe() {
-		new DefaultJRestlessContainerRequest(null, "DELETE", new ByteArrayInputStream("123".getBytes()),
-				ImmutableMap.of("a", ImmutableList.of("a0", "a1")));
+		assertThrows(NullPointerException.class, () -> {
+			new DefaultJRestlessContainerRequest(null, "DELETE", new ByteArrayInputStream("123".getBytes()),
+					ImmutableMap.of("a", ImmutableList.of("a0", "a1")));
+		});
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void construtor_NullRequestUriInPairGiven_ShouldThrowNpe() {
-		new DefaultJRestlessContainerRequest(new RequestAndBaseUri(URI.create("baseUri"), null), "DELETE",
-				new ByteArrayInputStream("123".getBytes()), ImmutableMap.of("a", ImmutableList.of("a0", "a1")));
+		assertThrows(NullPointerException.class, () -> {
+			new DefaultJRestlessContainerRequest(new RequestAndBaseUri(URI.create("baseUri"), null), "DELETE",
+					new ByteArrayInputStream("123".getBytes()), ImmutableMap.of("a", ImmutableList.of("a0", "a1")));
+		});
 	}
 
 	@Test

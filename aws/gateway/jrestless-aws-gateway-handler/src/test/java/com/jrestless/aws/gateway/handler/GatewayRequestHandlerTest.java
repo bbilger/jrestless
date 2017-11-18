@@ -16,9 +16,10 @@
 package com.jrestless.aws.gateway.handler;
 
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -43,9 +44,9 @@ import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.RequestScopedInitializer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.amazonaws.services.lambda.runtime.Context;
@@ -75,7 +76,7 @@ public class GatewayRequestHandlerTest {
 	private GatewayRequestHandlerImpl gatewayHandler;
 
 	@SuppressWarnings("unchecked")
-	@Before
+	@BeforeEach
 	public void setup() {
 		container = mock(JRestlessHandlerContainer.class);
 		gatewayHandler = new GatewayRequestHandlerImpl();
@@ -83,7 +84,7 @@ public class GatewayRequestHandlerTest {
 		gatewayHandler.start();
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		gatewayHandler.stop();
 	}
@@ -143,18 +144,18 @@ public class GatewayRequestHandlerTest {
 		return requestScopedInitializerCaptor.getValue();
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void createContainerRequest_NoPathGiven_ShouldThrowNpe() {
 		GatewayRequestAndLambdaContext request = createMinimalRequest();
 		((DefaultGatewayRequest) request.getGatewayRequest()).setPath(null);
-		gatewayHandler.createContainerRequest(request);
+		assertThrows(NullPointerException.class, () -> gatewayHandler.createContainerRequest(request));
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void createContainerRequest_NoHttpMethodGiven_ShouldThrowNpe() {
 		GatewayRequestAndLambdaContext request = createMinimalRequest();
 		((DefaultGatewayRequest) request.getGatewayRequest()).setHttpMethod(null);
-		gatewayHandler.createContainerRequest(request);
+		assertThrows(NullPointerException.class, () -> gatewayHandler.createContainerRequest(request));
 	}
 
 	@Test

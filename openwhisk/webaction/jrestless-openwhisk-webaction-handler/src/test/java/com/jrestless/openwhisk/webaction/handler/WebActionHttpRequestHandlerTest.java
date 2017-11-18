@@ -15,7 +15,8 @@
  */
 package com.jrestless.openwhisk.webaction.handler;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -36,14 +37,14 @@ public class WebActionHttpRequestHandlerTest {
 
 	private WebActionHttpRequestHandler handler = new WebActionHttpRequestHandler();
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void createJsonResponse_NullHeadersGiven_ShouldFailNpe() {
-		handler.createJsonResponse(null, null, Status.OK);
+		assertThrows(NullPointerException.class, () -> handler.createJsonResponse(null, null, Status.OK));
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void createJsonResponse_NullStatusTypeGiven_ShouldFailNpe() {
-		handler.createJsonResponse(null, Collections.emptyMap(), null);
+		assertThrows(NullPointerException.class, () -> handler.createJsonResponse(null, Collections.emptyMap(), null));
 	}
 
 	@Test

@@ -1,6 +1,7 @@
 package com.jrestless.aws.service.client;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -9,8 +10,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.jrestless.aws.service.io.ServiceRequest;
 import com.jrestless.aws.service.io.ServiceResponse;
@@ -21,7 +22,7 @@ public class AbstractFeignLambdaServiceClientTest {
 	private feign.Request feignRequest = mock(feign.Request.class);
 	private ServiceResponse serviceResponse = mock(ServiceResponse.class);
 
-	@Before
+	@BeforeEach
 	public void setup() throws UnsupportedEncodingException {
 		when(feignRequest.url()).thenReturn("/");
 		when(feignRequest.method()).thenReturn("GET");
@@ -60,11 +61,11 @@ public class AbstractFeignLambdaServiceClientTest {
 		assertEquals(Collections.singletonMap("k", Collections.singletonList("v")), client.getServiceRequest().getHeaders());
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void execute_NoRequestUrlGiven_ShouldFail() throws IOException {
 		FeignLambdaClientImpl client = new FeignLambdaClientImpl(serviceResponse);
 		when(feignRequest.url()).thenReturn(null);
-		client.execute(feignRequest, null);
+		assertThrows(NullPointerException.class, () -> client.execute(feignRequest, null));
 	}
 
 	@Test
@@ -75,11 +76,11 @@ public class AbstractFeignLambdaServiceClientTest {
 		assertEquals(URI.create("/whatever?a=b&c=d"), client.getServiceRequest().getRequestUri());
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void execute_NoHttpMethodGiven_ShouldFail() throws IOException {
 		FeignLambdaClientImpl client = new FeignLambdaClientImpl(serviceResponse);
 		when(feignRequest.method()).thenReturn(null);
-		client.execute(feignRequest, null);
+		assertThrows(NullPointerException.class, () -> client.execute(feignRequest, null));
 	}
 
 	@Test

@@ -1,5 +1,6 @@
 package com.jrestless.core.filter;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -17,7 +18,7 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ApplicationPathFilterTest {
 
@@ -30,9 +31,9 @@ public class ApplicationPathFilterTest {
 		createApplicationPathFilter(new ApplicationWithoutPath()).filter(null);
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void filter_AppPathGiven_ShouldAccessRequestContext() throws IOException {
-		createApplicationPathFilter(new ApplicationPathTest()).filter(null);
+		assertThrows(NullPointerException.class, () -> createApplicationPathFilter(new ApplicationPathTest()).filter(null));
 	}
 
 	@Test

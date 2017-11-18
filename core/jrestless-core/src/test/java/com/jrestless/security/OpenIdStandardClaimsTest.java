@@ -1,45 +1,37 @@
 package com.jrestless.security;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
-public class OpenIdStandardClaimsTest extends ClaimsTest<OpenIdStandardClaims> {
+public class OpenIdStandardClaimsTest extends ClaimsTestBase<OpenIdStandardClaims> {
 
-	@Parameters
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] {
-                 { "getSub", "sub", "someSubValue" },
-                 { "getName", "name", "someNameValue" },
-                 { "getGivenName", "given_name", "someGivenNameValue" },
-                 { "getFamilyName", "family_name", "someFamilyNameValue" },
-                 { "getMiddleName", "middle_name", "someMiddleNameValue" },
-                 { "getNickname", "nickname", "someNicknameValue" },
-                 { "getPreferredUsername", "preferred_username", "somePreferredUsernameValue" },
-                 { "getProfile", "profile", "someProfileValue" },
-                 { "getPicture", "picture", "somePictureValue" },
-                 { "getWebsite", "website", "someWebsiteValue" },
-                 { "getEmail", "email", "someEmailValue" },
-                 { "getEmailVerified", "email_verified", true },
-                 { "getGender", "gender", "someGenderValue" },
-                 { "getBirthdate", "birthdate", "someBirthdateValue" },
-                 { "getZoneinfo", "zoneinfo", "someZoneinfoValue" },
-                 { "getLocale", "locale", "someLocaleValue" },
-                 { "getPhoneNumber", "phone_number", "somePhoneNumberValue" },
-                 { "getPhoneNumberVerified", "phone_number_verified", true },
-                 { "getUpdatedAt", "updated_at", 123L }
-           });
+    public static Stream<Arguments> data() {
+    	return Stream.of(
+			ClaimArguments.of(OpenIdStandardClaims::getSub, "sub"),
+			ClaimArguments.of(OpenIdStandardClaims::getName, "name"),
+			ClaimArguments.of(OpenIdStandardClaims::getGivenName, "given_name"),
+			ClaimArguments.of(OpenIdStandardClaims::getFamilyName, "family_name"),
+			ClaimArguments.of(OpenIdStandardClaims::getMiddleName, "middle_name"),
+			ClaimArguments.of(OpenIdStandardClaims::getNickname, "nickname"),
+			ClaimArguments.of(OpenIdStandardClaims::getPreferredUsername, "preferred_username"),
+			ClaimArguments.of(OpenIdStandardClaims::getProfile, "profile"),
+			ClaimArguments.of(OpenIdStandardClaims::getPicture, "picture"),
+			ClaimArguments.of(OpenIdStandardClaims::getWebsite, "website"),
+			ClaimArguments.of(OpenIdStandardClaims::getEmail, "email"),
+			ClaimArguments.of(OpenIdStandardClaims::getEmailVerified, "email_verified", true),
+			ClaimArguments.of(OpenIdStandardClaims::getGender, "gender"),
+			ClaimArguments.of(OpenIdStandardClaims::getBirthdate, "birthdate"),
+			ClaimArguments.of(OpenIdStandardClaims::getZoneinfo, "zoneinfo"),
+			ClaimArguments.of(OpenIdStandardClaims::getLocale, "locale"),
+			ClaimArguments.of(OpenIdStandardClaims::getPhoneNumber, "phone_number"),
+			ClaimArguments.of(OpenIdStandardClaims::getPhoneNumberVerified, "phone_number_verified", true),
+			ClaimArguments.of(OpenIdStandardClaims::getUpdatedAt, "updated_at", 123L));
     }
-
-	public OpenIdStandardClaimsTest(String getterName, String key, Object value) throws NoSuchMethodException, SecurityException {
-		super(getterName, key, value);
-	}
 
 	@Override
 	OpenIdStandardClaims getClaims() {
@@ -56,9 +48,22 @@ public class OpenIdStandardClaimsTest extends ClaimsTest<OpenIdStandardClaims> {
 		};
 	}
 
-	@Override
-	Method getGetterByName(String getterName) throws NoSuchMethodException, SecurityException {
-		return OpenIdStandardClaims.class.getMethod(getterName);
+	@ParameterizedTest
+	@MethodSource("data")
+	public void get_MapValueGiven_ShouldReturnMapValue(Function<OpenIdStandardClaims, Object> getter, String mapKey,
+			Object mapValue) {
+		testGetterReturnsMapValue(getter, mapKey, mapValue);
 	}
 
+	@ParameterizedTest
+	@MethodSource("data")
+	public void get_NoMapValueGiven_ShouldReturnNull(Function<OpenIdStandardClaims, Object> getter) {
+		testGetterReturnsNullIfNoValueInMap(getter);
+	}
+
+	@ParameterizedTest
+	@MethodSource("data")
+	public void get_InvalidTypeValueGiven_ShouldThrowClassCastException(Function<OpenIdStandardClaims, Object> getter) {
+		testGetterReturnsNullIfNoValueInMap(getter);
+	}
 }

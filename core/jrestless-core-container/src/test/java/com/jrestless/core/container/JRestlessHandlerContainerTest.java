@@ -15,8 +15,9 @@
  */
 package com.jrestless.core.container;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -39,8 +40,8 @@ import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.jrestless.core.container.io.JRestlessContainerRequest;
 
@@ -49,7 +50,7 @@ public class JRestlessHandlerContainerTest {
 	private ApplicationHandler appHandler;
 	private JRestlessHandlerContainer<JRestlessContainerRequest> container;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		appHandler = mock(ApplicationHandler.class);
 		container = spy(new JRestlessHandlerContainer<JRestlessContainerRequest>(appHandler));
@@ -130,29 +131,29 @@ public class JRestlessHandlerContainerTest {
 		verify(container, times(1)).reload(config);
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void constructor_NoAppHandlerGiven_ShouldThrowNpe() {
-		new JRestlessHandlerContainer<JRestlessContainerRequest>((ApplicationHandler) null);
+		assertThrows(NullPointerException.class, () -> new JRestlessHandlerContainer<JRestlessContainerRequest>((ApplicationHandler) null));
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void handleRequest_NoContainerRequestGiven_ShouldThrowNpe() {
-		container.handleRequest(null);
+		assertThrows(NullPointerException.class, () -> container.handleRequest(null));
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void createContainerRequest_NoRequestGiven_ShouldThrowNpe() {
-		container.createContainerRequest(null, mock(ContainerResponseWriter.class), mock(SecurityContext.class));
+		assertThrows(NullPointerException.class, () -> container.createContainerRequest(null, mock(ContainerResponseWriter.class), mock(SecurityContext.class)));
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void createContainerRequest_NoContainerResponseWriterGiven_ShouldThrowNpe() {
-		container.createContainerRequest(createAnyRequest(), null, mock(SecurityContext.class));
+		assertThrows(NullPointerException.class, () -> container.createContainerRequest(createAnyRequest(), null, mock(SecurityContext.class)));
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void createContainerRequest_NoSecurityContext_ShouldThrowNpe() {
-		container.createContainerRequest(createAnyRequest(), mock(ContainerResponseWriter.class), null);
+		assertThrows(NullPointerException.class, () -> container.createContainerRequest(createAnyRequest(), mock(ContainerResponseWriter.class), null));
 	}
 
 	public void createContainerRequest_NoRequestBaseUriGiven_ShouldPass() {
@@ -161,32 +162,32 @@ public class JRestlessHandlerContainerTest {
 		container.createContainerRequest(request, mock(ContainerResponseWriter.class), mock(SecurityContext.class));
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void createContainerRequest_NoRequestRequestUriGiven_ShouldThrowNpe() {
 		JRestlessContainerRequest request = createAnyRequest();
 		when(request.getRequestUri()).thenReturn(null);
-		container.createContainerRequest(request, mock(ContainerResponseWriter.class), mock(SecurityContext.class));
+		assertThrows(NullPointerException.class, () -> container.createContainerRequest(request, mock(ContainerResponseWriter.class), mock(SecurityContext.class)));
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void createContainerRequest_NoRequestHttpMethodGiven_ShouldThrowNpe() {
 		JRestlessContainerRequest request = createAnyRequest();
 		when(request.getHttpMethod()).thenReturn(null);
-		container.createContainerRequest(request, mock(ContainerResponseWriter.class), mock(SecurityContext.class));
+		assertThrows(NullPointerException.class, () -> container.createContainerRequest(request, mock(ContainerResponseWriter.class), mock(SecurityContext.class)));
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void createContainerRequest_NoRequestEntityStreamGiven_ShouldThrowNpe() {
 		JRestlessContainerRequest request = createAnyRequest();
 		when(request.getEntityStream()).thenReturn(null);
-		container.createContainerRequest(request, mock(ContainerResponseWriter.class), mock(SecurityContext.class));
+		assertThrows(NullPointerException.class, () -> container.createContainerRequest(request, mock(ContainerResponseWriter.class), mock(SecurityContext.class)));
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void createContainerRequest_NoRequestHeadersGiven_ShouldThrowNpe() {
 		JRestlessContainerRequest request = createAnyRequest();
 		when(request.getHeaders()).thenReturn(null);
-		container.createContainerRequest(request, mock(ContainerResponseWriter.class), mock(SecurityContext.class));
+		assertThrows(NullPointerException.class, () -> container.createContainerRequest(request, mock(ContainerResponseWriter.class), mock(SecurityContext.class)));
 	}
 
 	@Test

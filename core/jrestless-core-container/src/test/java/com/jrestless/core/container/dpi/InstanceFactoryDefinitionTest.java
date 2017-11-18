@@ -15,12 +15,12 @@
  */
 package com.jrestless.core.container.dpi;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 
 import org.glassfish.jersey.process.internal.RequestScoped;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.jrestless.core.container.dpi.InstanceBinder.InstanceFactoryDefinition;
 import com.jrestless.test.ConstructorPreconditionsTester;

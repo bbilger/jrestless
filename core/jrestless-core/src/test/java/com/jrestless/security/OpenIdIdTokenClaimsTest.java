@@ -1,41 +1,48 @@
 package com.jrestless.security;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
-public class OpenIdIdTokenClaimsTest extends ClaimsTest<OpenIdIdTokenClaims> {
+public class OpenIdIdTokenClaimsTest extends ClaimsTestBase<OpenIdIdTokenClaims> {
 
-	@Parameters
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] {
-                 { "getIss", "iss", "someIssvalue", "someIssvalue", false },
-                 { "getSub", "sub", "someSubValue", "someSubValue", false },
-                 { "getAud", "aud", Collections.singletonList("aud0"), Collections.singletonList("aud0"), false },
-                 { "getAud", "aud", new String[] { "aud0" }, Collections.singletonList("aud0"), false },
-                 { "getSingleAud", "aud", "someSingleAud", "someSingleAud", false },
-                 { "getExp", "exp", 123L, 123L, false },
-                 { "getIat", "iat", 123L, 123L, false },
-                 { "getAuthTime", "auth_time", 123L, 123L, true },
-                 { "getNonce", "nonce", "someNonceValue", "someNonceValue", true },
-                 { "getAcr", "acr", "someAcrValue", "someAcrValue", true },
-                 { "getAmr", "amr", Collections.singletonList("amr0"), Collections.singletonList("amr0"), true },
-                 { "getAmr", "amr", new String[] { "amr0" }, Collections.singletonList("amr0"), true },
-                 { "getAzp", "azp", "someAzpValue", "someAzpValue", true }
-           });
-    }
+	public static Stream<? extends Arguments> data(boolean excludeMandatory) {
+		List<ClaimArguments<OpenIdIdTokenClaims>> getters = new ArrayList<>();
+		if (!excludeMandatory) {
+			getters.add(ClaimArguments.of(OpenIdIdTokenClaims::getIss, "iss"));
+			getters.add(ClaimArguments.of(OpenIdIdTokenClaims::getSub, "sub"));
+			getters.add(ClaimArguments.of(OpenIdIdTokenClaims::getAud, "aud", Collections.singletonList("aud0")));
+			getters.add(ClaimArguments.of(OpenIdIdTokenClaims::getSingleAud, "aud"));
+			getters.add(ClaimArguments.of(OpenIdIdTokenClaims::getExp, "exp", 123L));
+			getters.add(ClaimArguments.of(OpenIdIdTokenClaims::getIat, "iat", 123L));
+		}
+		getters.add(ClaimArguments.of(OpenIdIdTokenClaims::getAuthTime, "auth_time", 123L));
+		getters.add(ClaimArguments.of(OpenIdIdTokenClaims::getNonce, "nonce"));
+		getters.add(ClaimArguments.of(OpenIdIdTokenClaims::getAcr, "acr"));
+		getters.add(ClaimArguments.of(OpenIdIdTokenClaims::getNonce, "nonce"));
+		getters.add(ClaimArguments.of(OpenIdIdTokenClaims::getAmr, "amr", Collections.singletonList("amr0")));
+		getters.add(ClaimArguments.of(OpenIdIdTokenClaims::getAzp, "azp"));
 
-	public OpenIdIdTokenClaimsTest(String getterName, String key, Object mapValue, Object transformedValue, boolean testNull)
-			throws NoSuchMethodException, SecurityException {
-		super(getterName, key, mapValue, transformedValue, testNull);
 
+		return getters.stream();
+	}
+
+	public static Stream<? extends Arguments> dataAll() {
+		return data(false);
+	}
+
+	public static Stream<? extends Arguments> dataOptional() {
+		return data(true);
 	}
 
 	@Override
@@ -48,9 +55,35 @@ public class OpenIdIdTokenClaimsTest extends ClaimsTest<OpenIdIdTokenClaims> {
 		};
 	}
 
-	@Override
-	Method getGetterByName(String getterName) throws NoSuchMethodException, SecurityException {
-		return OpenIdIdTokenClaims.class.getMethod(getterName);
+	@ParameterizedTest
+	@MethodSource("dataAll")
+	public void get_MapValueGiven_ShouldReturnMapValue(Function<OpenIdIdTokenClaims, Object> getter, String mapKey,
+			Object mapValue) {
+		testGetterReturnsMapValue(getter, mapKey, mapValue);
+	}
+
+	@ParameterizedTest
+	@MethodSource("dataOptional")
+	public void get_NoMapValueGiven_ShouldReturnNull(Function<OpenIdIdTokenClaims, Object> getter) {
+		testGetterReturnsNullIfNoValueInMap(getter);
+	}
+
+	@ParameterizedTest
+	@MethodSource("dataOptional")
+	public void get_InvalidTypeValueGiven_ShouldThrowClassCastException(Function<OpenIdIdTokenClaims, Object> getter) {
+		testGetterReturnsNullIfNoValueInMap(getter);
+	}
+
+	@Test
+	public void getAud_StringArrayInMapGiven_ShouldReturnList() {
+		getClaimsMap().put("aud", new String[] { "aud0" });
+		assertEquals(Collections.singletonList("aud0"), getClaims().getAud());
+	}
+
+	@Test
+	public void getAmr_StringArrayInMapGiven_ShouldReturnList() {
+		getClaimsMap().put("amr", new String[] { "amr0" });
+		assertEquals(Collections.singletonList("amr0"), getClaims().getAmr());
 	}
 
 }

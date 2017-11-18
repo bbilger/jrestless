@@ -56,8 +56,8 @@ import javax.ws.rs.core.SecurityContext;
 import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.jrestless.core.container.dpi.InstanceBinder;
 import com.jrestless.core.container.io.JRestlessContainerRequest;
@@ -69,7 +69,7 @@ public class JRestlessHandlerContainerIntTest {
 	private ArticleService testService;
 	private JRestlessHandlerContainer<JRestlessContainerRequest> container;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		testService = mock(ArticleService.class);
 		Binder binder = new InstanceBinder.Builder().addInstance(testService, ArticleService.class).build();

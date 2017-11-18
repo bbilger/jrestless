@@ -1,21 +1,22 @@
 package com.jrestless.aws.gateway.security;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import javax.ws.rs.core.SecurityContext;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.jrestless.aws.gateway.io.GatewayRequest;
 
 public abstract class SecurityContextFactoryTestBase {
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void init_NullRequestGiven_ShouldFailWithNpe() {
-		createSecurityContextFactory(null);
+		assertThrows(NullPointerException.class, () -> createSecurityContextFactory(null));
 	}
 
 	@Test
@@ -24,9 +25,9 @@ public abstract class SecurityContextFactoryTestBase {
 				createSecurityContextFactory(mock(GatewayRequest.class)).getAuthenticationScheme());
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void createSecurityContext_InApplicableRequestGiven_ShouldFail() {
-		createSecurityContextFactory(createInapplicableInvlidRequest()).createSecurityContext();
+		assertThrows(IllegalStateException.class, () -> createSecurityContextFactory(createInapplicableInvlidRequest()).createSecurityContext());
 	}
 
 	@Test

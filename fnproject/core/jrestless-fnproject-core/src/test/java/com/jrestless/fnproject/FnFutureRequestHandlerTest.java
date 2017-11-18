@@ -1,6 +1,6 @@
 package com.jrestless.fnproject;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import java.io.ByteArrayInputStream;
@@ -21,8 +21,8 @@ import javax.ws.rs.ext.Provider;
 import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -39,7 +39,7 @@ public class FnFutureRequestHandlerTest {
     private TestService testService;
     private RuntimeContext runtimeContext = mock(RuntimeContext.class);
 
-    @Before
+    @BeforeEach
     public void setUp() {
         testService = mock(TestService.class);
         handler = createAndStartHandler(new ResourceConfig(), testService);

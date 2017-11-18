@@ -15,9 +15,10 @@
  */
 package com.jrestless.core.container;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -33,8 +34,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.server.ContainerResponse;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.jrestless.core.container.JRestlessHandlerContainer.JRestlessContainerResponse;
 import com.jrestless.core.container.JRestlessHandlerContainer.JRestlessContainerResponseWriter;
@@ -45,7 +46,7 @@ public class JRestlessContainerResponseWriterTest {
 	private JRestlessContainerResponseWriter containerResponseWriter;
 	private JRestlessContainerResponse response;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		JRestlessResponseWriter responseWriter = mock(JRestlessResponseWriter.class);
 		when(responseWriter.getEntityOutputStream()).thenReturn(new ByteArrayOutputStream());
@@ -106,12 +107,12 @@ public class JRestlessContainerResponseWriterTest {
 		verify(containerResponseWriter, times(1)).commit();
 	}
 
-	@Test(expected = RuntimeException.class)
+	@Test
 	public void failure_ResponseNotYetCommitted_ShouldRethrowOnCommitFailure() {
 		containerResponseWriter = spy(containerResponseWriter);
 		containerResponseWriter.failure(new RuntimeException());
 		doThrow(CommitException.class).when(containerResponseWriter).commit();
-		containerResponseWriter.failure(new RuntimeException());
+		assertThrows(RuntimeException.class, () -> containerResponseWriter.failure(new RuntimeException()));
 	}
 
 	@Test
@@ -119,14 +120,14 @@ public class JRestlessContainerResponseWriterTest {
 		assertFalse(containerResponseWriter.enableResponseBuffering());
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void setSuspendTimeout_Always_ShouldBeUnsupported() {
-		containerResponseWriter.setSuspendTimeout(1, null);
+		assertThrows(UnsupportedOperationException.class, () -> containerResponseWriter.setSuspendTimeout(1, null));
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void suspend_Always_ShouldBeUnsupported() {
-		containerResponseWriter.suspend(1, null, null);
+		assertThrows(UnsupportedOperationException.class, () -> containerResponseWriter.suspend(1, null, null));
 	}
 
 	@SuppressWarnings("serial")

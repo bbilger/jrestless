@@ -1,7 +1,7 @@
 package com.jrestless.core.interceptor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -17,7 +17,7 @@ import java.util.Random;
 
 import javax.ws.rs.ext.WriterInterceptorContext;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 public class ConditionalBase64WriteInterceptorTest {

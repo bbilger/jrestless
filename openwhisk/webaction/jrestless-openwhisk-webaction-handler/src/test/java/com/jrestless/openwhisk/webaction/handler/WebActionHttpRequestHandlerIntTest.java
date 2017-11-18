@@ -15,7 +15,7 @@
  */
 package com.jrestless.openwhisk.webaction.handler;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -35,9 +35,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.server.ResourceConfig;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
@@ -56,7 +56,7 @@ public class WebActionHttpRequestHandlerIntTest {
 	private WebActionHttpRequestHandler handler;
 	private TestService testService;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		testService = mock(TestService.class);
 		handler = new WebActionHttpRequestHandler();
@@ -68,7 +68,7 @@ public class WebActionHttpRequestHandlerIntTest {
 		handler.start();
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		handler.stop();
 	}

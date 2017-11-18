@@ -6,6 +6,6 @@ dependencies {
 		libraries.findbugs_jsr305
 	)
 	testCompile(
-		libraries.junit
+		libraries.junit_jupiter_params
 	)
 }

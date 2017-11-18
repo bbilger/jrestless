@@ -13,6 +13,7 @@ buildscript {
 	dependencies {
 		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
 		classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6'
+		classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.2'
 	}
 }
 
@@ -20,10 +21,10 @@ apply plugin: 'org.sonarqube'
 
 allprojects {
 
-	apply plugin: 'java'
+  apply plugin: 'java'
 
-	sourceCompatibility = 1.8
-	targetCompatibility = 1.8
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
 
   repositories {
 		jcenter()
@@ -49,6 +50,7 @@ subprojects {
 	apply plugin: 'jacoco'
 	apply plugin: 'com.jfrog.bintray'
 	apply plugin: 'maven-publish'
+	apply plugin: 'org.junit.platform.gradle.plugin'
 
 	repositories {
 		mavenCentral()
@@ -57,8 +59,13 @@ subprojects {
 	ext.libraries = [
 		jersey_server: "org.glassfish.jersey.core:jersey-server:${jerseyVersion}",
 		jersey_media_json_jackson: "org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyVersion}",
-		jersey_test_grizzly: "org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:${jerseyVersion}",
-		jersey_test_core: "org.glassfish.jersey.test-framework:jersey-test-framework-core:${jerseyVersion}",
+		jersey_test_core: dependencies.create("org.glassfish.jersey.test-framework:jersey-test-framework-core:${jerseyVersion}") {
+			exclude module: "junit"
+		},
+		jersey_test_grizzly: dependencies.create("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:${jerseyVersion}") {
+			exclude module: "jersey-test-framework-core"
+			exclude module: "junit"
+		},
 		jersey_inject_hk2: "org.glassfish.jersey.inject:jersey-hk2:${jerseyVersion}",
 		findbugs_jsr305: 'com.google.code.findbugs:jsr305:3.0.1',
 		aws_lambda_core: 'com.amazonaws:aws-lambda-java-core:1.1.0',
@@ -74,12 +81,26 @@ subprojects {
 		feign_core: 'io.github.openfeign:feign-core:9.3.1',
 		slf4j_api: 'org.slf4j:slf4j-api:1.7.21',
 		slf4j_simple: 'org.slf4j:slf4j-simple:1.7.21',
-		junit: 'junit:junit:4.12',
+		junit_jupiter_api: "org.junit.jupiter:junit-jupiter-api:${junitVersion}",
+		junit_jupiter_engine: "org.junit.jupiter:junit-jupiter-engine:${junitVersion}",
+		junit_jupiter_params: "org.junit.jupiter:junit-jupiter-params:${junitVersion}",
 		mockito_core: 'org.mockito:mockito-core:2.2.0',
-		guava_testlib: 'com.google.guava:guava-testlib:18.0',
+		guava: 'com.google.guava:guava:23.4-jre',
 		jsonassert: 'org.skyscreamer:jsonassert:1.3.0',
 		gson: 'com.google.code.gson:gson:2.8.1'
 	]
+	
+	// common dependencies 
+	dependencies {
+		testCompile(
+			libraries.junit_jupiter_api,
+			libraries.mockito_core
+		)
+		testRuntime(
+			libraries.junit_jupiter_engine,
+			'org.junit.platform:junit-platform-launcher:1.0.1'
+		)
+	}
 
 	checkstyle {
 		configFile = checkstyleCfg
@@ -105,13 +126,20 @@ subprojects {
 		toolVersion = '5.4.2'
 		sourceSets = [project.sourceSets.main]
 	}
-
+    jacoco {
+        applyTo junitPlatformTest
+    }
 	jacocoTestReport {
 		reports {
 			xml.enabled = true
 			html.enabled = true
 		}
 	}
+	junitPlatformTest {
+        jacoco {
+            destinationFile = file("$buildDir/jacoco/test.exec")
+        }
+    }
 	check.dependsOn jacocoTestReport
 
 	// custom tasks for creating source/javadoc jars

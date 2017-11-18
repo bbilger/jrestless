@@ -15,6 +15,8 @@
  */
 package com.jrestless.aws.gateway.io;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,8 +24,7 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.ImmutableMap;
 import com.jrestless.test.ConstructorPreconditionsTester;
@@ -34,7 +35,7 @@ public class GatewayResponseTest {
 	@Test
 	public void getStatusCode_StatusTypeGiven_ShouldReturnStatusCodeFromType() {
 		GatewayResponse resp = new GatewayResponse(null, ImmutableMap.of(), Status.CONFLICT, false);
-		Assert.assertEquals(409, resp.getStatusCode());
+		assertEquals(409, resp.getStatusCode());
 	}
 
 	@Test

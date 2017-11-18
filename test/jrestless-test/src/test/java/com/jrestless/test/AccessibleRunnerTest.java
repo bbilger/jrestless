@@ -1,12 +1,12 @@
 package com.jrestless.test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.reflect.Method;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AccessibleRunnerTest {
 	@Test
@@ -34,7 +34,7 @@ public class AccessibleRunnerTest {
 			AccessibleRunner.run(m, () -> {
 				throw new RuntimeException();
 			});
-			fail();
+			fail("expected a RuntimeException");
 		} catch (RuntimeException re) {
 			assertFalse(m.isAccessible());
 		}
@@ -68,7 +68,7 @@ public class AccessibleRunnerTest {
 			AccessibleRunner.run(m, () -> {
 				throw new RuntimeException();
 			});
-			fail();
+			fail("expected a RuntimeException");
 		} catch (RuntimeException re) {
 			assertTrue(m.isAccessible());
 		}

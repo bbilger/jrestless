@@ -15,25 +15,31 @@
  */
 package com.jrestless.test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.util.Objects;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.jrestless.test.CopyConstructorEqualsTester.ConstructorInvocationException;
 
 public class CopyConstructorEqualsTesterTest {
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void testEquals_NotAllParametersGiven_ShouldThrowIse() throws NoSuchMethodException, SecurityException {
-		new CopyConstructorEqualsTester(CorrectValueObject.class.getDeclaredConstructor(Integer.class, double.class))
-			.addArguments(0, 0, 1)
-			.testEquals();
+		assertThrows(IllegalStateException.class, () -> {
+			new CopyConstructorEqualsTester(CorrectValueObject.class.getDeclaredConstructor(Integer.class, double.class))
+				.addArguments(0, 0, 1)
+				.testEquals();
+		});
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testEquals_InvalidArgumentTypeGiven_ShouldThrowIae() throws NoSuchMethodException, SecurityException {
-		new CopyConstructorEqualsTester(CorrectValueObject.class.getDeclaredConstructor(Integer.class, double.class))
-			.addArguments(0, 0, 1L);
+		assertThrows(IllegalArgumentException.class, () -> {
+			new CopyConstructorEqualsTester(CorrectValueObject.class.getDeclaredConstructor(Integer.class, double.class))
+				.addArguments(0, 0, 1L);
+		});
 	}
 
 	@Test
@@ -44,20 +50,24 @@ public class CopyConstructorEqualsTesterTest {
 			.testEquals();
 	}
 
-	@Test(expected = AssertionError.class)
+	@Test
 	public void testEquals_IncorrectValueObjectGiven_ShouldNotPassEqualsTest() throws NoSuchMethodException, SecurityException {
-		new CopyConstructorEqualsTester(IncorrectValueObject.class.getDeclaredConstructor(Integer.class, double.class, char.class))
-			.addArguments(0, 0, 1)
-			.addArguments(1, 0.0, 0.1)
-			.addArguments(2, 'a', 'b')
-			.testEquals();
+		assertThrows(AssertionError.class, () -> {
+			new CopyConstructorEqualsTester(IncorrectValueObject.class.getDeclaredConstructor(Integer.class, double.class, char.class))
+				.addArguments(0, 0, 1)
+				.addArguments(1, 0.0, 0.1)
+				.addArguments(2, 'a', 'b')
+				.testEquals();
+		});
 	}
 
-	@Test(expected = ConstructorInvocationException.class)
+	@Test
 	public void testEquals_ConstructorThrowsException_ShouldFail() throws NoSuchMethodException, SecurityException {
-		new CopyConstructorEqualsTester(ThrowingConstructor.class.getDeclaredConstructor(String.class))
-			.addArguments(0, "abc")
-			.testEquals();
+		assertThrows(ConstructorInvocationException.class, () -> {
+			new CopyConstructorEqualsTester(ThrowingConstructor.class.getDeclaredConstructor(String.class))
+				.addArguments(0, "abc")
+				.testEquals();
+		});
 	}
 
 	private static class IncorrectValueObject extends CorrectValueObject {

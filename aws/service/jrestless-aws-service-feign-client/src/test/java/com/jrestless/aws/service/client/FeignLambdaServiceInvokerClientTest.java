@@ -1,7 +1,8 @@
 package com.jrestless.aws.service.client;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -10,8 +11,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 
 import com.amazonaws.services.lambda.AWSLambdaClient;
@@ -30,7 +31,7 @@ public class FeignLambdaServiceInvokerClientTest {
 	private LambdaInvokerFactory.Builder lambdaInvokerFactoryBuilder;
 	private LambdaInvokerService service = mock(LambdaInvokerService.class);
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		lambdaInvokerFactoryBuilder = mock(LambdaInvokerFactory.Builder.class);
 		when(lambdaInvokerFactoryBuilder.lambdaFunctionNameResolver(any())).thenReturn(lambdaInvokerFactoryBuilder);
@@ -40,14 +41,14 @@ public class FeignLambdaServiceInvokerClientTest {
 		when(lambdaInvokerFactoryBuilder.build(LambdaInvokerService.class)).thenReturn(service);
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void init_NullLambdaClientGiven_ShouldFail() {
-		new FeignLambdaServiceInvokerClient(null, FUNCTION_NAME, null, null);
+		assertThrows(NullPointerException.class, () -> new FeignLambdaServiceInvokerClient(null, FUNCTION_NAME, null, null));
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void init_NullFunctionNameGiven_ShouldFail() {
-		new FeignLambdaServiceInvokerClient(lambdaClient, null, null, null);
+		assertThrows(NullPointerException.class, () -> new FeignLambdaServiceInvokerClient(lambdaClient, null, null, null));
 	}
 
 	@Test

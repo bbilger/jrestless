@@ -1,5 +1,6 @@
 package com.jrestless.aws.service.client;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNotNull;
@@ -9,8 +10,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.lambda.AWSLambdaClient;
@@ -22,7 +23,7 @@ public class FeignLambdaInvokerServiceClientBuilderTest {
 	private FeignLambdaServiceInvokerClient.Builder builder;
 	private AWSLambdaClient lambdaClient = mock(AWSLambdaClient.class);
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		builder = spy(new FeignLambdaServiceInvokerClient.Builder());
 		doReturn(null).when(builder).create(any(), any(), any(), any());
@@ -36,17 +37,17 @@ public class FeignLambdaInvokerServiceClientBuilderTest {
 		verify(builder).create(lambdaClient, "myFunctionName", null, null);
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void setFunctionName_NoFunctionNameGiven_ShouldNotBuild() {
 		builder.setAwsLambdaClient(lambdaClient);
-		builder.build();
+		assertThrows(IllegalStateException.class, builder::build);
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void setFunctionName_NullFunctionNameGiven_ShouldNotBuild() {
 		builder.setFunctionName(null);
 		builder.setAwsLambdaClient(lambdaClient);
-		builder.build();
+		assertThrows(IllegalStateException.class, builder::build);
 	}
 
 	@Test
@@ -102,11 +103,11 @@ public class FeignLambdaInvokerServiceClientBuilderTest {
 		verify(builder).create(isNotNull(), eq(FUNCTION_NAME), isNull(), isNull());
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void setFunctionName_NullRegionGiven_ShouldNotBuild() {
 		builder.setFunctionName(FUNCTION_NAME);
 		builder.setRegion(null);
-		builder.build();
+		assertThrows(IllegalStateException.class, builder::build);
 	}
 
 	@Test

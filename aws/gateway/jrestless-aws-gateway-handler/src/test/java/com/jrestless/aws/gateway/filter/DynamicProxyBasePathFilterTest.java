@@ -12,7 +12,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.jrestless.aws.gateway.io.GatewayRequest;
 

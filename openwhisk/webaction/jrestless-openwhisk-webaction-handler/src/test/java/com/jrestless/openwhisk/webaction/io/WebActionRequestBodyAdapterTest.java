@@ -1,11 +1,12 @@
 package com.jrestless.openwhisk.webaction.io;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -40,7 +41,7 @@ public class WebActionRequestBodyAdapterTest {
 		assertNull(deserializer.deserialize(json, null, null));
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void deser_NonEmptyObjectGiven_ShouldFail() {
 		JsonElement json = mock(JsonElement.class);
 		when(json.isJsonNull()).thenReturn(false);
@@ -49,26 +50,26 @@ public class WebActionRequestBodyAdapterTest {
 		JsonObject object = new JsonObject();
 		object.addProperty("what", "ever");
 		when(json.getAsJsonObject()).thenReturn(object);
-		assertNull(deserializer.deserialize(json, null, null));
+		assertThrows(IllegalStateException.class, () -> deserializer.deserialize(json, null, null));
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void deser_UnsupportedTypeGiven_ShouldFail() {
 		JsonElement json = mock(JsonElement.class);
 		when(json.isJsonNull()).thenReturn(false);
 		when(json.isJsonPrimitive()).thenReturn(false);
 		when(json.isJsonObject()).thenReturn(false);
-		assertNull(deserializer.deserialize(json, null, null));
+		assertThrows(IllegalStateException.class, () -> deserializer.deserialize(json, null, null));
 	}
 
 	// artificial case for code coverage
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void deser_NoObjectButObjectEntriesGiven_ShouldFail() {
 		JsonElement json = mock(JsonElement.class);
 		when(json.isJsonNull()).thenReturn(false);
 		when(json.isJsonPrimitive()).thenReturn(false);
 		when(json.isJsonObject()).thenReturn(false);
 		when(json.getAsJsonObject()).thenReturn(new JsonObject());
-		assertNull(deserializer.deserialize(json, null, null));
+		assertThrows(IllegalStateException.class, () -> deserializer.deserialize(json, null, null));
 	}
 }
