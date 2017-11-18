@@ -30,6 +30,7 @@ public class CorsFilterIntTest extends JerseyTest {
 	public void setUp() throws Exception {
 		System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
 		super.setUp();
+		System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
 	}
 
 	@AfterEach
