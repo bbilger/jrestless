@@ -29,6 +29,8 @@ compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.26
 Aside from the HK2 injection manager (jersey-hk2) mentioned above, Jersey offers an alternative CDI 2 SE injection manager (jersey-cdi2-se).
 The CDI 2 SE injection manager (jersey-cdi2-se) is, however, not yet supported by JRestless because of a bug which by the way affects all containers: https://github.com/jersey/jersey/issues/3621
 
+BUT: you can still use CDI as usual via `org.glassfish.jersey.ext.cdi:jersey-weld2-se`; see https://github.com/bbilger/jrestless-examples/tree/master/aws/gateway/aws-gateway-cdi
+
 
 # 0.5.1 (2017-04-22)
 
