@@ -69,7 +69,7 @@ public final class EquivalenceTester<T> {
 
 	private EquivalenceTester(Equivalence<? super T> equivalence) {
 		this.equivalence = checkNotNull(equivalence);
-		this.delegate = new RelationshipTester<T>(equivalence, "equivalent", "hash", new ItemReporter());
+		this.delegate = new RelationshipTester<>(equivalence, "equivalent", "hash", new ItemReporter());
 	}
 
 	public static <T> EquivalenceTester<T> of(Equivalence<? super T> equivalence) {
