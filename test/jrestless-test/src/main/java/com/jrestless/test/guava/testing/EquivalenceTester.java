@@ -73,7 +73,7 @@ public final class EquivalenceTester<T> {
 	}
 
 	public static <T> EquivalenceTester<T> of(Equivalence<? super T> equivalence) {
-		return new EquivalenceTester<T>(equivalence);
+		return new EquivalenceTester<>(equivalence);
 	}
 
 	/**
