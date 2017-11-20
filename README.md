@@ -1,6 +1,6 @@
 # JRestless
 
-JRestless allows you to create serverless or rather AWS Lambda applications using JAX-RS.
+JRestless allows you to create serverless applications using JAX-RS.
 
 ![](jrestless_512_256.png)
 
@@ -41,7 +41,11 @@ JRestless is a framework allowing you to build serverless JAX-RS applications or
 
 Since this framework is just a wrapper around or rather a container for Jersey, you can use almost all JAX-RS features plus Jersey's custom extensions like **Spring integration** - not Spring MVC, though since this functionality is provided by JAX-RS itself.
 
-AWS Lambda is the only FaaS environment that supports Java at the moment and so it is the only supported environment for now.
+Supported Environments:
+
+  - [AWS Lambda](http://docs.aws.amazon.com/lambda/latest/dg/welcome.html)
+  - [OpenWhisk](https://openwhisk.apache.org/)
+  - [Fn Project](http://fnproject.io)
 
 ## Motivation
 
