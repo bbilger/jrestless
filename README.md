@@ -44,7 +44,7 @@ Since this framework is just a wrapper around or rather a container for Jersey, 
 Supported Environments:
 
   - [AWS Lambda](http://docs.aws.amazon.com/lambda/latest/dg/welcome.html)
-  - [OpenWhisk](https://openwhisk.apache.org/)
+  - [OpenWhisk](https://openwhisk.apache.org/) (experimental/in progress)
   - [Fn Project](http://fnproject.io)
 
 ## Motivation
