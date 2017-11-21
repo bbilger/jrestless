@@ -28,6 +28,7 @@ SonarQube:
 * [Function Types](#function-types)
 * [Usage Example](#usage-example)
   * [AWS Usage Example](#aws-usage-example)
+  * [Fn Project Usage Example](#fn-project-usage-example)
 * [Modules](#modules)
 * [Release History](#release-history)
 * [Alternative Projects](#alternative-projects)
@@ -76,13 +77,17 @@ The motivation for this project is to avoid a cloud vendor lock-in and to allow 
 - _Service Functions_ are AWS Lambda functions that can either be invoked by other AWS Lambda functions or can be invoked directly through the AWS SDK. The point is that you don't use AWS API Gateway. You can abstract the fact that you invoke an AWS Lambda function away by using a special feign client ([jrestless-aws-service-feign-client](aws/service/jrestless-aws-service-feign-client)). Usage example: [aws-service-usage-example](https://github.com/bbilger/jrestless-examples/tree/master/aws/service/aws-service-usage-example). [Read More...](aws/service/jrestless-aws-service-handler).
 - _SNS functions_ are AWS Lambda function that get invoked by SNS. This allow asynchronous calls to other Lambda functions. So when one Lambda function publishes a message to one SNS topic, SNS can then invoke all (1-N) subscribed Lambda functions. Usage example: [aws-sns-usage-example](https://github.com/bbilger/jrestless-examples/tree/master/aws/sns/aws-sns-usage-example). [Read More...](aws/sns/jrestless-aws-sns-handler).
 
+### Fn Project
+
+- _Http Functions_ handle [HTTP formatted](https://github.com/fnproject/fn/blob/master/docs/function-format.md#http-io-format) requests [Read More...](fnproject/core/jrestless-fnproject-core)
+
 Note: the framework is split up into multiple modules, so you choose which functionality you actually want to use. See [Modules](#modules)
 
 ## Usage Example
 
-All examples, including the following one, can be found in a separate repository: https://github.com/bbilger/jrestless-examples
-
 ### AWS Usage Example
+
+All examples, including the following one, can be found in a separate repository: https://github.com/bbilger/jrestless-examples
 
 JRestless does not depend on the [serverless framework](https://github.com/serverless/serverless) but it simplifies the necessary AWS configuration tremendously and will be used for this example.
 
@@ -231,6 +236,10 @@ curl -H 'Accept: application/json' 'https://<SOMEID>.execute-api.eu-central-1.am
 # {"statusMessage":"up and running"}
 ```
 
+### Fn Project Usage Example
+
+A very good example of how to use JRestless on Fn Project can be found here: https://github.com/fnproject/fn-jrestless-example
+
 ## Modules
 JRestless is split up into multiple modules whereas one has to depend on the \*-handler modules, only. [jrestless-aws-gateway-handler](aws/gateway/jrestless-aws-gateway-handler) is probably the most interesting one.
 
@@ -260,6 +269,9 @@ All modules are available in jcenter.
 * **jrestless-test** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-test/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-test/_latestVersion)
   * Provides common test functionality.
   * [Read More...](test/jrestless-test)
+* **jrestless-fnproject-core** [ ![Download](https://api.bintray.com/packages/bbilger/maven/jrestless-fnproject-core/images/download.svg) ](https://bintray.com/bbilger/maven/jrestless-fnproject-core/_latestVersion)
+  * [Fn Project](http://fnproject.io/) http request handler
+  * [Read More...](fnproject/core/jrestless-fnproject-core)
 
 ## Alternative Projects
 
@@ -269,6 +281,7 @@ All modules are available in jcenter.
   * [lambadaframework](https://github.com/lambadaframework/lambadaframework) provides similar functionality like JRestless. It implements some features of the JAX-RS standard and includes deployment functionality within the framework itself.
   * [ingenieux/lambada](https://github.com/ingenieux/lambada) Non-JAX-RS Java framework
   * [aws-lambda-servlet](https://github.com/bleshik/aws-lambda-servlet) run JAX-RS applications - uses Jersey and pretends to run in a servlet container
+  * [aws-serverless-java-container](https://github.com/awslabs/aws-serverless-java-container) run JAX-RS (using Jersey), Spring (MVC) and Spark - pretends to run in a servlet container
 * JavaScript
   * [aws-serverless-express](https://github.com/awslabs/aws-serverless-express) - run [express](https://github.com/expressjs/express) applications
 * Python
@@ -285,6 +298,10 @@ All modules are available in jcenter.
 * _Gateway functions_
   * AWS API Gateway has a timeout of 30 seconds
   * Multiple headers with same name are not supported
+  
+### Fn Project
+
+* At the moment [Fn Project](http://fnproject.io/) does not support wildcards in routes, see https://github.com/fnproject/fn-jrestless-example#question-what-about-binding-variables-from-path-params
 
 ## Release History
 [CHANGELOG](CHANGELOG.md)
