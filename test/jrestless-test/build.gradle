@@ -7,3 +7,12 @@ dependencies {
 		libraries.jersey_test_core
 	)
 }
+
+// https://stackoverflow.com/questions/29887805/filter-jacoco-coverage-reports-with-gradle/29887806#29887806
+jacocoTestReport {
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: 'com/jrestless/test/guava/testing/**')
+        })
+    }
+}
