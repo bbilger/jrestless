@@ -11,13 +11,17 @@ buildscript {
 	  }
 	}
 	dependencies {
-		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
-		classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6'
+		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
+		classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.1'
 		classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.2'
+	}
+	dependencies {
+		classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
 	}
 }
 
 apply plugin: 'org.sonarqube'
+apply plugin: 'com.github.ben-manes.versions'
 
 allprojects {
 
@@ -83,7 +87,7 @@ subprojects {
 		junit_jupiter_engine: "org.junit.jupiter:junit-jupiter-engine:${junitVersion}",
 		junit_jupiter_params: "org.junit.jupiter:junit-jupiter-params:${junitVersion}",
 		mockito_core: 'org.mockito:mockito-core:2.11.0',
-		guava: 'com.google.guava:guava:23.4-jre',
+		guava: 'com.google.guava:guava:23.5-jre',
 		jsonassert: 'org.skyscreamer:jsonassert:1.5.0',
 		gson: 'com.google.code.gson:gson:2.8.2'
 	]
