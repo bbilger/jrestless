@@ -21,7 +21,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.lambda.AWSLambdaClient;
+import com.amazonaws.services.lambda.AWSLambda;
+import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
 import com.amazonaws.services.lambda.invoke.LambdaInvokerFactory;
 import com.jrestless.aws.service.io.ServiceRequest;
 import com.jrestless.aws.service.io.ServiceResponse;
@@ -38,12 +39,12 @@ public class FeignLambdaServiceInvokerClient extends AbstractFeignLambdaServiceC
 
 	private final LambdaInvokerService service;
 
-	public FeignLambdaServiceInvokerClient(@Nonnull AWSLambdaClient awsLambdaClient, @Nonnull String functionName,
+	public FeignLambdaServiceInvokerClient(@Nonnull AWSLambda awsLambdaClient, @Nonnull String functionName,
 			@Nullable String functionAlias, @Nullable String functionVersion) {
 		this(LambdaInvokerFactory.builder(), awsLambdaClient, functionName, functionAlias, functionVersion);
 	}
 
-	FeignLambdaServiceInvokerClient(LambdaInvokerFactory.Builder builder, AWSLambdaClient awsLambdaClient,
+	FeignLambdaServiceInvokerClient(LambdaInvokerFactory.Builder builder, AWSLambda awsLambdaClient,
 			String functionName, String functionAlias, String functionVersion) {
 		requireNonNull(awsLambdaClient);
 		requireNonNull(functionName);
@@ -72,7 +73,7 @@ public class FeignLambdaServiceInvokerClient extends AbstractFeignLambdaServiceC
 		private String functionName;
 		private String functionAlias;
 		private String functionVersion;
-		private AWSLambdaClient awsLambdaClient;
+		private AWSLambda awsLambdaClient;
 		private Regions region;
 
 		public Builder setFunctionName(String functionName) {
@@ -90,7 +91,7 @@ public class FeignLambdaServiceInvokerClient extends AbstractFeignLambdaServiceC
 			return this;
 		}
 
-		public Builder setAwsLambdaClient(AWSLambdaClient awsLambdaClient) {
+		public Builder setAwsLambdaClient(AWSLambda awsLambdaClient) {
 			this.awsLambdaClient = awsLambdaClient;
 			return this;
 		}
@@ -100,11 +101,10 @@ public class FeignLambdaServiceInvokerClient extends AbstractFeignLambdaServiceC
 			return this;
 		}
 
-		protected AWSLambdaClient resolveAwsLambdaClient() {
-			AWSLambdaClient resolvedClient = awsLambdaClient;
+		protected AWSLambda resolveAwsLambdaClient() {
+			AWSLambda resolvedClient = awsLambdaClient;
 			if (resolvedClient == null && region != null) {
-				resolvedClient = new AWSLambdaClient();
-				resolvedClient.configureRegion(region);
+				resolvedClient = AWSLambdaClientBuilder.standard().withRegion(region).build();
 			}
 			return requireToBuild(resolvedClient, "an awsLambdaClient or a region is required");
 		}
@@ -121,7 +121,7 @@ public class FeignLambdaServiceInvokerClient extends AbstractFeignLambdaServiceC
 		}
 
 		// for JUnit
-		FeignLambdaServiceInvokerClient create(AWSLambdaClient awsLambdaClient, String functionName,
+		FeignLambdaServiceInvokerClient create(AWSLambda awsLambdaClient, String functionName,
 				String functionAlias, String functionVersion) {
 			return new FeignLambdaServiceInvokerClient(awsLambdaClient, functionName, functionAlias, functionVersion);
 		}

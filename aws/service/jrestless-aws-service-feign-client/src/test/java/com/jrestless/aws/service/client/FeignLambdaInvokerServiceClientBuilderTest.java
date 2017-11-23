@@ -14,14 +14,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.lambda.AWSLambdaClient;
+import com.amazonaws.services.lambda.AWSLambda;
 
 public class FeignLambdaInvokerServiceClientBuilderTest {
 
 	private static final String FUNCTION_NAME = "someFunctionName";
 
 	private FeignLambdaServiceInvokerClient.Builder builder;
-	private AWSLambdaClient lambdaClient = mock(AWSLambdaClient.class);
+	private AWSLambda lambdaClient = mock(AWSLambda.class);
 
 	@BeforeEach
 	public void setup() {
@@ -88,7 +88,7 @@ public class FeignLambdaInvokerServiceClientBuilderTest {
 
 	@Test
 	public void setFunctionName_LambdaClientGiven_ShouldUseLambdaClient() {
-		AWSLambdaClient myLambdaClient = mock(AWSLambdaClient.class);
+		AWSLambda myLambdaClient = mock(AWSLambda.class);
 		builder.setFunctionName(FUNCTION_NAME);
 		builder.setAwsLambdaClient(myLambdaClient);
 		builder.build();
@@ -112,7 +112,7 @@ public class FeignLambdaInvokerServiceClientBuilderTest {
 
 	@Test
 	public void setFunctionName_LambdaClientAndRegionGiven_ShouldUseLambdaClient() {
-		AWSLambdaClient myLambdaClient = mock(AWSLambdaClient.class);
+		AWSLambda myLambdaClient = mock(AWSLambda.class);
 		builder.setFunctionName(FUNCTION_NAME);
 		builder.setRegion(Regions.AP_NORTHEAST_1);
 		builder.setAwsLambdaClient(myLambdaClient);

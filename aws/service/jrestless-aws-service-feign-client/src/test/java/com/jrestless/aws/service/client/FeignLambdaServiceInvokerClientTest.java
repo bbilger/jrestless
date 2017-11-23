@@ -15,7 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 
-import com.amazonaws.services.lambda.AWSLambdaClient;
+import com.amazonaws.services.lambda.AWSLambda;
 import com.amazonaws.services.lambda.invoke.LambdaFunctionNameResolver;
 import com.amazonaws.services.lambda.invoke.LambdaInvokerFactory;
 import com.jrestless.aws.service.io.DefaultServiceResponse;
@@ -26,7 +26,7 @@ public class FeignLambdaServiceInvokerClientTest {
 
 	private static final String FUNCTION_NAME = "someFunctionName";
 
-	private AWSLambdaClient lambdaClient = mock(AWSLambdaClient.class);
+	private AWSLambda lambdaClient = mock(AWSLambda.class);
 
 	private LambdaInvokerFactory.Builder lambdaInvokerFactoryBuilder;
 	private LambdaInvokerService service = mock(LambdaInvokerService.class);
@@ -53,7 +53,7 @@ public class FeignLambdaServiceInvokerClientTest {
 
 	@Test
 	public void init_LambdaClientGiven_ShouldUseOnInvocationBuilder() {
-		AWSLambdaClient myLambdaClient = mock(AWSLambdaClient.class);
+		AWSLambda myLambdaClient = mock(AWSLambda.class);
 		FeignLambdaServiceInvokerClient invokerClient = init(myLambdaClient, FUNCTION_NAME, null, null);
 		verify(lambdaInvokerFactoryBuilder).lambdaClient(myLambdaClient);
 		verify(lambdaInvokerFactoryBuilder).lambdaFunctionNameResolver(eqFn(FUNCTION_NAME));
@@ -124,7 +124,7 @@ public class FeignLambdaServiceInvokerClientTest {
 			.getInvokerService());
 	}
 
-	FeignLambdaServiceInvokerClient init(AWSLambdaClient awsLambdaClient, String functionName, String functionAlias,
+	FeignLambdaServiceInvokerClient init(AWSLambda awsLambdaClient, String functionName, String functionAlias,
 			String functionVersion) {
 		FeignLambdaServiceInvokerClient lambdaClient = new FeignLambdaServiceInvokerClient(lambdaInvokerFactoryBuilder,
 				awsLambdaClient, functionName, functionAlias, functionVersion);
