@@ -19,6 +19,6 @@ jacocoTestReport {
 
 sonarqube {
     properties {
-        property 'sonar.exclusions', 'com/jrestless/test/guava/testing/**'
+        property 'sonar.exclusions', 'src/main/java/com/jrestless/test/guava/testing/*'
     }
 }
