@@ -143,6 +143,12 @@ subprojects {
         }
     }
 	check.dependsOn jacocoTestReport
+	sonarqube {
+		properties {
+			property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/test.exec"
+			property "sonar.junit.reportsPath", "${project.buildDir}/test-results"
+		}
+	}
 
 	// custom tasks for creating source/javadoc jars
 	task sourcesJar(type: Jar, dependsOn: classes) {
