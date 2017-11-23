@@ -16,3 +16,9 @@ jacocoTestReport {
         })
     }
 }
+
+sonarqube {
+    properties {
+        property 'sonar.exclusions', 'com/jrestless/test/guava/testing/**'
+    }
+}
