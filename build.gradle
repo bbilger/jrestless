@@ -146,7 +146,7 @@ subprojects {
 	sonarqube {
 		properties {
 			property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/test.exec"
-			property "sonar.junit.reportsPath", "${project.buildDir}/test-results"
+			property "sonar.junit.reportsPath", "${project.buildDir}/test-results/junit-platform"
 		}
 	}
 
