@@ -13,7 +13,7 @@ buildscript {
 	dependencies {
 		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
 		classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.1'
-		classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.2'
+		classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.3'
 	}
 	dependencies {
 		classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
@@ -91,8 +91,8 @@ subprojects {
 		jsonassert: 'org.skyscreamer:jsonassert:1.5.0',
 		gson: 'com.google.code.gson:gson:2.8.2'
 	]
-	
-	// common dependencies 
+
+	// common dependencies
 	dependencies {
 		testCompile(
 			libraries.junit_jupiter_api,
